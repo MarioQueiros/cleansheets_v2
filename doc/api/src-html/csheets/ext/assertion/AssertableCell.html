@@ -1,0 +1,419 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    /*<a name="line.1"></a>
+<FONT color="green">002</FONT>     * Copyright (c) 2005 Peter Palotas, Fredrik Johansson, Einar Pehrson,<a name="line.2"></a>
+<FONT color="green">003</FONT>     * Sebastian Kekkonen, Lars Magnus Lång, Malin Johansson and Sofia Nilsson<a name="line.3"></a>
+<FONT color="green">004</FONT>     *<a name="line.4"></a>
+<FONT color="green">005</FONT>     * This file is part of<a name="line.5"></a>
+<FONT color="green">006</FONT>     * CleanSheets Extension for Assertions<a name="line.6"></a>
+<FONT color="green">007</FONT>     *<a name="line.7"></a>
+<FONT color="green">008</FONT>     * CleanSheets Extension for Assertions is free software; you can<a name="line.8"></a>
+<FONT color="green">009</FONT>     * redistribute it and/or modify it under the terms of the GNU General Public<a name="line.9"></a>
+<FONT color="green">010</FONT>     * License as published by the Free Software Foundation; either version 2 of<a name="line.10"></a>
+<FONT color="green">011</FONT>     * the License, or (at your option) any later version.<a name="line.11"></a>
+<FONT color="green">012</FONT>     *<a name="line.12"></a>
+<FONT color="green">013</FONT>     * CleanSheets Extension for Assertions is distributed in the hope that<a name="line.13"></a>
+<FONT color="green">014</FONT>     * it will be useful, but WITHOUT ANY WARRANTY; without even the implied<a name="line.14"></a>
+<FONT color="green">015</FONT>     * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<a name="line.15"></a>
+<FONT color="green">016</FONT>     * See the GNU General Public License for more details.<a name="line.16"></a>
+<FONT color="green">017</FONT>     *<a name="line.17"></a>
+<FONT color="green">018</FONT>     * You should have received a copy of the GNU General Public License<a name="line.18"></a>
+<FONT color="green">019</FONT>     * along with CleanSheets Extension for Assertions; if not, write to the<a name="line.19"></a>
+<FONT color="green">020</FONT>     * Free Software Foundation, Inc., 59 Temple Place, Suite 330,<a name="line.20"></a>
+<FONT color="green">021</FONT>     * Boston, MA  02111-1307  USA<a name="line.21"></a>
+<FONT color="green">022</FONT>     */<a name="line.22"></a>
+<FONT color="green">023</FONT>    package csheets.ext.assertion;<a name="line.23"></a>
+<FONT color="green">024</FONT>    <a name="line.24"></a>
+<FONT color="green">025</FONT>    import java.io.IOException;<a name="line.25"></a>
+<FONT color="green">026</FONT>    import java.util.ArrayList;<a name="line.26"></a>
+<FONT color="green">027</FONT>    import java.util.List;<a name="line.27"></a>
+<FONT color="green">028</FONT>    <a name="line.28"></a>
+<FONT color="green">029</FONT>    import csheets.core.Cell;<a name="line.29"></a>
+<FONT color="green">030</FONT>    import csheets.core.Value;<a name="line.30"></a>
+<FONT color="green">031</FONT>    import csheets.ext.CellExtension;<a name="line.31"></a>
+<FONT color="green">032</FONT>    <a name="line.32"></a>
+<FONT color="green">033</FONT>    /**<a name="line.33"></a>
+<FONT color="green">034</FONT>     * An extension of a cell in a spreadsheet, with support for assertions.<a name="line.34"></a>
+<FONT color="green">035</FONT>     * @author Peter Palotas<a name="line.35"></a>
+<FONT color="green">036</FONT>     * @author Fredrik Johansson<a name="line.36"></a>
+<FONT color="green">037</FONT>     * @author Einar Pehrson<a name="line.37"></a>
+<FONT color="green">038</FONT>     */<a name="line.38"></a>
+<FONT color="green">039</FONT>    public class AssertableCell extends CellExtension {<a name="line.39"></a>
+<FONT color="green">040</FONT>    <a name="line.40"></a>
+<FONT color="green">041</FONT>            /** The unique version identifier used for serialization */<a name="line.41"></a>
+<FONT color="green">042</FONT>            private static final long serialVersionUID = 4956240183977127091L;<a name="line.42"></a>
+<FONT color="green">043</FONT>    <a name="line.43"></a>
+<FONT color="green">044</FONT>            /** The cell's user-specified assertion */<a name="line.44"></a>
+<FONT color="green">045</FONT>        private USAssertion usAssertion;<a name="line.45"></a>
+<FONT color="green">046</FONT>    <a name="line.46"></a>
+<FONT color="green">047</FONT>        /** The cell's system-generated assertion */<a name="line.47"></a>
+<FONT color="green">048</FONT>        private SGAssertion sgAssertion;<a name="line.48"></a>
+<FONT color="green">049</FONT>    <a name="line.49"></a>
+<FONT color="green">050</FONT>            /** The listeners registered to receive events from the assertable cell */<a name="line.50"></a>
+<FONT color="green">051</FONT>            private transient List&lt;AssertableCellListener&gt; listeners<a name="line.51"></a>
+<FONT color="green">052</FONT>                    = new ArrayList&lt;AssertableCellListener&gt;();<a name="line.52"></a>
+<FONT color="green">053</FONT>    <a name="line.53"></a>
+<FONT color="green">054</FONT>            /**<a name="line.54"></a>
+<FONT color="green">055</FONT>             * A flag that, when set, indicates that the system-generated assertion is<a name="line.55"></a>
+<FONT color="green">056</FONT>             * &lt;code&gt;null&lt;/code&gt; because of a mathematical error.<a name="line.56"></a>
+<FONT color="green">057</FONT>             */<a name="line.57"></a>
+<FONT color="green">058</FONT>            private boolean mathError;<a name="line.58"></a>
+<FONT color="green">059</FONT>    <a name="line.59"></a>
+<FONT color="green">060</FONT>            /**<a name="line.60"></a>
+<FONT color="green">061</FONT>             * A short description of a possible existing math-error occuring when<a name="line.61"></a>
+<FONT color="green">062</FONT>             * generating the system-generated assertion.<a name="line.62"></a>
+<FONT color="green">063</FONT>             */<a name="line.63"></a>
+<FONT color="green">064</FONT>            private String mathErrorMsg;<a name="line.64"></a>
+<FONT color="green">065</FONT>    <a name="line.65"></a>
+<FONT color="green">066</FONT>            /**<a name="line.66"></a>
+<FONT color="green">067</FONT>             * Creates a assertable cell extension for the given cell.<a name="line.67"></a>
+<FONT color="green">068</FONT>             * @param cell the cell to extend<a name="line.68"></a>
+<FONT color="green">069</FONT>             */<a name="line.69"></a>
+<FONT color="green">070</FONT>            AssertableCell(Cell cell) {<a name="line.70"></a>
+<FONT color="green">071</FONT>                    super(cell, AssertionExtension.NAME);<a name="line.71"></a>
+<FONT color="green">072</FONT>            }<a name="line.72"></a>
+<FONT color="green">073</FONT>    <a name="line.73"></a>
+<FONT color="green">074</FONT>    <a name="line.74"></a>
+<FONT color="green">075</FONT>    /*<a name="line.75"></a>
+<FONT color="green">076</FONT>     * DATA UPDATES<a name="line.76"></a>
+<FONT color="green">077</FONT>     */<a name="line.77"></a>
+<FONT color="green">078</FONT>    <a name="line.78"></a>
+<FONT color="green">079</FONT>    <a name="line.79"></a>
+<FONT color="green">080</FONT>            public void contentChanged(Cell cell) {<a name="line.80"></a>
+<FONT color="green">081</FONT>                    if (getFormula() != null &amp;&amp; !getFormula().getReferences().isEmpty())<a name="line.81"></a>
+<FONT color="green">082</FONT>                            generateAssertion();<a name="line.82"></a>
+<FONT color="green">083</FONT>                    else {<a name="line.83"></a>
+<FONT color="green">084</FONT>                            sgAssertion = null;<a name="line.84"></a>
+<FONT color="green">085</FONT>                            for (Cell depCell : getDependents())<a name="line.85"></a>
+<FONT color="green">086</FONT>                                    ((AssertableCell)depCell).generateAssertion();<a name="line.86"></a>
+<FONT color="green">087</FONT>                    }<a name="line.87"></a>
+<FONT color="green">088</FONT>            }<a name="line.88"></a>
+<FONT color="green">089</FONT>    <a name="line.89"></a>
+<FONT color="green">090</FONT>    <a name="line.90"></a>
+<FONT color="green">091</FONT>    /*<a name="line.91"></a>
+<FONT color="green">092</FONT>     * ASSERTIONS ACCESSORS<a name="line.92"></a>
+<FONT color="green">093</FONT>     */<a name="line.93"></a>
+<FONT color="green">094</FONT>    <a name="line.94"></a>
+<FONT color="green">095</FONT>    <a name="line.95"></a>
+<FONT color="green">096</FONT>            /**<a name="line.96"></a>
+<FONT color="green">097</FONT>             * Get the cell's user supplied assertion.<a name="line.97"></a>
+<FONT color="green">098</FONT>             * @return The user supplied assertion for the cell or &lt;code&gt;null&lt;/code&gt; if no user<a name="line.98"></a>
+<FONT color="green">099</FONT>             supplied assertion exists.<a name="line.99"></a>
+<FONT color="green">100</FONT>            */<a name="line.100"></a>
+<FONT color="green">101</FONT>            public USAssertion getUSAssertion() {<a name="line.101"></a>
+<FONT color="green">102</FONT>                    return usAssertion;<a name="line.102"></a>
+<FONT color="green">103</FONT>            }<a name="line.103"></a>
+<FONT color="green">104</FONT>    <a name="line.104"></a>
+<FONT color="green">105</FONT>            /** Get the cell's system generated assertion.<a name="line.105"></a>
+<FONT color="green">106</FONT>                    @return The system generated assertion for the cell or &lt;code&gt;null&lt;/code&gt; if no<a name="line.106"></a>
+<FONT color="green">107</FONT>                    system generated assertion exist. */<a name="line.107"></a>
+<FONT color="green">108</FONT>            public SGAssertion getSGAssertion() {<a name="line.108"></a>
+<FONT color="green">109</FONT>                    return sgAssertion;<a name="line.109"></a>
+<FONT color="green">110</FONT>            }<a name="line.110"></a>
+<FONT color="green">111</FONT>    <a name="line.111"></a>
+<FONT color="green">112</FONT>            /** Get the most significant assertion of the cell. This is currently the<a name="line.112"></a>
+<FONT color="green">113</FONT>                    System Generated Assertion if one exists, and the user supplied assertion otherwise.<a name="line.113"></a>
+<FONT color="green">114</FONT>                    @return the most significant assertion if one exists, or &lt;code&gt;null&lt;/code&gt; otherwise. */<a name="line.114"></a>
+<FONT color="green">115</FONT>            public Assertion getPriorityAssertion() {<a name="line.115"></a>
+<FONT color="green">116</FONT>                    if (isSGAsserted())<a name="line.116"></a>
+<FONT color="green">117</FONT>                            return getSGAssertion();<a name="line.117"></a>
+<FONT color="green">118</FONT>    <a name="line.118"></a>
+<FONT color="green">119</FONT>                    if (isUSAsserted())<a name="line.119"></a>
+<FONT color="green">120</FONT>                            return getUSAssertion();<a name="line.120"></a>
+<FONT color="green">121</FONT>    <a name="line.121"></a>
+<FONT color="green">122</FONT>                    return null;<a name="line.122"></a>
+<FONT color="green">123</FONT>            }<a name="line.123"></a>
+<FONT color="green">124</FONT>    <a name="line.124"></a>
+<FONT color="green">125</FONT>            /**<a name="line.125"></a>
+<FONT color="green">126</FONT>             * Returns whether the cell has an assertion.<a name="line.126"></a>
+<FONT color="green">127</FONT>             * @return true if the cell has an assertion<a name="line.127"></a>
+<FONT color="green">128</FONT>             */<a name="line.128"></a>
+<FONT color="green">129</FONT>            public boolean isAsserted() {<a name="line.129"></a>
+<FONT color="green">130</FONT>                    return isUSAsserted() || isSGAsserted();<a name="line.130"></a>
+<FONT color="green">131</FONT>            }<a name="line.131"></a>
+<FONT color="green">132</FONT>    <a name="line.132"></a>
+<FONT color="green">133</FONT>            /** Checks if the cell has a user supplied assertion associated with it.<a name="line.133"></a>
+<FONT color="green">134</FONT>                    @return &lt;code&gt;true&lt;/code&gt; if the cell has a user supplied assertion associated with it, &lt;code&gt;false&lt;/code&gt; otherwise. */<a name="line.134"></a>
+<FONT color="green">135</FONT>            public boolean isUSAsserted() {<a name="line.135"></a>
+<FONT color="green">136</FONT>                    return usAssertion != null;<a name="line.136"></a>
+<FONT color="green">137</FONT>            }<a name="line.137"></a>
+<FONT color="green">138</FONT>    <a name="line.138"></a>
+<FONT color="green">139</FONT>            /** Checks if the cell has a system generated assertion associated with it.<a name="line.139"></a>
+<FONT color="green">140</FONT>                    @return &lt;code&gt;true&lt;/code&gt; if the cell has a system generated assertion associated with it, &lt;code&gt;false&lt;/code&gt; otherwise. */<a name="line.140"></a>
+<FONT color="green">141</FONT>            public boolean isSGAsserted() {<a name="line.141"></a>
+<FONT color="green">142</FONT>                    return sgAssertion != null;<a name="line.142"></a>
+<FONT color="green">143</FONT>            }<a name="line.143"></a>
+<FONT color="green">144</FONT>    <a name="line.144"></a>
+<FONT color="green">145</FONT>    <a name="line.145"></a>
+<FONT color="green">146</FONT>    /*<a name="line.146"></a>
+<FONT color="green">147</FONT>     * ASSERTION MODIFIERS<a name="line.147"></a>
+<FONT color="green">148</FONT>     */<a name="line.148"></a>
+<FONT color="green">149</FONT>    <a name="line.149"></a>
+<FONT color="green">150</FONT>    <a name="line.150"></a>
+<FONT color="green">151</FONT>            /**<a name="line.151"></a>
+<FONT color="green">152</FONT>             * Sets the user-specified assertion for the cell.<a name="line.152"></a>
+<FONT color="green">153</FONT>             * @param assertion the user-specified assertion<a name="line.153"></a>
+<FONT color="green">154</FONT>             */<a name="line.154"></a>
+<FONT color="green">155</FONT>            public void setUSAssertion(USAssertion assertion) {<a name="line.155"></a>
+<FONT color="green">156</FONT>                    this.usAssertion = assertion;<a name="line.156"></a>
+<FONT color="green">157</FONT>                    // Notifies listeners<a name="line.157"></a>
+<FONT color="green">158</FONT>                    fireAssertionsChanged();<a name="line.158"></a>
+<FONT color="green">159</FONT>    <a name="line.159"></a>
+<FONT color="green">160</FONT>                    // Notifies all depending SGAssertions if this cell has no SGAssertion<a name="line.160"></a>
+<FONT color="green">161</FONT>                    if (sgAssertion == null)<a name="line.161"></a>
+<FONT color="green">162</FONT>                            for (Cell cell : getDependents())<a name="line.162"></a>
+<FONT color="green">163</FONT>                                    ((AssertableCell)cell).generateAssertion();<a name="line.163"></a>
+<FONT color="green">164</FONT>            }<a name="line.164"></a>
+<FONT color="green">165</FONT>    <a name="line.165"></a>
+<FONT color="green">166</FONT>            /**<a name="line.166"></a>
+<FONT color="green">167</FONT>             * Invoked to indicate that the content of the cell in the spreadsheet was<a name="line.167"></a>
+<FONT color="green">168</FONT>             * modified and that assertions that depend on that data must be updated.<a name="line.168"></a>
+<FONT color="green">169</FONT>             */<a name="line.169"></a>
+<FONT color="green">170</FONT>            public void generateAssertion() {<a name="line.170"></a>
+<FONT color="green">171</FONT>                    if (getFormula() != null &amp;&amp; !getFormula().hasCircularReference()) {<a name="line.171"></a>
+<FONT color="green">172</FONT>                            // For debugging purposes only<a name="line.172"></a>
+<FONT color="green">173</FONT>                            // System.out.println("Update SGA for cell: " + this);<a name="line.173"></a>
+<FONT color="green">174</FONT>    <a name="line.174"></a>
+<FONT color="green">175</FONT>                            try {<a name="line.175"></a>
+<FONT color="green">176</FONT>                                    sgAssertion = new SGAssertion(this);<a name="line.176"></a>
+<FONT color="green">177</FONT>                                    mathError = false;<a name="line.177"></a>
+<FONT color="green">178</FONT>                                    mathErrorMsg = null;<a name="line.178"></a>
+<FONT color="green">179</FONT>                            } catch (AssertionArithmeticException e) {<a name="line.179"></a>
+<FONT color="green">180</FONT>                                    // For debugging purposes only<a name="line.180"></a>
+<FONT color="green">181</FONT>                                    //e.printStackTrace();<a name="line.181"></a>
+<FONT color="green">182</FONT>    <a name="line.182"></a>
+<FONT color="green">183</FONT>                                    sgAssertion = null;<a name="line.183"></a>
+<FONT color="green">184</FONT>                                    mathError = false;<a name="line.184"></a>
+<FONT color="green">185</FONT>                                    mathErrorMsg = null;<a name="line.185"></a>
+<FONT color="green">186</FONT>                            } catch (MathException e) {<a name="line.186"></a>
+<FONT color="green">187</FONT>                                    // Division by zero error<a name="line.187"></a>
+<FONT color="green">188</FONT>                                    mathErrorMsg = e.getMessage();<a name="line.188"></a>
+<FONT color="green">189</FONT>                                    mathError = true;<a name="line.189"></a>
+<FONT color="green">190</FONT>                                    sgAssertion = null;<a name="line.190"></a>
+<FONT color="green">191</FONT>                            }<a name="line.191"></a>
+<FONT color="green">192</FONT>    <a name="line.192"></a>
+<FONT color="green">193</FONT>                            for (Cell cell : getDependents())<a name="line.193"></a>
+<FONT color="green">194</FONT>                                    ((AssertableCell)cell).generateAssertion();<a name="line.194"></a>
+<FONT color="green">195</FONT>    <a name="line.195"></a>
+<FONT color="green">196</FONT>                            // Notifies listeners<a name="line.196"></a>
+<FONT color="green">197</FONT>                            fireAssertionsChanged();<a name="line.197"></a>
+<FONT color="green">198</FONT>                    }<a name="line.198"></a>
+<FONT color="green">199</FONT>            }<a name="line.199"></a>
+<FONT color="green">200</FONT>    <a name="line.200"></a>
+<FONT color="green">201</FONT>    <a name="line.201"></a>
+<FONT color="green">202</FONT>    /*<a name="line.202"></a>
+<FONT color="green">203</FONT>     * ASSERTING<a name="line.203"></a>
+<FONT color="green">204</FONT>     */<a name="line.204"></a>
+<FONT color="green">205</FONT>    <a name="line.205"></a>
+<FONT color="green">206</FONT>    <a name="line.206"></a>
+<FONT color="green">207</FONT>            /** Asserts the current value of the cell using the user supplied assertion associated with the cell.<a name="line.207"></a>
+<FONT color="green">208</FONT>                    @return the result of the assertion. If no assertion exists, &lt;code&gt;Assertion.Result.OK&lt;/code&gt; is returned.<a name="line.208"></a>
+<FONT color="green">209</FONT>                    @see USAssertion#validate(Value) */<a name="line.209"></a>
+<FONT color="green">210</FONT>            public Assertion.Result assertUS() {<a name="line.210"></a>
+<FONT color="green">211</FONT>                    return assertUS(getValue());<a name="line.211"></a>
+<FONT color="green">212</FONT>            }<a name="line.212"></a>
+<FONT color="green">213</FONT>    <a name="line.213"></a>
+<FONT color="green">214</FONT>            /** Asserts the specified value using the user supplied assertion associated with the cell.<a name="line.214"></a>
+<FONT color="green">215</FONT>                    @return the result of the assertion. If no assertion exists, &lt;code&gt;Assertion.Result.OK&lt;/code&gt; is returned.<a name="line.215"></a>
+<FONT color="green">216</FONT>                    @see USAssertion#validate(Value) */<a name="line.216"></a>
+<FONT color="green">217</FONT>            public Assertion.Result assertUS(Value value) {<a name="line.217"></a>
+<FONT color="green">218</FONT>                    if (usAssertion != null)<a name="line.218"></a>
+<FONT color="green">219</FONT>                            return usAssertion.validate(value);<a name="line.219"></a>
+<FONT color="green">220</FONT>    <a name="line.220"></a>
+<FONT color="green">221</FONT>                    // If no assertion exist, the value is okay.<a name="line.221"></a>
+<FONT color="green">222</FONT>                    return Assertion.Result.OK;<a name="line.222"></a>
+<FONT color="green">223</FONT>            }<a name="line.223"></a>
+<FONT color="green">224</FONT>    <a name="line.224"></a>
+<FONT color="green">225</FONT>            /** Asserts the current value of the cell using the system generated assertion associated with the cell.<a name="line.225"></a>
+<FONT color="green">226</FONT>                    @return the result of the assertion. If no assertion exists, &lt;code&gt;Assertion.Result.OK&lt;/code&gt; is returned.<a name="line.226"></a>
+<FONT color="green">227</FONT>                    @see SGAssertion#validate(Value) */<a name="line.227"></a>
+<FONT color="green">228</FONT>            public Assertion.Result assertSG() {<a name="line.228"></a>
+<FONT color="green">229</FONT>                    return assertSG(getValue());<a name="line.229"></a>
+<FONT color="green">230</FONT>            }<a name="line.230"></a>
+<FONT color="green">231</FONT>    <a name="line.231"></a>
+<FONT color="green">232</FONT>            /** Asserts the specified value using the system generated assertion associated with the cell.<a name="line.232"></a>
+<FONT color="green">233</FONT>                    @return the result of the assertion. If no assertion exists, &lt;code&gt;Assertion.Result.OK&lt;/code&gt; is returned.<a name="line.233"></a>
+<FONT color="green">234</FONT>                    @see SGAssertion#validate(Value) */<a name="line.234"></a>
+<FONT color="green">235</FONT>            public Assertion.Result assertSG(Value value) {<a name="line.235"></a>
+<FONT color="green">236</FONT>                    if (sgAssertion != null)<a name="line.236"></a>
+<FONT color="green">237</FONT>                            return sgAssertion.validate(value);<a name="line.237"></a>
+<FONT color="green">238</FONT>    <a name="line.238"></a>
+<FONT color="green">239</FONT>                    // If no assertion exist, the value is okay.<a name="line.239"></a>
+<FONT color="green">240</FONT>                    return Assertion.Result.OK;<a name="line.240"></a>
+<FONT color="green">241</FONT>            }<a name="line.241"></a>
+<FONT color="green">242</FONT>    <a name="line.242"></a>
+<FONT color="green">243</FONT>            /** Asserts the specified value using any (or both) assertion(s) associated with the cell.<a name="line.243"></a>
+<FONT color="green">244</FONT>                    The system generated assertion (if available) will be run first and upon error its return<a name="line.244"></a>
+<FONT color="green">245</FONT>                    code will be returned. If the value was successfully asserted using the system generated<a name="line.245"></a>
+<FONT color="green">246</FONT>                    assertion then the value will be asserted using the user supplied assertion, and its<a name="line.246"></a>
+<FONT color="green">247</FONT>                    return code will be returned.  If no assertion is available in the cell &lt;code&gt;Assertion.Result.OK&lt;/code&gt;<a name="line.247"></a>
+<FONT color="green">248</FONT>                    will be returned.<a name="line.248"></a>
+<FONT color="green">249</FONT>                    @return the success status of the assertion.<a name="line.249"></a>
+<FONT color="green">250</FONT>                    @see USAssertion#validate(Value) */<a name="line.250"></a>
+<FONT color="green">251</FONT>            public Assertion.Result assertAny(Value value) {<a name="line.251"></a>
+<FONT color="green">252</FONT>                    Assertion.Result res = Assertion.Result.OK;<a name="line.252"></a>
+<FONT color="green">253</FONT>    <a name="line.253"></a>
+<FONT color="green">254</FONT>                    if (isSGAsserted()) {<a name="line.254"></a>
+<FONT color="green">255</FONT>                            res = assertSG(value);<a name="line.255"></a>
+<FONT color="green">256</FONT>                    }<a name="line.256"></a>
+<FONT color="green">257</FONT>    <a name="line.257"></a>
+<FONT color="green">258</FONT>                    if (res == Assertion.Result.OK &amp;&amp; isUSAsserted()) {<a name="line.258"></a>
+<FONT color="green">259</FONT>                            res = assertUS(value);<a name="line.259"></a>
+<FONT color="green">260</FONT>                    }<a name="line.260"></a>
+<FONT color="green">261</FONT>    <a name="line.261"></a>
+<FONT color="green">262</FONT>                    return res;<a name="line.262"></a>
+<FONT color="green">263</FONT>            }<a name="line.263"></a>
+<FONT color="green">264</FONT>    <a name="line.264"></a>
+<FONT color="green">265</FONT>            /** Asserts the current value of the cell using any (or both) assertion(s) associated with the cell.<a name="line.265"></a>
+<FONT color="green">266</FONT>                    The system generated assertion (if available) will be run first and upon error its return<a name="line.266"></a>
+<FONT color="green">267</FONT>                    code will be returned. If the value was successfully asserted using the system generated<a name="line.267"></a>
+<FONT color="green">268</FONT>                    assertion then the value will be asserted using the user supplied assertion, and its<a name="line.268"></a>
+<FONT color="green">269</FONT>                    return code will be returned.  If no assertion is available in the cell &lt;code&gt;Assertion.Result.OK&lt;/code&gt;<a name="line.269"></a>
+<FONT color="green">270</FONT>                    will be returned.<a name="line.270"></a>
+<FONT color="green">271</FONT>                    @return the success status of the assertion.<a name="line.271"></a>
+<FONT color="green">272</FONT>                    @see USAssertion#validate(Value) */<a name="line.272"></a>
+<FONT color="green">273</FONT>            public Assertion.Result assertAny() {<a name="line.273"></a>
+<FONT color="green">274</FONT>                    return assertAny(getValue());<a name="line.274"></a>
+<FONT color="green">275</FONT>            }<a name="line.275"></a>
+<FONT color="green">276</FONT>    <a name="line.276"></a>
+<FONT color="green">277</FONT>            /** Checks wether the assertions associated with the cell agree with each other and<a name="line.277"></a>
+<FONT color="green">278</FONT>                that no division by zero can occur using values within this assertion.<a name="line.278"></a>
+<FONT color="green">279</FONT>                @return<a name="line.279"></a>
+<FONT color="green">280</FONT>                            &lt;ul&gt;<a name="line.280"></a>
+<FONT color="green">281</FONT>                            &lt;li&gt;&lt;code&gt;Assertion.ComparisonResult.OK&lt;/code&gt; if both the SGA and USA are specified for the cell and are equal &lt;i&gt;or&lt;/i&gt;<a name="line.281"></a>
+<FONT color="green">282</FONT>                            if none or only one of them is specified, AND the system generated assertion did not fail to<a name="line.282"></a>
+<FONT color="green">283</FONT>                            generate because it would include a division by zero error.<a name="line.283"></a>
+<FONT color="green">284</FONT>                            &lt;li&gt;&lt;code&gt;Assertion.ComparisonResult.NON_EQUAL&lt;/code&gt; if the SGA and USA are both specified and do not agree with each other.<a name="line.284"></a>
+<FONT color="green">285</FONT>                            &lt;li&gt;&lt;code&gt;Assertion.ComparisonResult.DIV_BY_ZERO&lt;/code&gt; if the SGA failed to be generated because it would lead to<a name="line.285"></a>
+<FONT color="green">286</FONT>                                    a division by zero error, either because of errenous assertions in precedents or an errenous<a name="line.286"></a>
+<FONT color="green">287</FONT>                                    formula in the cell.<a name="line.287"></a>
+<FONT color="green">288</FONT>                                    &lt;/ul&gt;<a name="line.288"></a>
+<FONT color="green">289</FONT>                             */<a name="line.289"></a>
+<FONT color="green">290</FONT>            public Assertion.ComparisonResult assertAssertions() {<a name="line.290"></a>
+<FONT color="green">291</FONT>    <a name="line.291"></a>
+<FONT color="green">292</FONT>                    if (!isSGAsserted() &amp;&amp; mathError) {<a name="line.292"></a>
+<FONT color="green">293</FONT>                            Assertion.ComparisonResult errorResult = Assertion.ComparisonResult.ILLEGAL_INTERVAL;<a name="line.293"></a>
+<FONT color="green">294</FONT>                            errorResult.setErrorMsg(mathErrorMsg);<a name="line.294"></a>
+<FONT color="green">295</FONT>                            return errorResult;<a name="line.295"></a>
+<FONT color="green">296</FONT>                    }<a name="line.296"></a>
+<FONT color="green">297</FONT>    <a name="line.297"></a>
+<FONT color="green">298</FONT>                    if (isSGAsserted() &amp;&amp; isUSAsserted())<a name="line.298"></a>
+<FONT color="green">299</FONT>                            return sgAssertion.equals(usAssertion) ? Assertion.ComparisonResult.OK : Assertion.ComparisonResult.NON_EQUAL;<a name="line.299"></a>
+<FONT color="green">300</FONT>    <a name="line.300"></a>
+<FONT color="green">301</FONT>                    return Assertion.ComparisonResult.OK;<a name="line.301"></a>
+<FONT color="green">302</FONT>            }<a name="line.302"></a>
+<FONT color="green">303</FONT>    <a name="line.303"></a>
+<FONT color="green">304</FONT>            /** Checks wether there are any errors or inconsitencies in the cell related<a name="line.304"></a>
+<FONT color="green">305</FONT>                    to assertions.<a name="line.305"></a>
+<FONT color="green">306</FONT>                    @return &lt;code&gt;false&lt;/code&gt; if there are no errors that can be found in the cell using<a name="line.306"></a>
+<FONT color="green">307</FONT>                                    assertion related functions, &lt;code&gt;true&lt;/code&gt; otherwise. */<a name="line.307"></a>
+<FONT color="green">308</FONT>            public boolean hasAssertionError() {<a name="line.308"></a>
+<FONT color="green">309</FONT>                    return !((assertAssertions() == Assertion.ComparisonResult.OK) &amp;&amp; (assertAny() == Assertion.Result.OK));<a name="line.309"></a>
+<FONT color="green">310</FONT>            }<a name="line.310"></a>
+<FONT color="green">311</FONT>    <a name="line.311"></a>
+<FONT color="green">312</FONT>    <a name="line.312"></a>
+<FONT color="green">313</FONT>    /*<a name="line.313"></a>
+<FONT color="green">314</FONT>     * EVENT LISTENING SUPPORT<a name="line.314"></a>
+<FONT color="green">315</FONT>     */<a name="line.315"></a>
+<FONT color="green">316</FONT>    <a name="line.316"></a>
+<FONT color="green">317</FONT>    <a name="line.317"></a>
+<FONT color="green">318</FONT>            /**<a name="line.318"></a>
+<FONT color="green">319</FONT>             * Registers the given listener on the cell.<a name="line.319"></a>
+<FONT color="green">320</FONT>             * @param listener the listener to be added<a name="line.320"></a>
+<FONT color="green">321</FONT>             */<a name="line.321"></a>
+<FONT color="green">322</FONT>            public void addAssertableCellListener(AssertableCellListener listener) {<a name="line.322"></a>
+<FONT color="green">323</FONT>                    listeners.add(listener);<a name="line.323"></a>
+<FONT color="green">324</FONT>            }<a name="line.324"></a>
+<FONT color="green">325</FONT>    <a name="line.325"></a>
+<FONT color="green">326</FONT>            /**<a name="line.326"></a>
+<FONT color="green">327</FONT>             * Removes the given listener from the cell.<a name="line.327"></a>
+<FONT color="green">328</FONT>             * @param listener the listener to be removed<a name="line.328"></a>
+<FONT color="green">329</FONT>             */<a name="line.329"></a>
+<FONT color="green">330</FONT>            public void removeAssertableCellListener(AssertableCellListener listener) {<a name="line.330"></a>
+<FONT color="green">331</FONT>                    listeners.remove(listener);<a name="line.331"></a>
+<FONT color="green">332</FONT>            }<a name="line.332"></a>
+<FONT color="green">333</FONT>    <a name="line.333"></a>
+<FONT color="green">334</FONT>            /**<a name="line.334"></a>
+<FONT color="green">335</FONT>             * Notifies all registered listeners that the cell's assertions changed.<a name="line.335"></a>
+<FONT color="green">336</FONT>             */<a name="line.336"></a>
+<FONT color="green">337</FONT>            protected void fireAssertionsChanged() {<a name="line.337"></a>
+<FONT color="green">338</FONT>                    for (AssertableCellListener listener : listeners)<a name="line.338"></a>
+<FONT color="green">339</FONT>                            listener.assertionsChanged(this);<a name="line.339"></a>
+<FONT color="green">340</FONT>            }<a name="line.340"></a>
+<FONT color="green">341</FONT>    <a name="line.341"></a>
+<FONT color="green">342</FONT>            /**<a name="line.342"></a>
+<FONT color="green">343</FONT>             * Customizes serialization, by recreating the listener list.<a name="line.343"></a>
+<FONT color="green">344</FONT>             * @param stream the object input stream from which the object is to be read<a name="line.344"></a>
+<FONT color="green">345</FONT>             * @throws IOException If any of the usual Input/Output related exceptions occur<a name="line.345"></a>
+<FONT color="green">346</FONT>             * @throws ClassNotFoundException If the class of a serialized object cannot be found.<a name="line.346"></a>
+<FONT color="green">347</FONT>             */<a name="line.347"></a>
+<FONT color="green">348</FONT>            private void readObject(java.io.ObjectInputStream stream)<a name="line.348"></a>
+<FONT color="green">349</FONT>                            throws java.io.IOException, ClassNotFoundException {<a name="line.349"></a>
+<FONT color="green">350</FONT>                stream.defaultReadObject();<a name="line.350"></a>
+<FONT color="green">351</FONT>                    listeners = new ArrayList&lt;AssertableCellListener&gt;();<a name="line.351"></a>
+<FONT color="green">352</FONT>            }<a name="line.352"></a>
+<FONT color="green">353</FONT>    }<a name="line.353"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>
