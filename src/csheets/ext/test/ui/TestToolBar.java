@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Jens Schou, Staffan Gustafsson, Björn Lanneskog, 
+ * Copyright (c) 2005 Jens Schou, Staffan Gustafsson, Bjorn Lanneskog, 
  * Einar Pehrson and Sebastian Kekkonen
  *
  * This file is part of
@@ -40,7 +40,7 @@ import csheets.ui.ctrl.SelectionListener;
 
 /**
  * A toolbar that shows information about test cases.
- * @author Lars Magnus "Burken" Lång
+ * @author Lars Magnus "Burken" Lang
  * @author Sebastian Kekkonen
  */
 @SuppressWarnings("serial")

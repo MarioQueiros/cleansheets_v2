@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Jens Schou, Staffan Gustafsson, Björn Lanneskog, 
+ * Copyright (c) 2005 Jens Schou, Staffan Gustafsson, Bjorn Lanneskog, 
  * Einar Pehrson and Sebastian Kekkonen
  *
  * This file is part of
@@ -104,7 +104,7 @@ public class TestCaseParam extends Literal implements Serializable {
 	}
 	
 	public void setType(Type type, boolean toggle) {
-		// TO DO fulhack för att hinna klart i tid
+		// TO DO fulhack for att hinna klart i tid
 		switch(type){
 		case USER_ENTERED:
 			if(toggle)

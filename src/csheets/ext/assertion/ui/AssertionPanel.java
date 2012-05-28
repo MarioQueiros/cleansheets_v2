@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2005 Peter Palotas, Fredrik Johansson, Einar Pehrson,
- * Sebastian Kekkonen, Lars Magnus Lång, Malin Johansson and Sofia Nilsson
+ * Sebastian Kekkonen, Lars Magnus Lang, Malin Johansson and Sofia Nilsson
  *
  * This file is part of
  * CleanSheets Extension for Assertions
@@ -50,7 +50,7 @@ import csheets.ui.ctrl.UIController;
 
 /**
  * A panel for adding or editing an assertion for a cell
- * @author Björn Lanneskog
+ * @author Bjorn Lanneskog
  * @author Einar Pehrson
  */
 @SuppressWarnings("serial")

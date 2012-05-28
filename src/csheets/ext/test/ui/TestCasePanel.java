@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Jens Schou, Staffan Gustafsson, Björn Lanneskog, 
+ * Copyright (c) 2005 Jens Schou, Staffan Gustafsson, Bjorn Lanneskog, 
  * Einar Pehrson and Sebastian Kekkonen
  *
  * This file is part of
@@ -45,7 +45,7 @@ import csheets.ui.ctrl.UIController;
 /**
  * A panel for displaying test cases and providing editing of their validation
  * states.
- * @author Björn Lanneskog
+ * @author Bjorn Lanneskog
  * @author Einar Pehrson
  */
 @SuppressWarnings("serial")

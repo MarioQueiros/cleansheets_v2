@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Jens Schou, Staffan Gustafsson, Björn Lanneskog, 
+ * Copyright (c) 2005 Jens Schou, Staffan Gustafsson, Bjorn Lanneskog, 
  * Einar Pehrson and Sebastian Kekkonen
  *
  * This file is part of

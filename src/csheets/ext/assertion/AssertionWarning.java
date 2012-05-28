@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2005 Peter Palotas, Fredrik Johansson, Einar Pehrson,
- * Sebastian Kekkonen, Lars Magnus Lång, Malin Johansson and Sofia Nilsson
+ * Sebastian Kekkonen, Lars Magnus Lang, Malin Johansson and Sofia Nilsson
  *
  * This file is part of
  * CleanSheets Extension for Assertions

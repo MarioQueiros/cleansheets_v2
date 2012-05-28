@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Jens Schou, Staffan Gustafsson, Björn Lanneskog, 
+ * Copyright (c) 2005 Jens Schou, Staffan Gustafsson, Bjorn Lanneskog, 
  * Einar Pehrson and Sebastian Kekkonen
  *
  * This file is part of
@@ -43,7 +43,7 @@ import csheets.ui.ctrl.UIController;
 
 /**
  * A panel for displaying and providing editing of test case parameters
- * @author Björn Lanneskog
+ * @author Bjorn Lanneskog
  * @author Einar Pehrson
  */
 @SuppressWarnings("serial")
@@ -119,7 +119,7 @@ public class TestCaseParamPanel extends JPanel implements SelectionListener {
 
 	/**
 	 * A table model listener for setting the test case parameters of a cell.
-	 * @author Björn Lanneskog
+	 * @author Bjorn Lanneskog
 	 * @author Einar Pehrson
 	 */
 	protected class TestCaseParamSetter implements TableModelListener {

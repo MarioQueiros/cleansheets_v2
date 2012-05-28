@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Jens Schou, Staffan Gustafsson, Björn Lanneskog, 
+ * Copyright (c) 2005 Jens Schou, Staffan Gustafsson, Bjorn Lanneskog, 
  * Einar Pehrson and Sebastian Kekkonen
  *
  * This file is part of
@@ -30,7 +30,7 @@ import csheets.ext.test.TestCaseParam;
 
 /**
  * The table used to display and provide editing of test case parameters.
- * @author Björn Lanneskog
+ * @author Bjorn Lanneskog
  * @author Einar Pehrson
  */
 @SuppressWarnings("serial")
