@@ -1,3 +1,5 @@
 Hugo: Check
-Joao: Check Mate!
-Mario Done!!! ---
+ !
+Joao: Check !
+Mario: Done !
+Tiago: Check!
