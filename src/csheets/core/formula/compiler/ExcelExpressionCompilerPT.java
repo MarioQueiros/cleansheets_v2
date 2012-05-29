@@ -105,10 +105,8 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
 		// Convert function call
 		Function function = null;
 		try {
-			function = Language.getInstance().getFunction(node.getText());
-		} catch (UnknownElementException e) {
-                throw new FormulaCompilationException(e);
-			}
+			function = Language.getInstance().getFunction_PT(node.getText());
+		} catch (UnknownElementException e) {}
 
 		if (function != null) {
 			List<Expression> args = new ArrayList<Expression>();
@@ -125,12 +123,12 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
 		if (node.getNumberOfChildren() == 1)
 			// Convert unary operation
 			return new UnaryOperation(
-				Language.getInstance().getUnaryOperator(node.getText()),
+				Language.getInstance().getUnaryOperator_PT(node.getText()),
 				convert(cell, node.getFirstChild())
 			);
 		else if (node.getNumberOfChildren() == 2) {
 			// Convert binary operation
-			BinaryOperator operator = Language.getInstance().getBinaryOperator(node.getText());
+			BinaryOperator operator = Language.getInstance().getBinaryOperator_PT(node.getText());
 			if (operator instanceof RangeReference)
 				return new ReferenceOperation(
 					(Reference)convert(cell, node.getFirstChild()),
