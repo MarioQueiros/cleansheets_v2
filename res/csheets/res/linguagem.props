@@ -1,0 +1,44 @@
+# Mathematic functions
+Factorial
+Soma
+
+# # # Numeric functions reflected from java.lang.Math
+#
+# # Trigonometry
+# Sin
+# Sinh
+# Asin
+# Cos
+# Cosh
+# Acos
+# Tan
+# Tanh
+# Atan
+# Atan2
+# Hypot
+#
+# # Powers
+# Pow
+# Sqrt
+# Cbrt
+# Exp
+# Expm1
+# Log
+# Log10
+# Log1p
+#
+# # Rounding
+# Abs
+# Ceil
+# Floor
+# Rint
+# Ieeeremainder
+# Ulp
+#
+# Miscellaneous Mathematic
+# Min
+# Max
+# Signum
+# Random
+# ToDegrees
+# ToDadians
