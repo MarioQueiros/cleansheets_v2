@@ -123,12 +123,12 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
 		if (node.getNumberOfChildren() == 1)
 			// Convert unary operation
 			return new UnaryOperation(
-				Language.getInstance().getUnaryOperator_PT(node.getText()),
+				Language.getInstance().getUnaryOperator(node.getText()),
 				convert(cell, node.getFirstChild())
 			);
 		else if (node.getNumberOfChildren() == 2) {
 			// Convert binary operation
-			BinaryOperator operator = Language.getInstance().getBinaryOperator_PT(node.getText());
+			BinaryOperator operator = Language.getInstance().getBinaryOperator(node.getText());
 			if (operator instanceof RangeReference)
 				return new ReferenceOperation(
 					(Reference)convert(cell, node.getFirstChild()),
