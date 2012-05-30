@@ -1,0 +1,8 @@
+\.orig$
+\.orig\..*$
+\.chg\..*$
+\.rej$
+\.conflict\~$
+syntax: glob
+docs/Log_Gestao_Projecto_aluno1_1100554.xls
+.hg_archival.txt
