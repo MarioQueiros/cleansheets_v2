@@ -174,6 +174,14 @@ public class ConnectFrame extends JFrame{
         pack();
     
     }
+
+    void getArea() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    void getIP() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
     
     
 }
