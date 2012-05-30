@@ -15,9 +15,11 @@ import java.awt.event.ActionEvent;
 public class ClientAction extends BaseAction{
     
     ConnectFrame cFrame = new ConnectFrame();
+    AreaFrame aFrame = new AreaFrame();
     
     public ClientAction() {
         cFrame.setVisible(false);
+        aFrame.setVisible(false);
         
     }
     
@@ -29,9 +31,11 @@ public class ClientAction extends BaseAction{
     @Override
     public void actionPerformed(ActionEvent e) {
         
-        cFrame.setVisible(false);
         cFrame.setVisible(true);
-        
+        cFrame.getIP();
+        cFrame.getArea();
+        aFrame.setVisible(true);
+        aFrame.getFirstCell();
     }
     
 }
