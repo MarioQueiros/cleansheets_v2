@@ -44,15 +44,19 @@ public class Language {
 
 	/** The name of the file in which language properties are stored */
 	private static final String PROPERTIES_FILENAME = "res/language.props";
+        private static final String PROPERTIES_FILENAME_PT = "res/linguagem.props";
 
 	/** The unary operators that are supported by the language */
 	private List<UnaryOperator> unaryOperators = new ArrayList<UnaryOperator>();
-
+      //  private List<UnaryOperator> unaryOperators_PT = new ArrayList<UnaryOperator>();
+        
 	/** The binary operators that are supported by the language */
 	private List<BinaryOperator> binaryOperators = new ArrayList<BinaryOperator>();
-
+      //  private List<BinaryOperator> binaryOperators_PT = new ArrayList<BinaryOperator>();
+        
 	/** The functions that are supported by the language */
 	private List<Function> functions = new ArrayList<Function>();
+        private List<Function> functions_PT = new ArrayList<Function>();
 
 	/**
 	 * Creates a new language.
@@ -60,18 +64,24 @@ public class Language {
 	private Language() {
 		// Loads properties
 		Properties language = new Properties();
+                Properties language_PT = new Properties();
 		InputStream stream = CleanSheets.class.getResourceAsStream(PROPERTIES_FILENAME);
-		if (stream != null) {
+                InputStream stream_PT = CleanSheets.class.getResourceAsStream(PROPERTIES_FILENAME_PT);
+                
+		if (stream != null && stream_PT!=null) {
 			try {
 				language.load(stream);
+                                language_PT.load(stream_PT);
 			} catch (IOException e) {
 				System.err.println("An I/O error occurred when loading language"
-					+ " properties file (" + PROPERTIES_FILENAME + ").");
+					+ " properties file.");
 				return;
 			} finally {
 				try {
 					if (stream != null)
 						stream.close();
+                                        if(stream_PT!=null)
+                                            stream_PT.close();
 				} catch (IOException e) {}
 			}
 
@@ -97,15 +107,41 @@ public class Language {
 				if (UnaryOperator.class.isAssignableFrom(elementClass))
 					unaryOperators.add(UnaryOperator.class.cast(element));
 			}
-		} else
+                        for (Object className : language_PT.keySet()) {
+				// Loads class and instantiates element
+				Class elementClass;
+				Object element;
+				try {
+					elementClass = Class.forName(getClass().getPackage()
+						.getName() + "." + (String)className);
+					element = elementClass.newInstance();
+				} catch (Exception e) {
+					// Skip this element, regardless of what went wrong
+					continue;
+				}
+
+				// Stores element
+				if (Function.class.isAssignableFrom(elementClass))
+					functions_PT.add(Function.class.cast(element));
+			/*	if (BinaryOperator.class.isAssignableFrom(elementClass))
+					binaryOperators_PT.add(BinaryOperator.class.cast(element));
+				if (UnaryOperator.class.isAssignableFrom(elementClass))
+					unaryOperators_PT.add(UnaryOperator.class.cast(element));*/
+			}
+		} else if(stream != null)
 			System.err.println("Could not find language properties file ("
 				+ PROPERTIES_FILENAME + ").");
+                else System.err.println("Não foi possivel encontrar o ficheiro de propriedades da linguagem ("
+				+ PROPERTIES_FILENAME_PT + ").");
 
 		// Loads static methods from java.lang.Math that use double precision
 		for (Method method : Math.class.getMethods())
 			if (Modifier.isStatic(method.getModifiers()) &&
-						method.getReturnType() == Double.TYPE)
-				functions.add(new NumericFunction(method));
+						method.getReturnType() == Double.TYPE){
+				functions.add(new NumericFunction(method)); 
+                                functions_PT.add(new NumericFunction(method));
+                            }
+                
 	}
 
 	/**
@@ -126,6 +162,13 @@ public class Language {
 				return operator; // .clone()
 		throw new UnknownElementException(identifier);
 	}
+        
+      /*  public UnaryOperator getUnaryOperator_PT(String identifier) throws UnknownElementException {
+		for (UnaryOperator operator : unaryOperators_PT)
+			if (identifier.equalsIgnoreCase(operator.getIdentifier()))
+				return operator; // .clone()
+		throw new UnknownElementException(identifier);
+	}*/
 
 	/**
 	 * Returns the binary operator with the given identifier.
@@ -137,6 +180,13 @@ public class Language {
 				return operator; // .clone()
 		throw new UnknownElementException(identifier);
 	}
+        
+       /* public BinaryOperator getBinaryOperator_PT(String identifier) throws UnknownElementException {
+		for (BinaryOperator operator : binaryOperators_PT)
+			if (identifier.equalsIgnoreCase(operator.getIdentifier()))
+				return operator; // .clone()
+		throw new UnknownElementException(identifier);
+	}*/
 
 	/**
 	 * Returns the function with the given identifier.
@@ -144,6 +194,13 @@ public class Language {
 	 */
 	public Function getFunction(String identifier) throws UnknownElementException {
 		for (Function function : functions)
+			if (identifier.equalsIgnoreCase(function.getIdentifier()))
+				return function; // .clone()
+		throw new UnknownElementException(identifier);
+	}
+        
+        public Function getFunction_PT(String identifier) throws UnknownElementException {
+		for (Function function : functions_PT)
 			if (identifier.equalsIgnoreCase(function.getIdentifier()))
 				return function; // .clone()
 		throw new UnknownElementException(identifier);
@@ -160,12 +217,24 @@ public class Language {
 			return false;
 		}
 	}
+        
+        public boolean hasFunction_PT(String identifier) {
+		try {
+			return getFunction_PT(identifier) != null;
+		} catch (UnknownElementException e) {
+			return false;
+		}
+	}
 
 	/**
 	 * Returns the functions that are supported by the syntax.
 	 * @return the functions that are supported by the syntax
 	 */
 	public Function[] getFunctions() {
-		return functions.toArray(new Function[functions.size()]);
+		return functions_PT.toArray(new Function[functions.size()]);
+	}
+        
+        public Function[] getFunctions_PT() {
+		return functions_PT.toArray(new Function[functions.size()]);
 	}
 }
