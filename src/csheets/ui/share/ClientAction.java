@@ -28,9 +28,7 @@ public class ClientAction extends BaseAction{
     @Override
     public void actionPerformed(ActionEvent e) {
         cFrame.setVisible(true);
-        cFrame.getIp();
-        cFrame.getFirstCell();
-        cFrame.getLastCell();
+        
     }
     
 }
