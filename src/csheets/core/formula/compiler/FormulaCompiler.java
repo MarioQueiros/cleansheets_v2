@@ -42,7 +42,6 @@ public class FormulaCompiler {
 
 	/** The name of the file in which compiler properties are stored */
 	private static final String PROPERTIES_FILENAME = "res/compilers.props";
-
 	/** The expression compilers used to compile formulas */
 	private List<ExpressionCompiler> compilers = new ArrayList<ExpressionCompiler>();
 	
