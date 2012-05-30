@@ -18,6 +18,7 @@ public class ClientAction extends BaseAction{
     
     public ClientAction() {
         cFrame.setVisible(false);
+        
     }
     
     @Override
