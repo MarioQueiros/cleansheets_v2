@@ -1,0 +1,5 @@
+Hugo: Check
+ !
+Joao: Check !
+Mario: Done !
+Tiago: Check!
