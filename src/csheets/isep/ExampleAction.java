@@ -35,7 +35,7 @@ public class ExampleAction extends BaseAction {
 	public void actionPerformed(ActionEvent event) {
 
 		// Lets user select a font
-		JOptionPane.showConfirmDialog(null, "Seleccionou o Exemplo. Vou alterar a celula A1...");
+		JOptionPane.showConfirmDialog(null, "Seleccionou o sdgfsdgsffsdg. Vou alterar a celula A1...");
 		
 		// Vamos exemplificar como se acede ao modelo de dominio (o workbook)
 		try {

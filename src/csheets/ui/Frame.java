@@ -37,38 +37,10 @@ import javax.swing.JToolBar;
 
 import csheets.CleanSheets;
 import csheets.core.Workbook;
-import csheets.ui.ctrl.AboutAction;
-import csheets.ui.ctrl.ActionManager;
-import csheets.ui.ctrl.AddSpreadsheetAction;
-import csheets.ui.ctrl.ClearAction;
-import csheets.ui.ctrl.CloseAction;
-import csheets.ui.ctrl.CloseAllAction;
-import csheets.ui.ctrl.CopyAction;
-import csheets.ui.ctrl.CutAction;
-import csheets.ui.ctrl.ExitAction;
-import csheets.ui.ctrl.HelpAction;
-import csheets.ui.ctrl.InsertColumnAction;
-import csheets.ui.ctrl.InsertRowAction;
-import csheets.ui.ctrl.LicenseAction;
-import csheets.ui.ctrl.NewAction;
-import csheets.ui.ctrl.OpenAction;
-import csheets.ui.ctrl.PasteAction;
-import csheets.ui.ctrl.PreferencesAction;
-import csheets.ui.ctrl.PrintAction;
-import csheets.ui.ctrl.RedoAction;
-import csheets.ui.ctrl.RemoveColumnAction;
-import csheets.ui.ctrl.RemoveRowAction;
-import csheets.ui.ctrl.RemoveSpreadsheetAction;
-import csheets.ui.ctrl.RenameSpreadsheetAction;
-import csheets.ui.ctrl.SaveAction;
-import csheets.ui.ctrl.SaveAsAction;
-import csheets.ui.ctrl.SearchAction;
-import csheets.ui.ctrl.SelectAllAction;
-import csheets.ui.ctrl.SelectionEvent;
-import csheets.ui.ctrl.SelectionListener;
-import csheets.ui.ctrl.SortAction;
-import csheets.ui.ctrl.UIController;
-import csheets.ui.ctrl.UndoAction;
+import csheets.ui.ctrl.*;
+import csheets.ui.share.ClientAction;
+import csheets.ui.share.DisconnectAction;
+import csheets.ui.share.HostAction;
 import csheets.ui.ext.UIExtension;
 import csheets.ui.sheet.AddressBox;
 import csheets.ui.sheet.CellEditor;
@@ -138,6 +110,15 @@ public class Frame extends JFrame implements SelectionListener {
 		actionManager.registerAction("help", new HelpAction());
 		actionManager.registerAction("license", new LicenseAction());
 		actionManager.registerAction("about", new AboutAction());
+                
+                // Registers macros actions
+		actionManager.registerAction("Criação de Novas Macros", new MacroAction());
+
+                // Registers page share actions
+                
+		actionManager.registerAction("host", new HostAction());
+		actionManager.registerAction("client", new ClientAction());
+		actionManager.registerAction("disconnect", new DisconnectAction());
 
 		// Creates spreadsheet components
 		WorkbookPane workbookPane = new WorkbookPane(uiController, actionManager);
