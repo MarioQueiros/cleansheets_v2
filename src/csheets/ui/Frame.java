@@ -41,12 +41,15 @@ import csheets.ui.ctrl.AboutAction;
 import csheets.ui.ctrl.ActionManager;
 import csheets.ui.ctrl.AddSpreadsheetAction;
 import csheets.ui.ctrl.ClearAction;
+import csheets.ui.share.ClientAction;
 import csheets.ui.ctrl.CloseAction;
 import csheets.ui.ctrl.CloseAllAction;
 import csheets.ui.ctrl.CopyAction;
 import csheets.ui.ctrl.CutAction;
+import csheets.ui.share.DisconnectAction;
 import csheets.ui.ctrl.ExitAction;
 import csheets.ui.ctrl.HelpAction;
+import csheets.ui.share.HostAction;
 import csheets.ui.ctrl.InsertColumnAction;
 import csheets.ui.ctrl.InsertRowAction;
 import csheets.ui.ctrl.LicenseAction;
@@ -138,6 +141,12 @@ public class Frame extends JFrame implements SelectionListener {
 		actionManager.registerAction("help", new HelpAction());
 		actionManager.registerAction("license", new LicenseAction());
 		actionManager.registerAction("about", new AboutAction());
+                
+                // Registers page share actions
+                
+		actionManager.registerAction("host", new HostAction());
+		actionManager.registerAction("client", new ClientAction());
+		actionManager.registerAction("disconnect", new DisconnectAction());
 
 		// Creates spreadsheet components
 		WorkbookPane workbookPane = new WorkbookPane(uiController, actionManager);
