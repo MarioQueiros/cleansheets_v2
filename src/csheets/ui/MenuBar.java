@@ -166,6 +166,10 @@ public class MenuBar extends JMenuBar {
 		helpMenu.addSeparator();
 		helpMenu.add(actionManager.getAction("license"));
 		helpMenu.add(actionManager.getAction("about"));
+                
+                // Criar o Menu Macros
+		JMenu macrosMenu = addMenu("Macros", KeyEvent.VK_M);
+		macrosMenu.add(actionManager.getAction("Criação de Novas Macros"));
 }
 
 	/**
