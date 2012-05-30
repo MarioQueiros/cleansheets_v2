@@ -38,6 +38,9 @@ import javax.swing.JToolBar;
 import csheets.CleanSheets;
 import csheets.core.Workbook;
 import csheets.ui.ctrl.*;
+import csheets.ui.share.ClientAction;
+import csheets.ui.share.DisconnectAction;
+import csheets.ui.share.HostAction;
 import csheets.ui.ext.UIExtension;
 import csheets.ui.sheet.AddressBox;
 import csheets.ui.sheet.CellEditor;
@@ -111,6 +114,11 @@ public class Frame extends JFrame implements SelectionListener {
                 // Registers macros actions
 		actionManager.registerAction("Criação de Novas Macros", new MacroAction());
 
+                // Registers page share actions
+                
+		actionManager.registerAction("host", new HostAction());
+		actionManager.registerAction("client", new ClientAction());
+		actionManager.registerAction("disconnect", new DisconnectAction());
 
 		// Creates spreadsheet components
 		WorkbookPane workbookPane = new WorkbookPane(uiController, actionManager);
