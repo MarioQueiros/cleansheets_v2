@@ -36,7 +36,7 @@ public class Se implements Function {
 	public static final FunctionParameter[] parameters = new FunctionParameter[] {
 		new FunctionParameter(Value.Type.BOOLEAN, "Condition", false,
 			"A condition to evaluate before proceeding"),
-		new FunctionParameter(Value.Type.UNDEFINED, "Then", false,
+		new FunctionParameter(Value.Type.UNDEFINED, "Fazer", false,
 			"A value to return if the condition was met"),
 		new FunctionParameter(Value.Type.UNDEFINED, "Else", true,
 			"A value to return otherwise")
