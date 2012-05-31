@@ -1,24 +1,26 @@
 package csheets.io;
 
-import csheets.core.*;
-import csheets.ext.style.*;
+import csheets.core.Spreadsheet;
+import csheets.core.Workbook;
+import csheets.core.formula.compiler.FormulaCompilationException;
+import csheets.ext.style.StylableCell;
+import csheets.ext.style.StylableSpreadsheet;
+import csheets.ext.style.StyleExtension;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.*;
-import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import javax.xml.XMLConstants;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import org.xml.sax.InputSource;
+import org.w3c.dom.*;
 
 /**
  *
@@ -39,6 +41,7 @@ public class XMLCodec implements Codec {
     public Workbook read(InputStream stream) throws IOException, ClassNotFoundException {
         String[][] content = null;
         Font font = null;
+        Font fontnew = null;
         Workbook work = new Workbook();
         try {
 
@@ -48,158 +51,185 @@ public class XMLCodec implements Codec {
             //Schema schema = loadSchema("xsd.xsd");
 
             doc.getDocumentElement().normalize();
+            content = new String[MATRIX_WIDTH][MATRIX_HEIGHT];
+
+            for (int i = 0; i < MATRIX_WIDTH; i++) {
+                for (int j = 0; j < MATRIX_HEIGHT; j++) {
+                    content[i][j] = "";
+                }
+            }
             //String validade = validateXML(schema, doc);
 
             //if (validade.equals("true")) {
+//
+//            NodeList nodeLstSP = doc.getElementsByTagName("spreadsheet");
+//            for (int h = 0; h < nodeLstSP.getLength(); h++) {
+//                Node fstNodeSP = nodeLstSP.item(h);
+////                //if (fstNodeSP.getNodeType() == Node.ELEMENT_NODE) {
 
-            NodeList nodeLstSP = doc.getElementsByTagName("spreadsheet");
-            for (int h = 0; h < nodeLstSP.getLength(); h++) {
-                Node fstNodeSP = nodeLstSP.item(h);
-               // if (fstNodeSP.getNodeType() == Node.ELEMENT_NODE) {
+            NodeList nodeLst = doc.getElementsByTagName("row");
+            String rowID = "", columnID = "", contentStr = "";
+            int nLength = nodeLst.getLength();
+            for (int s = 0; s < nLength; s++) {
+                Node fstNode = nodeLst.item(s);
 
-                    NodeList nodeLst = doc.getElementsByTagName("row");
-                    String rowID = "", columnID = "", contentStr = "";
+                if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    content = new String[MATRIX_WIDTH][MATRIX_HEIGHT];
+                    Element fstElmnt = (Element) fstNode;
+//                        NamedNodeMap attrs = fstNode.getAttributes();
+//                        Attr attributeRow;
+//                        attributeRow = (Attr) attrs.item(1);
+//                        rowID = attributeRow.getValue();
+//                        attributeRow = (Attr) attrs.item(0);
+//                        rowHeight = attributeRow.getValue();
+                    NamedNodeMap attrs = fstNode.getAttributes();
+                    Attr attributeRow;
+                    attributeRow = (Attr) attrs.item(0);
+                    rowID = attributeRow.getValue();
+                    NodeList fstNmElmntLst = fstElmnt.getElementsByTagName("column");
+                    int fLength = fstNmElmntLst.getLength();
+                    for (int i = 0; i < fLength; i++) {
 
-                    for (int i = 0; i < MATRIX_WIDTH; i++) {
-                        for (int j = 0; j < MATRIX_HEIGHT; j++) {
-                            content[i][j] = "";
-                        }
+                        Node fstNodeAtri = fstNmElmntLst.item(i);
+                        NamedNodeMap attrsAtr = fstNodeAtri.getAttributes();
+
+                        Attr attribute = (Attr) attrsAtr.item(1);
+                        columnID = attribute.getValue();
+
+                        NodeList fstNmElmntLstCont = fstElmnt.getElementsByTagName("content");
+                        Element fstNmElmnt = (Element) fstNmElmntLstCont.item(i);
+                        NodeList fstNm = fstNmElmnt.getChildNodes();
+                        contentStr = ((Node) fstNm.item(0)).getTextContent();
+                        int col = getPosition(columnID);
+                        content[Integer.parseInt(rowID)][col] = contentStr;
+//                        work.addSpreadsheet(content);
+
+//                        for(int p=0;p<work.getSpreadsheetCount();p++)
+//                        ((StylableCell) work.getSpreadsheet(p).getCell(s, i).getExtension(StyleExtension.NAME)).setFont(font);
                     }
-
-                    for (int s = 0; s < nodeLst.getLength(); s++) {
-                        Node fstNode = nodeLst.item(s);
-
-
-                        Element fstElmnt = (Element) fstNode;
-                        NamedNodeMap attrs = fstNode.getAttributes();
-                        NodeList fstNmElmntLst = fstElmnt.getElementsByTagName("column");
-                        for (int i = 0; i < attrs.getLength(); i++) {
-                            Attr attribute = (Attr) attrs.item(i);
-                            rowID = attribute.getValue();
-                        }
-                        for (int i = 0; i < fstNmElmntLst.getLength(); i++) {
-                            Node fstNodeAtri = fstNmElmntLst.item(i);
-                            NamedNodeMap attrsAtr = fstNodeAtri.getAttributes();
-
-                            Attr attribute = (Attr) attrsAtr.item(0);
-                            columnID = attribute.getValue();
-                            attribute = (Attr) attrsAtr.item(1);
-                            String columnWidth = attribute.getValue();
-
-                            NodeList fstNmElmntLstCont = fstElmnt.getElementsByTagName("content");
-                            Element fstNmElmnt = (Element) fstNmElmntLstCont.item(0);
-                            NodeList fstNm = fstNmElmnt.getChildNodes();
-                            contentStr = ((Node) fstNm.item(0)).getTextContent();
-
-
-                            Border border;
-                            int valign, halign;
-                            Color fore, back;
-                            String aux[];
-                            String aux1[];
-                            String aux2[];
-                            String aux3[];
-                            fstNmElmntLstCont = fstElmnt.getElementsByTagName("font");
-                            fstNmElmnt = (Element) fstNmElmntLstCont.item(0);
-                            fstNm = fstNmElmnt.getChildNodes();
-                            aux = ((Node) fstNm.item(0)).getNodeValue().split("=");
-                            aux1 = aux[2].split(",");
-                            String fname = aux1[0];
-                            aux2 = aux[3].split(",");
-                            String style = aux2[0];
-                            String size = aux[4].substring(0, aux[4].length() - 1);
-                            switch (style) {
-                                case "plain":
-                                    font = new Font(fname, Font.PLAIN, Integer.parseInt(size));
-                                    break;
-                                case "bold":
-                                    font = new Font(fname, Font.BOLD, Integer.parseInt(size));
-                                    break;
-                                case "italic":
-                                    font = new Font(fname, Font.ITALIC, Integer.parseInt(size));
-                                    break;
-                                case "bolditalic":
-                                    font = new Font(fname, Font.BOLD | Font.ITALIC, Integer.parseInt(size));
-                                    break;
-                            }
-
-                            fstNmElmntLstCont = fstElmnt.getElementsByTagName("valign");
-                            fstNmElmnt = (Element) fstNmElmntLstCont.item(0);
-                            fstNm = fstNmElmnt.getChildNodes();
-                            valign = Integer.parseInt(((Node) fstNm.item(0)).getNodeValue());
-
-
-                            fstNmElmntLstCont = fstElmnt.getElementsByTagName("halign");
-                            fstNmElmnt = (Element) fstNmElmntLstCont.item(0);
-                            fstNm = fstNmElmnt.getChildNodes();
-                            halign = Integer.parseInt(((Node) fstNm.item(0)).getNodeValue());
-
-
-                            fstNmElmntLstCont = fstElmnt.getElementsByTagName("foreColor");
-                            fstNmElmnt = (Element) fstNmElmntLstCont.item(0);
-                            fstNm = fstNmElmnt.getChildNodes();
-                            aux = ((Node) fstNm.item(0)).getNodeValue().split("=");
-                            aux1 = aux[1].split(",");
-                            String fr = aux1[0];
-                            aux2 = aux[2].split(",");
-                            String fg = aux2[0];
-                            String fb = aux[3].substring(0, aux[3].length() - 1);
-                            fore = new Color(Integer.parseInt(fb), Integer.parseInt(fg), Integer.parseInt(fb));
-
-
-                            fstNmElmntLstCont = fstElmnt.getElementsByTagName("backColor");
-                            fstNmElmnt = (Element) fstNmElmntLstCont.item(0);
-                            fstNm = fstNmElmnt.getChildNodes();
-                            aux = ((Node) fstNm.item(0)).getNodeValue().split("=");
-                            aux1 = aux[1].split(",");
-                            String br = aux1[0];
-                            aux2 = aux[2].split(",");
-                            String bg = aux2[0];
-                            String bb = aux[3].substring(0, aux[3].length() - 1);
-                            back = new Color(Integer.parseInt(bb), Integer.parseInt(bg), Integer.parseInt(bb));
-
-
-                            fstNmElmntLstCont = fstElmnt.getElementsByTagName("border");
-                            fstNmElmnt = (Element) fstNmElmntLstCont.item(0);
-                            fstNm = fstNmElmnt.getChildNodes();
-                            aux = ((Node) fstNm.item(0)).getNodeValue().split("=");
-                            aux1 = aux[1].split(",");
-                            String top = aux1[0];
-                            aux2 = aux[2].split(",");
-                            String left = aux2[0];
-                            aux3 = aux[3].split(",");
-                            String bottom = aux3[0];
-                            String right = aux[4].substring(0, aux[4].length() - 1);
-
-                            content[s][i] = contentStr;
-
-                        }
-                    }
-                    
-               // }
-                work.addSpreadsheet(content);
+                }
             }
+
+            work.addSpreadsheet(content);
+
+            for (int s = 0; s < nodeLst.getLength(); s++) {
+
+                Node fstNode = nodeLst.item(s);
+
+                if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                    Element fstElmnt = (Element) fstNode;
+                    NamedNodeMap attrs = fstNode.getAttributes();
+                    Attr attributeRow;
+                    attributeRow = (Attr) attrs.item(0);
+                    rowID = attributeRow.getValue();
+//                        attributeRow = (Attr) attrs.item(0);
+//                        rowHeight = attributeRow.getValue();
+                    NodeList fstNmElmntLst = fstElmnt.getElementsByTagName("column");
+
+                    for (int i = 0; i < fstNmElmntLst.getLength(); i++) {
+                        Node fstNodeAtri = fstNmElmntLst.item(i);
+                        NamedNodeMap attrsAtr = fstNodeAtri.getAttributes();
+
+                        Attr attribute = (Attr) attrsAtr.item(1);
+                        columnID = attribute.getValue();
+                        attribute = (Attr) attrsAtr.item(1);
+                        String columnWidth = attribute.getValue();
+
+                        Border border;
+                        int valign, halign;
+                        Color fore, back;
+                        String aux[];
+                        String aux1[];
+                        String aux2[];
+                        String aux3[];
+                        NodeList fstNmElmntLstCont = fstElmnt.getElementsByTagName("font");
+                        Element fstNmElmnt = (Element) fstNmElmntLstCont.item(i);
+                        NodeList fstNm = fstNmElmnt.getChildNodes();
+                        aux = ((Node) fstNm.item(0)).getNodeValue().split("=");
+                        aux1 = aux[2].split(",");
+                        String fname = aux1[0];
+                        aux2 = aux[3].split(",");
+                        String style = aux2[0];
+                        String size = aux[4].substring(0, aux[4].length() - 1);
+                        switch (style) {
+                            case "plain":
+                                font = new Font(fname, Font.PLAIN, Integer.parseInt(size));
+                                break;
+                            case "bold":
+                                font = new Font(fname, Font.BOLD, Integer.parseInt(size));
+                                break;
+                            case "italic":
+                                font = new Font(fname, Font.ITALIC, Integer.parseInt(size));
+                                break;
+                            case "bolditalic":
+                                font = new Font(fname, Font.BOLD | Font.ITALIC, Integer.parseInt(size));
+                                break;
+                        }
+
+                        fstNmElmntLstCont = fstElmnt.getElementsByTagName("valign");
+                        fstNmElmnt = (Element) fstNmElmntLstCont.item(0);
+                        fstNm = fstNmElmnt.getChildNodes();
+                        valign = Integer.parseInt(((Node) fstNm.item(0)).getNodeValue());
+
+
+                        fstNmElmntLstCont = fstElmnt.getElementsByTagName("halign");
+                        fstNmElmnt = (Element) fstNmElmntLstCont.item(0);
+                        fstNm = fstNmElmnt.getChildNodes();
+                        halign = Integer.parseInt(((Node) fstNm.item(0)).getNodeValue());
+
+
+                        fstNmElmntLstCont = fstElmnt.getElementsByTagName("foreColor");
+                        fstNmElmnt = (Element) fstNmElmntLstCont.item(0);
+                        fstNm = fstNmElmnt.getChildNodes();
+                        aux = ((Node) fstNm.item(0)).getNodeValue().split("=");
+                        aux1 = aux[1].split(",");
+                        String fr = aux1[0];
+                        aux2 = aux[2].split(",");
+                        String fg = aux2[0];
+                        String fb = aux[3].substring(0, aux[3].length() - 1);
+                        fore = new Color(Integer.parseInt(fb), Integer.parseInt(fg), Integer.parseInt(fb));
+
+
+                        fstNmElmntLstCont = fstElmnt.getElementsByTagName("backColor");
+                        fstNmElmnt = (Element) fstNmElmntLstCont.item(0);
+                        fstNm = fstNmElmnt.getChildNodes();
+                        aux = ((Node) fstNm.item(0)).getNodeValue().split("=");
+                        aux1 = aux[1].split(",");
+                        String br = aux1[0];
+                        aux2 = aux[2].split(",");
+                        String bg = aux2[0];
+                        String bb = aux[3].substring(0, aux[3].length() - 1);
+                        back = new Color(Integer.parseInt(bb), Integer.parseInt(bg), Integer.parseInt(bb));
+
+
+                        fstNmElmntLstCont = fstElmnt.getElementsByTagName("border");
+                        fstNmElmnt = (Element) fstNmElmntLstCont.item(0);
+                        fstNm = fstNmElmnt.getChildNodes();
+                        aux = ((Node) fstNm.item(0)).getNodeValue().split("=");
+                        aux1 = aux[1].split(",");
+                        String top = aux1[0];
+                        aux2 = aux[2].split(",");
+                        String left = aux2[0];
+                        aux3 = aux[3].split(",");
+                        String bottom = aux3[0];
+                        String right = aux[4].substring(0, aux[4].length() - 1);
+                        border = BorderFactory.createEmptyBorder(Integer.parseInt(top), Integer.parseInt(left), Integer.parseInt(bottom), Integer.parseInt(right));
+
+                        ((StylableCell) work.getSpreadsheet(0).getCell(Integer.parseInt(rowID), getPosition(columnID)).getExtension(StyleExtension.NAME)).setFont(font);
+                    }
+                }
+            }
+
+//            work.addSpreadsheet(content); //Possivelmente para abrir o numero de spreadsheets guardadas
+//            }
             // }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
-//        for (int i = 0; i < MATRIX_WIDTH; i++) {
-//            for (int j = 0; j < MATRIX_HEIGHT; j++) {
-//                System.out.println("content[" + i + "][" + j + "]:" + content[i][j]);
-//            }
-//        }
 
         stream.close();
-        
-        
-        StylableCell st = (StylableCell) work.getSpreadsheet(0).getCell(0, 0).getExtension(StyleExtension.NAME);
-        st.setFont(font);
-        //work.getSpreadsheet(0).
-        //work.getSpreadsheet(0).getCell(0, 0).getExtension(StyleExtension.NAME);
-        return new Workbook(content);
+        return work;
     }
 
     @Override
@@ -213,7 +243,7 @@ public class XMLCodec implements Codec {
         for (int i = 0; i < workbook.getSpreadsheetCount(); i++) {
             sheet = workbook.getSpreadsheet(i);
             st = (StylableSpreadsheet) sheet.getExtension(StyleExtension.NAME);
-            writer.print("\t<spreadsheet title='" + sheet.getTitle() + "'>\n");
+            //writer.print("\t<spreadsheet title='" + sheet.getTitle() + "'>\n");
             for (int row = 0; row < sheet.getRowCount(); row++) {
                 writer.print("\t\t<row id='" + row + "' rowHeight='" + st.getRowHeight(row) + "'>\n");
                 for (int column = 0; column <= sheet.getColumnCount(); column++) {
@@ -233,7 +263,7 @@ public class XMLCodec implements Codec {
                 }
                 writer.print("\t\t</row>\n\n");
             }
-            writer.print("\t</spreadsheet>\n\n");
+            //writer.print("\t</spreadsheet>\n\n");
         }
 
         writer.print("</cleanSheets>");
@@ -261,16 +291,28 @@ public class XMLCodec implements Codec {
             SchemaFactory factory = SchemaFactory.newInstance(language);
             schema = factory.newSchema(new File(name));
         } catch (Exception e) {
-            System.out.println(e.toString());
+            e.printStackTrace();
         }
         return schema;
     }
-    /*
-     * public static Document parseXMLDom(InputStream name) { Document document
-     * = null; try { DocumentBuilderFactory factory =
-     * DocumentBuilderFactory.newInstance(); DocumentBuilder builder =
-     * factory.newDocumentBuilder(); document = builder.parse(name);
-     * document.getDocumentElement().normalize(); } catch (Exception e) {
-     * System.out.println(e.toString()); } return document; }
-     */
+
+    public int getPosition(String x) {
+        boolean found = false;
+        int i = 0, position = -1;
+
+        while (!found) {
+            if (columns[i].equals(x)) {
+                position = i;
+                found = true;
+            }
+            i++;
+        }
+        return position;
+    }
+//      public static Document parseXMLDom(InputStream name) { Document document
+//      = null; try { DocumentBuilderFactory factory =
+//      DocumentBuilderFactory.newInstance(); DocumentBuilder builder =
+//      factory.newDocumentBuilder(); document = builder.parse(name);
+//     document.getDocumentElement().normalize(); } catch (Exception e) {
+//      System.out.println(e.toString()); } return document; }
 }
