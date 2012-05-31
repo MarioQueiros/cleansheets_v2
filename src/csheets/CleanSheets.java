@@ -172,7 +172,7 @@ public class CleanSheets {
 			} finally {
 				try {
 					if (stream != null)
-						stream.close();
+                                            stream.close();
 				} catch (IOException e) {}
 			}
 
