@@ -44,6 +44,7 @@ import csheets.ext.ExtensionManager;
 import csheets.io.Codec;
 import csheets.io.CodecFactory;
 import csheets.io.NamedProperties;
+import csheets.sp.Connection;
 
 /**
  * CleanSheets - the main class of the application.
@@ -68,7 +69,7 @@ public class CleanSheets {
 	/** The listeners registered to receive events */
 	private List<SpreadsheetAppListener> listeners
 		= new ArrayList<SpreadsheetAppListener>();
-
+        
 	/**
 	 * Creates the CleanSheets application.
 	 */
@@ -118,6 +119,8 @@ public class CleanSheets {
 
 		// Creates user interface
 		new csheets.ui.Frame.Creator(app).createAndWait();
+                
+                
 		app.create();
 	}
 
@@ -326,6 +329,8 @@ public class CleanSheets {
 				)
 			);
 	}
+
+        
 
 	/**
 	 * A utility for dispatching events on the AWT event dispatching thread.
