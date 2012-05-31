@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<cleanSheets>
+	<row id='0' rowHeight='-1'>
+		<column id='A' width='-1'>
+			<content>tgtnjrtj</content>
+			<font>javax.swing.plaf.FontUIResource[family=Dialog,name=Dialog,style=plain,size=12]</font>
+			<valign>0</valign>
+			<halign>2</halign>
+			<foreColor>sun.swing.PrintColorUIResource[r=51,g=51,b=51]</foreColor>
+			<backColor>javax.swing.plaf.ColorUIResource[r=255,g=255,b=255]</backColor>
+			<border>java.awt.Insets[top=1,left=1,bottom=1,right=1]</border>
+		</column>
+		<column id='B' width='-1'>
+			<content>jnsrtm</content>
+			<font>javax.swing.plaf.FontUIResource[family=Dialog,name=Dialog,style=plain,size=12]</font>
+			<valign>0</valign>
+			<halign>2</halign>
+			<foreColor>sun.swing.PrintColorUIResource[r=51,g=51,b=51]</foreColor>
+			<backColor>javax.swing.plaf.ColorUIResource[r=255,g=255,b=255]</backColor>
+			<border>java.awt.Insets[top=1,left=1,bottom=1,right=1]</border>
+		</column>
+	</row>
+
+	<row id='1' rowHeight='-1'>
+		<column id='A' width='-1'>
+			<content>tmdfs</content>
+			<font>javax.swing.plaf.FontUIResource[family=Dialog,name=Dialog,style=plain,size=12]</font>
+			<valign>0</valign>
+			<halign>2</halign>
+			<foreColor>sun.swing.PrintColorUIResource[r=51,g=51,b=51]</foreColor>
+			<backColor>javax.swing.plaf.ColorUIResource[r=255,g=255,b=255]</backColor>
+			<border>java.awt.Insets[top=1,left=1,bottom=1,right=1]</border>
+		</column>
+		<column id='B' width='-1'>
+			<content>rtmdst</content>
+			<font>javax.swing.plaf.FontUIResource[family=Dialog,name=Dialog,style=plain,size=12]</font>
+			<valign>0</valign>
+			<halign>2</halign>
+			<foreColor>sun.swing.PrintColorUIResource[r=51,g=51,b=51]</foreColor>
+			<backColor>javax.swing.plaf.ColorUIResource[r=255,g=255,b=255]</backColor>
+			<border>java.awt.Insets[top=1,left=1,bottom=1,right=1]</border>
+		</column>
+	</row>
+
+</cleanSheets>
