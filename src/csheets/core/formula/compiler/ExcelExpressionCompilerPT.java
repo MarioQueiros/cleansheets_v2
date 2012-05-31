@@ -64,7 +64,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
 	public Expression compile(Cell cell, String source) throws FormulaCompilationException {
 		// Creates the lexer and parser
 		FormulaParser parser = new FormulaParser(
-			new FormulaLexer(new StringReader(source)));
+			new FormulaLexer_PT(new StringReader(source)));
 
 		try {
 			// Attempts to match an expression

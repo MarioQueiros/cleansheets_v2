@@ -1,4 +1,4 @@
-// $ANTLR 2.7.5 (20050128): "../src/csheets/core/formula/compiler/FormulaCompiler.g" -> "FormulaLexer.java"$
+// $ANTLR 2.7.5 (20050128): "../src/csheets/core/formula/compiler/FormulaCompiler_PT.g" -> "FormulaLexer_PT.java"$
 package csheets.core.formula.compiler;
 import java.io.InputStream;
 import antlr.TokenStreamException;
@@ -30,18 +30,18 @@ import csheets.core.formula.lang.Language;
  * @author Einar Pehrson
  */
 @SuppressWarnings("all")
-public class FormulaLexer extends antlr.CharScanner implements FormulaParserTokenTypes, TokenStream
+public class FormulaLexer_PT extends antlr.CharScanner implements FormulaParserTokenTypes, TokenStream
  {
-public FormulaLexer(InputStream in) {
+public FormulaLexer_PT(InputStream in) {
 	this(new ByteBuffer(in));
 }
-public FormulaLexer(Reader in) {
+public FormulaLexer_PT(Reader in) {
 	this(new CharBuffer(in));
 }
-public FormulaLexer(InputBuffer ib) {
+public FormulaLexer_PT(InputBuffer ib) {
 	this(new LexerSharedInputState(ib));
 }
-public FormulaLexer(LexerSharedInputState state) {
+public FormulaLexer_PT(LexerSharedInputState state) {
 	super(state);
 	caseSensitiveLiterals = false;
 	setCaseSensitive(false);
@@ -96,7 +96,7 @@ tryAgain:
 					theRetToken=_returnToken;
 					break;
 				}
-				case '=':
+				case '#':
 				{
 					mEQ(true);
 					theRetToken=_returnToken;
@@ -286,7 +286,7 @@ tryAgain:
 			if ( inputState.guessing==0 ) {
 				
 							try {
-								Language.getInstance().getFunction(getText());
+								Language.getInstance().getFunction_PT(getText());
 								_ttype = FUNCTION;
 							} catch (Exception ex) {
 								throw new RecognitionException(ex.toString());
@@ -544,7 +544,7 @@ tryAgain:
 		_ttype = EQ;
 		int _saveIndex;
 		
-		match("=");
+		match("#");
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
