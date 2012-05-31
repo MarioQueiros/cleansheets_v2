@@ -4,8 +4,11 @@
  */
 package csheets.ui.share;
 
+import csheets.CleanSheets;
+import csheets.sp.ConnectionController;
 import csheets.ui.ctrl.BaseAction;
-import csheets.ui.share.CreateConnectionFrame;
+import csheets.ui.ctrl.UIController;
+import java.awt.ComponentOrientation;
 import java.awt.event.ActionEvent;
 
 /**
@@ -13,11 +16,20 @@ import java.awt.event.ActionEvent;
  * @author Tiago
  */
 public class HostAction extends BaseAction{
-
+    UIController uiController;
+    CleanSheets app;
+    ConnectionController connectController;
+    
     CreateConnectionFrame cFrame = new CreateConnectionFrame();
     
-    public HostAction() {
+    public HostAction(CleanSheets app, UIController uiController, ConnectionController connectController) {
+        this.app = app;
+        this.connectController = connectController;
+        this.uiController=uiController;
+        
         cFrame.setVisible(false);
+        cFrame.setUIController(uiController);
+        cFrame.setConnectionController(connectController);
     }
     @Override
     protected String getName() {
@@ -26,7 +38,10 @@ public class HostAction extends BaseAction{
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        
         cFrame.setVisible(true);
+        
+        
     }
     
 }
