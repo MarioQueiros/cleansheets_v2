@@ -20,9 +20,10 @@ public class BaseDadosAction extends BaseAction {
                 "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ"};
    
     private boolean flag_geral=false;
+    String infor[]= new String[5];
     int[] linhas = new int[nrlinhas];
     int[] vec = new int[4]; //Vector com os extremos seleccionados
-
+    String tipo_bd;
     /**
      * Creates a new font action.
      * @param uiController the user interface controller
@@ -49,6 +50,7 @@ public class BaseDadosAction extends BaseAction {
     public void reset(){
             //flag começa sempre a false
             flag_geral=false;
+          
     }
 
     protected String getName() {
@@ -61,7 +63,7 @@ public class BaseDadosAction extends BaseAction {
     public boolean validaString(String a) {
         for (int i = 0; i < nrlinhas; ++i) {
             for (int j = 0; j < nrcolunas; ++j) {
-                if (options[i][j].equals(a)) {
+                if (options[i][j].equalsIgnoreCase(a)) {
                     return true;
                 }
             }
@@ -83,7 +85,7 @@ public class BaseDadosAction extends BaseAction {
                 flag = false;
                 String receive;
                 receive = JOptionPane.showInputDialog("Introduza a área das células que pretende gravar. Exemplo : A1-D5");
-                System.out.println(receive);
+               
                 
                 if(receive==null){
                     flag_geral=true;
@@ -171,30 +173,43 @@ public class BaseDadosAction extends BaseAction {
                 row++;
             }
     }
-    
    
-
-    /**
-     * Lets the user select a font from a chooser.
-     * Then applies the font to the selected cells in the focus owner table.
-     * @param event the event that was fired
-     */
-    public void actionPerformed(ActionEvent event) {
-
-        // Lets user select a font
-        //Perguntar qual a área da folha que o utilizador pretende gravar
-
-        // Vamos exemplificar como se acede ao modelo de dominio (o workbook)
-        try {
-            reset();
-            escolherAreaCelulas();
-            preencherVectorCoord();
-            preencherMatrizFinal();
+    public void escolhaSGBD(){
+         //Qual o SGBD que pretende
             
-            MySQL a = new MySQL();
-            if(a.verificarErro(matriz_sel)){
+            boolean tipo_bd_f = false, tipobd_message = false;
+            do {
+                
+                if(flag_geral)
+                    break;
+                
+                
+                if (tipobd_message) {
+                    JOptionPane.showMessageDialog(null, "Esse sistema SGDB não está disponível, digite novamente!");
+                }
+                 
+                tipo_bd = JOptionPane.showInputDialog(null, "Em que tipo de SGBD pretende gravar? (Postgres/MySQL/SQLserver)");
+                if(tipo_bd==null){
+                    flag_geral=true;
+                    break;
+                }
+                
+                if(tipo_bd.equalsIgnoreCase("mysql") || tipo_bd.equalsIgnoreCase("postgres") || tipo_bd.equalsIgnoreCase("sqlserver"))
+                     tipo_bd_f=true;
+                if (! tipo_bd_f) {
+                    tipobd_message = true;
+                }
+            } while (! tipo_bd_f);
+
+    }
+    
+    public void formulario(BaseDados a){
+        if(a.verificarErro(matriz_sel)){
+            
+            escolhaSGBD();
+           
                
-            String nome_bd="";
+            String dados_bd="";
             boolean flagbd = false, flagbd_message = false;
             do {
                 
@@ -203,20 +218,25 @@ public class BaseDadosAction extends BaseAction {
                 
                 //Indicar o nome da base de dados destino e o nome da tabela
                 if (flagbd_message) {
-                    JOptionPane.showMessageDialog(null, "Base de dados inexistente no sistema");
+                    JOptionPane.showMessageDialog(null, "Dados inválidos");
                 }
                  
-                nome_bd = JOptionPane.showInputDialog(null, "Indique o nome da base de dados destino:");
-                if(nome_bd==null){
+                dados_bd = JOptionPane.showInputDialog(null, "Indique base de dados destino, endereço ou ip de conexão, porta , user e pass no seguinte formato\n"
+                        + "nomebd;conexao;porta;user;pass  *Se não há pass use o seguinte token no lugar de pass !#n0p@ss#!*");
+                if(dados_bd==null){
                     flag_geral=true;
                     break;
                 }
-                flagbd = a.connectarbd(nome_bd);
+               
+                infor=dados_bd.split(";");
+                flagbd = a.connectarbd(infor[0],tipo_bd,infor[1],infor[2],infor[3],infor[4]);
                 if (!flagbd) {
                     flagbd_message = true;
                 }
             } while (!flagbd);
-
+            
+            
+           
 
             boolean flagtab = false, flagtab_message = false;
             do {
@@ -230,7 +250,7 @@ public class BaseDadosAction extends BaseAction {
                 String nome_tabela;
                 nome_tabela = JOptionPane.showInputDialog(null, "Indique o nome da tabela:");
 
-                flagtab = a.criarTabela(nome_tabela, nome_bd,matriz_sel);
+                flagtab = a.criarTabela(nome_tabela, infor[0],matriz_sel,tipo_bd,infor[1],infor[2],infor[3],infor[4]);
                 if (!flagtab) {
                     flagtab_message = true;
                     
@@ -252,12 +272,36 @@ public class BaseDadosAction extends BaseAction {
                 else
                 JOptionPane.showMessageDialog(null,"O nome das colunas é inválido");
             }
+    }
+    
+   
+
+    /**
+     * Lets the user select a font from a chooser.
+     * Then applies the font to the selected cells in the focus owner table.
+     * @param event the event that was fired
+     */
+    public void actionPerformed(ActionEvent event) {
+
+        // Lets user select a font
+        //Perguntar qual a área da folha que o utilizador pretende gravar
+
+        // Vamos exemplificar como se acede ao modelo de dominio (o workbook)
+        try {
+            reset();
+            escolherAreaCelulas();
+            preencherVectorCoord();
+            preencherMatrizFinal();
+            
+            BaseDados a = new BaseDados(tipo_bd);
+            
+            formulario(a);
 
 
             //this.uiController.getActiveSpreadsheet().getCell(0, 0).setContent("Alterada");
 
         } catch (Exception ex) {
-            //ex.printStackTrace();
+            ex.printStackTrace();
             // para ja ignoramos a excepcao
         }
     }
