@@ -10,7 +10,7 @@ package csheets.bd;
  */
 public class BaseDadosFactory {
     
-    public static IBaseDados getBD(String tipo){
+    public  IBaseDados getBD(String tipo){
         if(tipo.equalsIgnoreCase("mysql"))
             return (IBaseDados) new MySQL();
         else if(tipo.equalsIgnoreCase("postgres"))

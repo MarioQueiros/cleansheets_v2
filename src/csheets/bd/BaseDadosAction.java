@@ -39,7 +39,8 @@ public class BaseDadosAction extends BaseAction {
             escolherAreaCelulas();
             preencherVectorCoord();
             preencherMatrizFinal();
-            IBaseDados bd = BaseDadosFactory.getBD(tipo_bd);
+            BaseDadosFactory bf= new BaseDadosFactory();
+            IBaseDados bd = bf.getBD(tipo_bd);
             formulario(bd);
         }
     }
@@ -69,6 +70,7 @@ public class BaseDadosAction extends BaseAction {
     public void reset() {
         //flag começa sempre a false
         flag_geral = false;
+        
 
     }
 
@@ -160,11 +162,11 @@ public class BaseDadosAction extends BaseAction {
 
         for (int i = 0; i < nrlinhas; ++i) {
             for (int j = 0; j < nrcolunas; ++j) {
-                if (options[i][j].equals(temp[0])) {
+                if (options[i][j].equalsIgnoreCase(temp[0])) {
                     vec[0] = i;
                     vec[1] = j;
                 }
-                if (options[i][j].equals(temp[1])) {
+                if (options[i][j].equalsIgnoreCase(temp[1])) {
                     vec[2] = i;
                     vec[3] = j;
                 }
@@ -175,9 +177,9 @@ public class BaseDadosAction extends BaseAction {
 
     public void preencherMatrizFinal() {
         // Matriz com a informação que o utilizador seleccionou
-        int nrlinhas = vec[2] - vec[0] + 1;
-        int nrcolunas = vec[3] - vec[1] + 1;
-        matriz_sel = new String[nrlinhas][nrcolunas];
+        int nrlinhas2 = vec[2] - vec[0] + 1;
+        int nrcolunas2 = vec[3] - vec[1] + 1;
+        matriz_sel = new String[nrlinhas2][nrcolunas2];
         int row = 0, col = 0;
 
         for (int k = vec[0]; k <= vec[2]; k++) {
@@ -311,7 +313,8 @@ public class BaseDadosAction extends BaseAction {
         try {
             //Correr a thread criada
             Thread a = new Thread(new ThreadBD());
-            a.run();
+            a.start();
+            
 
 
         } catch (Exception ex) {
