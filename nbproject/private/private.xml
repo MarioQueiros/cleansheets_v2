@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/1"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
+        <file>file:/C:/Users/Administrador/Documents/NetBeansProjects/lapr4_cleansheets_v2/src/csheets/core/formula/compiler/ExcelExpressionCompilerPT.java</file>
+        <file>file:/C:/Users/Administrador/Documents/NetBeansProjects/lapr4_cleansheets_v2/src/csheets/core/formula/compiler/ExcelExpressionCompiler.java</file>
+        <file>file:/C:/Users/Administrador/Documents/NetBeansProjects/lapr4_cleansheets_v2/src/csheets/core/formula/lang/Language.java</file>
+        <file>file:/C:/Users/Administrador/Documents/NetBeansProjects/lapr4_cleansheets_v2/src/csheets/core/formula/compiler/FormulaCompiler.java</file>
+        <file>file:/C:/Users/Administrador/Documents/NetBeansProjects/lapr4_cleansheets_v2/src/csheets/core/formula/compiler/FormulaParser.java</file>
+        <file>file:/C:/Users/Administrador/Documents/NetBeansProjects/lapr4_cleansheets_v2/src/csheets/core/formula/compiler/FormulaCompilationException.java</file>
+        <file>file:/C:/Users/Administrador/Documents/NetBeansProjects/lapr4_cleansheets_v2/src/csheets/core/formula/compiler/FormulaCompiler_PT.g</file>
+        <file>file:/C:/Users/Administrador/Documents/NetBeansProjects/lapr4_cleansheets_v2/src/csheets/core/formula/compiler/FormulaCompiler.g</file>
+    </open-files>
 </project-private>
