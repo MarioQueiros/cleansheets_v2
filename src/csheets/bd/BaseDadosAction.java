@@ -62,9 +62,7 @@ public class BaseDadosAction extends BaseAction {
             for (int j = 0; j < nrlinhas; ++j) {
                 options[j][i] = coluna[i] + linhas[j];
             }
-
-
-        }
+       }
 
     }
 
