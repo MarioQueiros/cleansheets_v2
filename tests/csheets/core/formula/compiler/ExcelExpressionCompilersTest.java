@@ -6,7 +6,10 @@ package csheets.core.formula.compiler;
 
 import antlr.collections.AST;
 import csheets.core.Cell;
+import csheets.core.Spreadsheet;
+import csheets.core.Workbook;
 import csheets.core.formula.Expression;
+import csheets.core.formula.Formula;
 import csheets.core.formula.lang.Language;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -15,36 +18,47 @@ import static org.junit.Assert.*;
  *
  * @author Administrador
  */
-public class ExcelExpressionCompilerPTTest {
-    
-    public ExcelExpressionCompilerPTTest() {
+public class ExcelExpressionCompilersTest {
+
+    Workbook wb = new Workbook(2);
+    Spreadsheet s = wb.getSpreadsheet(0);
+    ExcelExpressionCompilerPT instancePT = new ExcelExpressionCompilerPT();
+    ExcelExpressionCompiler instance = new ExcelExpressionCompiler();
+
+    public ExcelExpressionCompilersTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        Language.getInstance();
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
-    
+
     @Before
     public void setUp() {
+        Language.getInstance();
+        s.setTitle("titulo");
     }
-    
+
     @After
     public void tearDown() {
     }
 
-    /**
-     * Test of getStarter method, of class ExcelExpressionCompilerPT.
-     */
+    @Test
+    public void testGetStarterPT() {
+        System.out.println("getStarterPT");
+
+        char expResult = '#';
+        char result = instancePT.getStarter();
+        assertEquals(expResult, result);
+    }
+
     @Test
     public void testGetStarter() {
         System.out.println("getStarter");
-        ExcelExpressionCompilerPT instance = new ExcelExpressionCompilerPT();
-        char expResult = '#';
+        char expResult = '=';
         char result = instance.getStarter();
         assertEquals(expResult, result);
     }
@@ -55,14 +69,10 @@ public class ExcelExpressionCompilerPTTest {
     @Test
     public void testCompile() throws Exception {
         System.out.println("compile");
-        Cell cell = null;
-        String source = "";
-        ExcelExpressionCompilerPT instance = new ExcelExpressionCompilerPT();
-        Expression expResult = null;
-        Expression result = instance.compile(cell, source);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String source = "#Media(2;4;6)";
+        Cell cell = s.getCell(1, 1);
+        Formula f = FormulaCompiler.getInstance().compile(cell, source);
+        assertEquals(true, f.toString().length()>0);        
     }
 
     /**
@@ -73,7 +83,6 @@ public class ExcelExpressionCompilerPTTest {
         System.out.println("convert");
         Cell cell = null;
         AST node = null;
-        ExcelExpressionCompilerPT instance = new ExcelExpressionCompilerPT();
         Expression expResult = null;
         Expression result = instance.convert(cell, node);
         assertEquals(expResult, result);
