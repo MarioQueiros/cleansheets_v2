@@ -231,7 +231,7 @@ paraphrase = "']'";
 protected
 DIGIT:	'0'..'9'
 	;
-	
+
 NUMBER
 options {	
 	paraphrase = "a numeric constant";
