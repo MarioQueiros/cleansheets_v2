@@ -95,7 +95,6 @@ public class OpenAction extends BaseAction {
 					showErrorDialog("Primitive data was found in the input stream instead of objects.");
 				} catch (Exception e) {
 					showErrorDialog("An I/O error occurred when loading the file.");
-                                        e.printStackTrace();
 				}
 			else
 				uiController.setActiveWorkbook(workbook);
