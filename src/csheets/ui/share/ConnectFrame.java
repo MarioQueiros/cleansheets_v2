@@ -185,7 +185,7 @@ public class ConnectFrame extends JFrame{
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {  
-        /*boolean error;
+        boolean error;
         String ip1,ip2,ip3,ip4;
         int col=0,row=0;
         
@@ -193,7 +193,7 @@ public class ConnectFrame extends JFrame{
         ip2=jTextField2.getText();
         ip3=jTextField3.getText();
         ip4=jTextField4.getText();
-        
+        /*
        
         
          try{
@@ -220,6 +220,7 @@ public class ConnectFrame extends JFrame{
         
         String str = "";
         try {
+                
                 InetAddress ad = InetAddress.getByName("localhost");
                 connectController.connect(ad,"A1",uiController.getActiveWorkbook(),uiController.getActiveSpreadsheet());
         } catch (UnknownHostException ex) {

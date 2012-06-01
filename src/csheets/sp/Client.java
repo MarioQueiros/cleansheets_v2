@@ -20,7 +20,17 @@ import javax.swing.JOptionPane;
  */
 public class Client extends Connection implements Runnable{
     private Socket socket;
+
+    @Override
+    void closeSockets() {
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null,ex.getMessage());
+        }
+    }
     
+   
     class Send implements Runnable{
         
         public void run() {
@@ -29,18 +39,17 @@ public class Client extends Connection implements Runnable{
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             
             String str;
-            while(true){
                 try {
                     out = new PrintWriter(socket.getOutputStream(), true);
                     while(true){
                         str = in.readLine();
-
+                        
                         out.println(str);
                     }
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(null, ex.getMessage());
                 }
-            }
+            
             
         }
       
@@ -50,16 +59,21 @@ public class Client extends Connection implements Runnable{
         
         public void run() {
             BufferedReader in;
-            while(true){
+            
                 try {
                     in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    String str = in.readLine();
-                    System.out.println("> "+str);
+                    while(true){
+                        String str = in.readLine();
+                        if(str == null){
+                            break;
+                        }
+                        System.out.println("> "+str);
+                    }
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(null, ex.getMessage());
                 }
                 
-            }
+            
         }
       
     }
@@ -67,7 +81,7 @@ public class Client extends Connection implements Runnable{
     public Client(InetAddress ip, String firstCell){
         try {
             address = ip;
-            System.out.println("addr = " + address);
+            socket = new Socket(address, PORT);
         }catch (Exception ex) {
             JOptionPane.showMessageDialog(null,ex.getMessage());
         }
@@ -78,21 +92,16 @@ public class Client extends Connection implements Runnable{
     public void run() {
         
         try {
-              socket = new Socket(address, PORT);
+              
               Thread t1 = new Thread(this.new Send());
               Thread t2 = new Thread(this.new Receive());
-              System.out.println("socket@client = " + socket);
-
-              //base for reading what server has to say
-
+              
               t1.start();
               t2.start();
 
               t1.join();
               t2.join();
 
-              //to end the communication send the "END" message to server
-              //out.println("END");
               socket.close();
         }
          catch (Exception ex) {

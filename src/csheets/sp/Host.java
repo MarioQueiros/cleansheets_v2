@@ -5,12 +5,12 @@
 package csheets.sp;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import javax.swing.JOptionPane;
 
 /**
@@ -21,13 +21,25 @@ public class Host extends Connection implements Runnable{
     ServerSocket servSocket;
     Socket clntSocket;
     
+
+
+    @Override
+    void closeSockets() {
+        try {    
+            clntSocket.close();
+            servSocket.close();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null,ex.getMessage());
+        }
+    }
+    
     class Send implements Runnable{
 
         public void run() {
             PrintWriter out;
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             String str;
-            while(true){
+           
                 try {
                     out = new PrintWriter(clntSocket.getOutputStream(), true);
                     while(true){
@@ -37,7 +49,7 @@ public class Host extends Connection implements Runnable{
                 }catch (Exception ex) {
                     JOptionPane.showMessageDialog(null,ex.getMessage());
                 }
-            }
+            
             
         }
       
@@ -47,39 +59,40 @@ public class Host extends Connection implements Runnable{
       
         public void run() {
             BufferedReader in;
-            while(true){
                 try {
                     in = new BufferedReader(new InputStreamReader(clntSocket.getInputStream()));
-                    String str = in.readLine();
-                    if (str.equals("END")) {
-                        break;
+                    while(true){
+                        String str = in.readLine();
+                        if(str == null){
+                            break;
+                        }
+                        System.out.println("> "+str);
                     }
-                    System.out.println("> "+str);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(null,ex.getMessage());
                 }
                 
-            }
+            
         }
       
     }
   
     public Host(String firstCell, String lastCell){
-        try {
+        
+            try{
             address = InetAddress.getByName("localhost");
-        } catch (UnknownHostException ex) {
-            JOptionPane.showMessageDialog(null,ex.getMessage());
-        }
-         System.out.println("addr = " + address);
+            servSocket = new ServerSocket(PORT,0,address);
+            
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null,e.getMessage());
+            }
+       
     }
 
     @Override
     public void run() {
         try {
-            servSocket = new ServerSocket(PORT,0,address);
-            System.out.println("Server: started " + servSocket);
-            System.out.println("Server: awaiting new TCP connection...");
-            clntSocket = servSocket.accept();// awaiting incoming connection
+            clntSocket = servSocket.accept();
             Thread t1 = new Thread(this.new Send());
             Thread t2 = new Thread(this.new Receive());
             

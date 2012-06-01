@@ -165,12 +165,13 @@ public class CreateConnectionFrame extends JFrame{
         return false;
     }
 
-    public void setConnectionController(ConnectionController connectController) {
-        this.connectController=connectController;
-    }
     
     public void setUIController(UIController uiController) {
         this.uiController=uiController;
+    }
+
+    void setConnectionController(ConnectionController connectController) {
+        this.connectController = connectController;
     }
 
 }

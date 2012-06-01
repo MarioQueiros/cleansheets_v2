@@ -13,9 +13,10 @@ import java.net.InetAddress;
  *
  * @author Tiago
  */
-public class Connection implements Serializable{
+public abstract class Connection implements Serializable{
     
     protected final int PORT=53531;
+    protected String type;
     protected InetAddress address;
     protected Workbook connectedWorkbook;
     protected Spreadsheet connectedSpreadsheet;
@@ -30,6 +31,16 @@ public class Connection implements Serializable{
 
     public InetAddress getAddress() {
         return address;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    abstract void closeSockets();
+
+    void setType(String string) {
+        type = string;
     }
 
     

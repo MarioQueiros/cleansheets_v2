@@ -44,7 +44,7 @@ import csheets.ext.ExtensionManager;
 import csheets.io.Codec;
 import csheets.io.CodecFactory;
 import csheets.io.NamedProperties;
-import csheets.sp.Connection;
+import csheets.ui.Frame;
 
 /**
  * CleanSheets - the main class of the application.
@@ -118,8 +118,8 @@ public class CleanSheets {
 		} catch (Exception e) {} */
 
 		// Creates user interface
-		new csheets.ui.Frame.Creator(app).createAndWait();
-                
+		
+                new csheets.ui.Frame.Creator(app,new csheets.sp.ConnectionController.Creator(app).createAndWait()).createAndWait();
                 
 		app.create();
 	}
