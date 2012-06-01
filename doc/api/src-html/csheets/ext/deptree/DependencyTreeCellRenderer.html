@@ -1,0 +1,155 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    /*<a name="line.1"></a>
+<FONT color="green">002</FONT>     * Copyright (c) 2005 Einar Pehrson, Malin Johansson and Sofia Nilsson<a name="line.2"></a>
+<FONT color="green">003</FONT>     *<a name="line.3"></a>
+<FONT color="green">004</FONT>     * This file is part of<a name="line.4"></a>
+<FONT color="green">005</FONT>     * CleanSheets Extension for Dependency Trees<a name="line.5"></a>
+<FONT color="green">006</FONT>     *<a name="line.6"></a>
+<FONT color="green">007</FONT>     * CleanSheets Extension for Dependency Trees is free software; you can<a name="line.7"></a>
+<FONT color="green">008</FONT>     * redistribute it and/or modify it under the terms of the GNU General Public<a name="line.8"></a>
+<FONT color="green">009</FONT>     * License as published by the Free Software Foundation; either version 2 of<a name="line.9"></a>
+<FONT color="green">010</FONT>     * the License, or (at your option) any later version.<a name="line.10"></a>
+<FONT color="green">011</FONT>     *<a name="line.11"></a>
+<FONT color="green">012</FONT>     * CleanSheets Extension for Dependency Trees is distributed in the hope that<a name="line.12"></a>
+<FONT color="green">013</FONT>     * it will be useful, but WITHOUT ANY WARRANTY; without even the implied<a name="line.13"></a>
+<FONT color="green">014</FONT>     * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<a name="line.14"></a>
+<FONT color="green">015</FONT>     * See the GNU General Public License for more details.<a name="line.15"></a>
+<FONT color="green">016</FONT>     *<a name="line.16"></a>
+<FONT color="green">017</FONT>     * You should have received a copy of the GNU General Public License<a name="line.17"></a>
+<FONT color="green">018</FONT>     * along with CleanSheets Extension for Dependency Trees; if not, write to the<a name="line.18"></a>
+<FONT color="green">019</FONT>     * Free Software Foundation, Inc., 59 Temple Place, Suite 330,<a name="line.19"></a>
+<FONT color="green">020</FONT>     * Boston, MA  02111-1307  USA<a name="line.20"></a>
+<FONT color="green">021</FONT>     */<a name="line.21"></a>
+<FONT color="green">022</FONT>    package csheets.ext.deptree;<a name="line.22"></a>
+<FONT color="green">023</FONT>    <a name="line.23"></a>
+<FONT color="green">024</FONT>    import java.awt.Component;<a name="line.24"></a>
+<FONT color="green">025</FONT>    <a name="line.25"></a>
+<FONT color="green">026</FONT>    import javax.swing.Icon;<a name="line.26"></a>
+<FONT color="green">027</FONT>    import javax.swing.ImageIcon;<a name="line.27"></a>
+<FONT color="green">028</FONT>    import javax.swing.JTree;<a name="line.28"></a>
+<FONT color="green">029</FONT>    import javax.swing.tree.DefaultTreeCellRenderer;<a name="line.29"></a>
+<FONT color="green">030</FONT>    <a name="line.30"></a>
+<FONT color="green">031</FONT>    import csheets.core.Cell;<a name="line.31"></a>
+<FONT color="green">032</FONT>    <a name="line.32"></a>
+<FONT color="green">033</FONT>    /**<a name="line.33"></a>
+<FONT color="green">034</FONT>     * The renderer used for nodes in dependency trees.<a name="line.34"></a>
+<FONT color="green">035</FONT>     * @author Malin Johansson<a name="line.35"></a>
+<FONT color="green">036</FONT>     * @author Sofia Nilsson<a name="line.36"></a>
+<FONT color="green">037</FONT>     * @author Einar Pehrson<a name="line.37"></a>
+<FONT color="green">038</FONT>     */<a name="line.38"></a>
+<FONT color="green">039</FONT>    @SuppressWarnings("serial")<a name="line.39"></a>
+<FONT color="green">040</FONT>    public class DependencyTreeCellRenderer extends DefaultTreeCellRenderer{<a name="line.40"></a>
+<FONT color="green">041</FONT>            <a name="line.41"></a>
+<FONT color="green">042</FONT>            /** An icon representing a node containing a formula */<a name="line.42"></a>
+<FONT color="green">043</FONT>            private Icon formulaIcon = new ImageIcon(<a name="line.43"></a>
+<FONT color="green">044</FONT>                    DependencyTreeExtension.class.getResource("res/img/formula.gif"));<a name="line.44"></a>
+<FONT color="green">045</FONT>            <a name="line.45"></a>
+<FONT color="green">046</FONT>            /** An icon representing a cell containing a constant value */<a name="line.46"></a>
+<FONT color="green">047</FONT>            private Icon literalIcon = new ImageIcon(<a name="line.47"></a>
+<FONT color="green">048</FONT>                    DependencyTreeExtension.class.getResource("res/img/literal.gif"));<a name="line.48"></a>
+<FONT color="green">049</FONT>            <a name="line.49"></a>
+<FONT color="green">050</FONT>            /** An icon representing a cell containing a range */<a name="line.50"></a>
+<FONT color="green">051</FONT>            private Icon rangeIcon = new ImageIcon(<a name="line.51"></a>
+<FONT color="green">052</FONT>                    DependencyTreeExtension.class.getResource("res/img/range.gif"));<a name="line.52"></a>
+<FONT color="green">053</FONT>            <a name="line.53"></a>
+<FONT color="green">054</FONT>            /**<a name="line.54"></a>
+<FONT color="green">055</FONT>             * Creates a new dependency tree cell renderer<a name="line.55"></a>
+<FONT color="green">056</FONT>             */<a name="line.56"></a>
+<FONT color="green">057</FONT>            public DependencyTreeCellRenderer() {}<a name="line.57"></a>
+<FONT color="green">058</FONT>            <a name="line.58"></a>
+<FONT color="green">059</FONT>            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, <a name="line.59"></a>
+<FONT color="green">060</FONT>                                                            boolean leaf, int row, boolean hasFocus) {<a name="line.60"></a>
+<FONT color="green">061</FONT>    <a name="line.61"></a>
+<FONT color="green">062</FONT>                    if (value instanceof CellNode) {<a name="line.62"></a>
+<FONT color="green">063</FONT>                            // Selects the appropriate icon and tool tip to display<a name="line.63"></a>
+<FONT color="green">064</FONT>                            Cell cell = ((CellNode)value).getCell();<a name="line.64"></a>
+<FONT color="green">065</FONT>                            Icon icon;<a name="line.65"></a>
+<FONT color="green">066</FONT>                            if (cell.getFormula() == null) {<a name="line.66"></a>
+<FONT color="green">067</FONT>                                    icon = literalIcon;<a name="line.67"></a>
+<FONT color="green">068</FONT>                                    setToolTipText(cell.getValue().toString());<a name="line.68"></a>
+<FONT color="green">069</FONT>                            } else {<a name="line.69"></a>
+<FONT color="green">070</FONT>                                    icon = formulaIcon;<a name="line.70"></a>
+<FONT color="green">071</FONT>                                    setToolTipText(cell.getValue() + " = " + cell.getFormula());<a name="line.71"></a>
+<FONT color="green">072</FONT>                            }<a name="line.72"></a>
+<FONT color="green">073</FONT>    <a name="line.73"></a>
+<FONT color="green">074</FONT>                            // Updates the appropriate icon(s)<a name="line.74"></a>
+<FONT color="green">075</FONT>                            if (leaf)<a name="line.75"></a>
+<FONT color="green">076</FONT>                                    setLeafIcon(icon);<a name="line.76"></a>
+<FONT color="green">077</FONT>                            else {<a name="line.77"></a>
+<FONT color="green">078</FONT>                                    setOpenIcon(icon);<a name="line.78"></a>
+<FONT color="green">079</FONT>                                    setClosedIcon(icon);<a name="line.79"></a>
+<FONT color="green">080</FONT>                            }<a name="line.80"></a>
+<FONT color="green">081</FONT>                    } else if (value instanceof ReferenceNode) {<a name="line.81"></a>
+<FONT color="green">082</FONT>                            // Node is a reference to multiple cells, and therefore not a leaf<a name="line.82"></a>
+<FONT color="green">083</FONT>                            setOpenIcon(rangeIcon);<a name="line.83"></a>
+<FONT color="green">084</FONT>                            setClosedIcon(rangeIcon);<a name="line.84"></a>
+<FONT color="green">085</FONT>                    }<a name="line.85"></a>
+<FONT color="green">086</FONT>    <a name="line.86"></a>
+<FONT color="green">087</FONT>                    return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);<a name="line.87"></a>
+<FONT color="green">088</FONT>            }<a name="line.88"></a>
+<FONT color="green">089</FONT>    }<a name="line.89"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>
