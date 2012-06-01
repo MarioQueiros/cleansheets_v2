@@ -30,6 +30,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
 import csheets.CleanSheets;
+import csheets.isep.ExampleAction;
 import csheets.ui.ctrl.ActionManager;
 import csheets.ui.ctrl.UIController;
 import csheets.ui.ext.CellDecorator;
@@ -169,9 +170,9 @@ public class MenuBar extends JMenuBar {
                 
                 // Criar o Menu Macros
 		JMenu macrosMenu = addMenu("Macros", KeyEvent.VK_M);
-		macrosMenu.add(actionManager.getAction("Criação de Novas Macros"));
-                //Creates the page share menu (Partilha de Folha)
+		macrosMenu.add(actionManager.getAction("Criacao de Novas Macros"));
                 
+                //Creates the page share menu (Partilha de Folha)                
                 JMenu shareMenu = addMenu("Share",KeyEvent.VK_P);
                 shareMenu.add(actionManager.getAction("host"));
                 shareMenu.add(actionManager.getAction("client"));

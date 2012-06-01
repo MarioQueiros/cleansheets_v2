@@ -74,8 +74,8 @@ public class CleanSheets {
 	 */
 	public CleanSheets() {
 		// Loads compilers
-		FormulaCompiler.getInstance();
-
+		FormulaCompiler.getInstance();              
+                
 		// Loads language
 		Language.getInstance();
 
