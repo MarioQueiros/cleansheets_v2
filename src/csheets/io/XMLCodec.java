@@ -61,10 +61,6 @@ public class XMLCodec implements Codec {
                         content[i][j] = "";
                     }
                 }
-//            NodeList nodeLstSP = doc.getElementsByTagName("spreadsheet");
-//            for (int h = 0; h < nodeLstSP.getLength(); h++) {
-//                Node fstNodeSP = nodeLstSP.item(h);
-////                //if (fstNodeSP.getNodeType() == Node.ELEMENT_NODE) {
 
                 NodeList nodeLst = doc.getElementsByTagName("row");
                 String rowID = "", columnID = "", contentStr = "";
@@ -217,9 +213,6 @@ public class XMLCodec implements Codec {
                     }
                 }
             }
-//            work.addSpreadsheet(content); //Possivelmente para abrir o numero de spreadsheets guardadas
-//            }
-            // }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -271,7 +264,7 @@ public class XMLCodec implements Codec {
         stream.close();
     }
 
-    public static String validateXML(Schema schema, Document document) {
+    private static String validateXML(Schema schema, Document document) {
         String validate = "";
         try {
             Validator validator = schema.newValidator();
@@ -283,7 +276,7 @@ public class XMLCodec implements Codec {
         return validate;
     }
 
-    public static Schema loadSchema(String name) {
+    private static Schema loadSchema(String name) {
         Schema schema = null;
         try {
             String language = XMLConstants.W3C_XML_SCHEMA_NS_URI;
@@ -293,9 +286,8 @@ public class XMLCodec implements Codec {
         }
         return schema;
     }
-    
 
-    public int getPosition(String x) {
+    private int getPosition(String x) {
         boolean found = false;
         int i = 0, position = -1;
 
@@ -308,10 +300,4 @@ public class XMLCodec implements Codec {
         }
         return position;
     }
-//      public static Document parseXMLDom(InputStream name) { Document document
-//      = null; try { DocumentBuilderFactory factory =
-//      DocumentBuilderFactory.newInstance(); DocumentBuilder builder =
-//      factory.newDocumentBuilder(); document = builder.parse(name);
-//     document.getDocumentElement().normalize(); } catch (Exception e) {
-//      System.out.println(e.toString()); } return document; }
 }
