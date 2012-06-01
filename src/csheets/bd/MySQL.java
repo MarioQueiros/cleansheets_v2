@@ -6,20 +6,15 @@ package csheets.bd;
 
 import java.sql.*;
 
-//MySQL precisa de melhorias e provavelmente o nome irá ser modificado
-public class MySQL {
-
+/**
+ *
+ * @author joaodias
+ */
+public class MySQL implements IBaseDados {
     Connection conn;
     private String nome_tabela;
-
-    public MySQL() throws SQLException {
-
-
-        DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-
-
-
-    }
+    private String token_pass;
+    
     //Verificar se existe alguma Coluna vazia
     public boolean verificarErro(String [][] matriz){
         for(int i=0;i<matriz[0].length;i++){
@@ -29,18 +24,22 @@ public class MySQL {
         
         return true;
     }
-            
+   
+     
 
-    public boolean connectarbd(String nome_bd) {
+    public boolean connectarbd(String nome_bd,String tipobd, String end,String porta, String user, String pass) {
         try {
-
-            String url = "jdbc:mysql://localhost:3306/" + nome_bd;
-            conn = DriverManager.getConnection(
-                    url, "root", "");
+            
+            verificarPass(pass);
+            
+            String url="";
+            DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+            url = "jdbc:mysql://"+end+":"+porta+"/"+ nome_bd;
+           conn = (Connection) DriverManager.getConnection(url, user, token_pass);
             conn.setAutoCommit(false);
             return true;
         } catch (Exception e) {
-           e.printStackTrace();
+         //  e.printStackTrace();
             return false;
         }
     }
@@ -57,9 +56,9 @@ public class MySQL {
         
     }
     
-    public void preencherInformação(String [][] matriz) throws SQLException{
+    public void preencherInformacao(String [][] matriz) throws SQLException{
         
-        Statement st = conn.createStatement();
+        Statement st = (Statement) conn.createStatement();
             for(int i=0;i<matriz.length;i++){
             String infor="insert into "+nome_tabela+" values ( ";
             for(int j=0;j<matriz[0].length;j++){
@@ -74,27 +73,43 @@ public class MySQL {
         
           
     }
+    
+    public void verificarPass(String pass){
+        if(pass.equalsIgnoreCase("!#n0p@ss#!"))
+            token_pass="";
+        else
+            token_pass=pass;
+    }
 
-    public boolean criarTabela(String nome_tab, String nome_bd,String [][] matriz) {
+    public boolean criarTabela(String nome_tab, String nome_bd,String [][] matriz,String tipobd, String end,String porta, String user, String pass ) {
 
         try {
             nome_tabela=nome_tab;
-            String url = "jdbc:mysql://localhost:3306/" + nome_bd;
-            conn = DriverManager.getConnection(
-                    url, "root", "");
+            
+            verificarPass(pass);
+            
+            String url="";
+           
+                DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+                url = "jdbc:mysql://"+end+":"+porta+"/"+ nome_bd;
+         
+           
+            conn = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
             conn.setAutoCommit(false);
-            Statement st = conn.createStatement();
+            Statement st = (Statement) conn.createStatement();
             String colunas=criarColunas(matriz);
             String total="create table "+nome_tabela+" ("+colunas+");";
             st.executeUpdate(total);
-            preencherInformação(matriz);
+            preencherInformacao(matriz);
             st.close();
             conn.commit();
             conn.close();
             return true;
         } catch (Exception e) {
-            //e.printStackTrace();
+           // e.printStackTrace();
             return false;
         }
     }
+    
 }

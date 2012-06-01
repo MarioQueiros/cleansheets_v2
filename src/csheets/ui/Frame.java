@@ -37,6 +37,7 @@ import javax.swing.JToolBar;
 
 import csheets.CleanSheets;
 import csheets.core.Workbook;
+import csheets.sp.ConnectionController;
 import csheets.ui.ctrl.*;
 import csheets.ui.share.ClientAction;
 import csheets.ui.share.DisconnectAction;
@@ -67,7 +68,9 @@ public class Frame extends JFrame implements SelectionListener {
 		// Stores members and creates controllers
 		this.app = app;
 		UIController uiController = new UIController(app);
-
+                
+                ConnectionController connectionController = new ConnectionController(app,uiController);
+                
 		// Creates action manager
 		FileChooser chooser = null;
 		try {
@@ -112,13 +115,14 @@ public class Frame extends JFrame implements SelectionListener {
 		actionManager.registerAction("about", new AboutAction());
                 
                 // Registers macros actions
-		actionManager.registerAction("Criacao de Novas Macros", new MacroAction(uiController));
+		
+		actionManager.registerAction("Criação de Novas Macros", new MacroAction());
 
                 // Registers page share actions
                 
-		actionManager.registerAction("host", new HostAction());
-		actionManager.registerAction("client", new ClientAction());
-		actionManager.registerAction("disconnect", new DisconnectAction());
+		actionManager.registerAction("host", new HostAction(app,uiController,connectionController));
+		actionManager.registerAction("client", new ClientAction(app,uiController,connectionController));
+		actionManager.registerAction("disconnect", new DisconnectAction(app,uiController));
 
 		// Creates spreadsheet components
 		WorkbookPane workbookPane = new WorkbookPane(uiController, actionManager);

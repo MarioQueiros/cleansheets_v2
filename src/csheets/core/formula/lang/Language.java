@@ -122,11 +122,7 @@ public class Language {
 
 				// Stores element
 				if (Function.class.isAssignableFrom(elementClass))
-					functions_PT.add(Function.class.cast(element));
-			/*	if (BinaryOperator.class.isAssignableFrom(elementClass))
-					binaryOperators_PT.add(BinaryOperator.class.cast(element));
-				if (UnaryOperator.class.isAssignableFrom(elementClass))
-					unaryOperators_PT.add(UnaryOperator.class.cast(element));*/
+					functions_PT.add(Function.class.cast(element));			
 			}
 		} else if(stream != null)
 			System.err.println("Could not find language properties file ("

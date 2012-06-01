@@ -4,17 +4,20 @@
  */
 package csheets.ui.share;
 
-import javax.print.attribute.AttributeSet;
+import csheets.sp.Client;
+import csheets.sp.ConnectionController;
+import csheets.ui.ctrl.UIController;
+import csheets.ui.sheet.SpreadsheetTableModel;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import javax.swing.JFrame;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
 
 /**
  *
  * @author Tiago
  */
 public class ConnectFrame extends JFrame{
-    
+
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -29,6 +32,11 @@ public class ConnectFrame extends JFrame{
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField6;
     private javax.swing.JTextField jTextField7;
+    private String ip;
+    private int rows,columns;
+    private UIController uiController;
+    private ConnectionController connectController;
+    
     
     /* A Frame for the ClientAction */
     /* Lacks limit of chars in Text Fields and Listeners*/
@@ -50,7 +58,7 @@ public class ConnectFrame extends JFrame{
         jLabel6 = new javax.swing.JLabel();
         jTextField7 = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jLabel1.setText("IP Address");
 
@@ -59,20 +67,17 @@ public class ConnectFrame extends JFrame{
         jTextField1.setColumns(3);
         jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField1.setToolTipText("");
-        /*jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });*/
+        
 
         jTextField2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         jButton1.setText("Create Connection!");
-        /*jButton1.addActionListener(new java.awt.event.ActionListener() {
+        
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
-        });*/
+        });
 
         jTextField3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
@@ -89,22 +94,14 @@ public class ConnectFrame extends JFrame{
         jTextField6.setColumns(3);
         jTextField6.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField6.setToolTipText("");
-        /*jTextField6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField6ActionPerformed(evt);
-            }
-        });*/
+        
 
         jLabel6.setText("x");
 
         jTextField7.setColumns(3);
         jTextField7.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField7.setToolTipText("");
-        /*jTextField7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField7ActionPerformed(evt);
-            }
-        });*/
+        
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -174,6 +171,103 @@ public class ConnectFrame extends JFrame{
         pack();
     
     }
+
+    int getRows() {
+        return rows;
+    }
+    
+    int getColumns(){
+        return columns;
+    }
+
+    String getIP() {
+        return ip;
+    }
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {  
+        /*boolean error;
+        String ip1,ip2,ip3,ip4;
+        int col=0,row=0;
+        
+        ip1=jTextField1.getText();
+        ip2=jTextField2.getText();
+        ip3=jTextField3.getText();
+        ip4=jTextField4.getText();
+        
+       
+        
+         try{
+            col=Integer.parseInt(jTextField6.getText());
+            row=Integer.parseInt(jTextField7.getText());
+            error=checkDataInsered(ip1,ip2,ip3,ip4,col,row);
+        }catch(Exception e){
+            error=true;
+        }
+        
+        
+        if(error==false){
+            ip=ip1+"."+ip2+"."+ip3+"."+ip4;
+
+            rows=row;
+            columns=col;
+            
+            JOptionPane.showMessageDialog(null,"IP: "+ip+" Area: Linhas: "+rows+" Colunas: "+columns);
+            
+        }
+        else{
+            JOptionPane.showMessageDialog(null,"Error in data insered!");
+        }*/
+        
+        String str = "";
+        try {
+                InetAddress ad = InetAddress.getByName("localhost");
+                connectController.connect(ad,"A1",uiController.getActiveWorkbook(),uiController.getActiveSpreadsheet());
+        } catch (UnknownHostException ex) {
+                ex.printStackTrace();
+        }
+
+      
+    }
     
     
+    private boolean checkDataInsered(String ip1,String ip2,String ip3,String ip4,int col, int row){
+        
+        int numberAux1=0,numberAux2=0,numberAux3=0,numberAux4=0;
+        
+        try{
+            numberAux1=Integer.parseInt(ip1);
+            numberAux2=Integer.parseInt(ip2);
+            numberAux3=Integer.parseInt(ip3);
+            numberAux4=Integer.parseInt(ip4);
+            if((numberAux1<0||numberAux1>255)||(numberAux2<0||numberAux2>255)||(numberAux3<0||numberAux3>255)||(numberAux4<0||numberAux4>255)){
+                return true;
+            }
+            SpreadsheetTableModel aux = new SpreadsheetTableModel(uiController.getActiveSpreadsheet(),uiController);
+            int activeSpreadsheetRows = aux.getRowCount();
+            int activeSpreadsheetColumns = aux.getColumnCount();
+
+
+            if(row < 0 || row > activeSpreadsheetRows){
+                return true;
+            }
+
+             if(col < 0 || col > activeSpreadsheetColumns){
+                return true;
+            }
+        }
+        catch(Exception e){
+            return true;
+        }
+        
+        return false;
+    }
+    
+     void setUIController(UIController uiController) {
+        this.uiController=uiController;
+     }
+     
+     
+    public void setConnectionController(ConnectionController connectController) {
+        this.connectController=connectController;
+    }
 }
