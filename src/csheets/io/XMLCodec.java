@@ -2,15 +2,12 @@ package csheets.io;
 
 import csheets.core.Spreadsheet;
 import csheets.core.Workbook;
-import csheets.core.formula.compiler.FormulaCompilationException;
 import csheets.ext.style.StylableCell;
 import csheets.ext.style.StylableSpreadsheet;
 import csheets.ext.style.StyleExtension;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import javax.xml.XMLConstants;
@@ -76,16 +73,11 @@ public class XMLCodec implements Codec {
                 if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
 
                     Element fstElmnt = (Element) fstNode;
-//                        NamedNodeMap attrs = fstNode.getAttributes();
-//                        Attr attributeRow;
-//                        attributeRow = (Attr) attrs.item(1);
-//                        rowID = attributeRow.getValue();
-//                        attributeRow = (Attr) attrs.item(0);
-//                        rowHeight = attributeRow.getValue();
                     NamedNodeMap attrs = fstNode.getAttributes();
                     Attr attributeRow;
                     attributeRow = (Attr) attrs.item(0);
                     rowID = attributeRow.getValue();
+                    
                     NodeList fstNmElmntLst = fstElmnt.getElementsByTagName("column");
                     int fLength = fstNmElmntLst.getLength();
                     for (int i = 0; i < fLength; i++) {
@@ -102,10 +94,7 @@ public class XMLCodec implements Codec {
                         contentStr = ((Node) fstNm.item(0)).getTextContent();
                         int col = getPosition(columnID);
                         content[Integer.parseInt(rowID)][col] = contentStr;
-//                        work.addSpreadsheet(content);
-
-//                        for(int p=0;p<work.getSpreadsheetCount();p++)
-//                        ((StylableCell) work.getSpreadsheet(p).getCell(s, i).getExtension(StyleExtension.NAME)).setFont(font);
+                  
                     }
                 }
             }
@@ -123,8 +112,7 @@ public class XMLCodec implements Codec {
                     Attr attributeRow;
                     attributeRow = (Attr) attrs.item(0);
                     rowID = attributeRow.getValue();
-//                        attributeRow = (Attr) attrs.item(0);
-//                        rowHeight = attributeRow.getValue();
+                    
                     NodeList fstNmElmntLst = fstElmnt.getElementsByTagName("column");
 
                     for (int i = 0; i < fstNmElmntLst.getLength(); i++) {
@@ -133,9 +121,9 @@ public class XMLCodec implements Codec {
 
                         Attr attribute = (Attr) attrsAtr.item(1);
                         columnID = attribute.getValue();
+                        
                         attribute = (Attr) attrsAtr.item(1);
                         String columnWidth = attribute.getValue();
-
                         Border border;
                         int valign, halign;
                         Color fore, back;
@@ -143,6 +131,7 @@ public class XMLCodec implements Codec {
                         String aux1[];
                         String aux2[];
                         String aux3[];
+                        
                         NodeList fstNmElmntLstCont = fstElmnt.getElementsByTagName("font");
                         Element fstNmElmnt = (Element) fstNmElmntLstCont.item(i);
                         NodeList fstNm = fstNmElmnt.getChildNodes();
@@ -215,8 +204,13 @@ public class XMLCodec implements Codec {
                         String bottom = aux3[0];
                         String right = aux[4].substring(0, aux[4].length() - 1);
                         border = BorderFactory.createEmptyBorder(Integer.parseInt(top), Integer.parseInt(left), Integer.parseInt(bottom), Integer.parseInt(right));
-
-                        ((StylableCell) work.getSpreadsheet(0).getCell(Integer.parseInt(rowID), getPosition(columnID)).getExtension(StyleExtension.NAME)).setFont(font);
+                        
+                        ((StylableCell) work.getSpreadsheet(0).getCell(getPosition(columnID),Integer.parseInt(rowID) ).getExtension(StyleExtension.NAME)).setFont(font);
+                        ((StylableCell) work.getSpreadsheet(0).getCell(getPosition(columnID),Integer.parseInt(rowID) ).getExtension(StyleExtension.NAME)).setBackgroundColor(back);
+                        ((StylableCell) work.getSpreadsheet(0).getCell(getPosition(columnID),Integer.parseInt(rowID) ).getExtension(StyleExtension.NAME)).setForegroundColor(fore);
+                        ((StylableCell) work.getSpreadsheet(0).getCell(getPosition(columnID),Integer.parseInt(rowID) ).getExtension(StyleExtension.NAME)).setHorizontalAlignment(halign);
+                        ((StylableCell) work.getSpreadsheet(0).getCell(getPosition(columnID),Integer.parseInt(rowID) ).getExtension(StyleExtension.NAME)).setVerticalAlignment(valign);
+                        ((StylableCell) work.getSpreadsheet(0).getCell(getPosition(columnID),Integer.parseInt(rowID) ).getExtension(StyleExtension.NAME)).setBorder(border);
                     }
                 }
             }
