@@ -238,6 +238,9 @@ public class XMLCodec implements Codec {
             st = (StylableSpreadsheet) sheet.getExtension(StyleExtension.NAME);
             //writer.print("\t<spreadsheet title='" + sheet.getTitle() + "'>\n");
             for (int row = 0; row < sheet.getRowCount(); row++) {
+                int rowcount = sheet.getColumnCount();
+                System.out.println("rowcount: " + rowcount);
+
                 writer.print("\t\t<row idr='" + row + "' rowHeight='" + st.getRowHeight(row) + "'>\n");
                 for (int column = 0; column <= sheet.getColumnCount(); column++) {
                     String aux = sheet.getCell(column, row).getContent();
@@ -255,6 +258,8 @@ public class XMLCodec implements Codec {
                     }
                 }
                 writer.print("\t\t</row>\n\n");
+
+
             }
             //writer.print("\t</spreadsheet>\n\n");
         }
