@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="cleanSheets">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="row" maxOccurs="128">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="column" maxOccurs="52" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="content"></xs:element>
+                                        <xs:element name="font"></xs:element>
+                                        <xs:element name="valign"></xs:element>
+                                        <xs:element name="halign"></xs:element>
+                                        <xs:element name="foreColor"></xs:element>
+                                        <xs:element name="backColor"></xs:element>
+                                        <xs:element name="border"></xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="idc" type="Cid" use="required"/>
+                                    <xs:attribute name="columnWidth" type="xs:string" use="required"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="idr" type="Rid" use="required"/>
+                        <xs:attribute name="rowHeight" type="xs:string" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:simpleType name="Rid">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0" />
+            <xs:maxInclusive value="127" />
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="Cid">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[A-Z]{1}[A-Z]?" />
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>
