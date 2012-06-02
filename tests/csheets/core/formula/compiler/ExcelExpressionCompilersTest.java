@@ -75,18 +75,5 @@ public class ExcelExpressionCompilersTest {
         assertEquals(true, f.toString().length()>0);        
     }
 
-    /**
-     * Test of convert method, of class ExcelExpressionCompilerPT.
-     */
-    @Test
-    public void testConvert() throws Exception {
-        System.out.println("convert");
-        Cell cell = null;
-        AST node = null;
-        Expression expResult = null;
-        Expression result = instance.convert(cell, node);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+    
 }
