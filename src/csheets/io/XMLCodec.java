@@ -61,7 +61,9 @@ public class XMLCodec implements Codec {
                         content[i][j] = "";
                     }
                 }
-
+                Element attriTitle = doc.getDocumentElement();
+                String title = attriTitle.getAttribute("title");
+                
                 NodeList nodeLst = doc.getElementsByTagName("row");
                 String rowID = "", columnID = "", contentStr = "";
                 int nLength = nodeLst.getLength();
@@ -208,6 +210,7 @@ public class XMLCodec implements Codec {
                             
                             int pos = getPosition(columnID);
                             
+                            work.getSpreadsheet(0).setTitle(title);
                             ((StylableSpreadsheet)work.getSpreadsheet(0).getExtension(StyleExtension.NAME)).setColumnWidth(pos, Integer.parseInt(columnWidth));
                             ((StylableSpreadsheet)work.getSpreadsheet(0).getExtension(StyleExtension.NAME)).setRowHeight(Integer.parseInt(rowID), Integer.parseInt(rowHeight));
                             ((StylableCell) work.getSpreadsheet(0).getCell(pos, Integer.parseInt(rowID)).getExtension(StyleExtension.NAME)).setFont(font);
@@ -238,12 +241,13 @@ public class XMLCodec implements Codec {
         Spreadsheet sheet;
         StylableCell stylableCell;
         StylableSpreadsheet st;
+        sheet = workbook.getSpreadsheet(0);
         writer.print("<?xml version='1.0' encoding='UTF-8'?>\n");
-        writer.print("<cleanSheets>\n");
-        for (int i = 0; i < workbook.getSpreadsheetCount(); i++) {
-            sheet = workbook.getSpreadsheet(i);
+        writer.print("<cleanSheets title='"+sheet.getTitle()+"'>\n");
+//        for (int i = 0; i < workbook.getSpreadsheetCount(); i++) {
+//            sheet = workbook.getSpreadsheet(i);
             st = (StylableSpreadsheet) sheet.getExtension(StyleExtension.NAME);
-            //writer.print("\t<spreadsheet title='" + sheet.getTitle() + "'>\n");
+//            writer.print("\t<spreadsheet title='" + sheet.getTitle() + "'>\n");
             for (int row = 0; row < sheet.getRowCount(); row++) {
                 int rowcount = sheet.getColumnCount();
 
@@ -268,8 +272,8 @@ public class XMLCodec implements Codec {
 
 
             }
-            //writer.print("\t</spreadsheet>\n\n");
-        }
+//            writer.print("\t</spreadsheet>\n\n");
+//        }
 
         writer.print("</cleanSheets>");
         writer.close();
