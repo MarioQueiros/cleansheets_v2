@@ -63,7 +63,7 @@ public class XMLCodec implements Codec {
                 }
                 Element attriTitle = doc.getDocumentElement();
                 String title = attriTitle.getAttribute("title");
-                
+
                 NodeList nodeLst = doc.getElementsByTagName("row");
                 String rowID = "", columnID = "", contentStr = "";
                 int nLength = nodeLst.getLength();
@@ -114,7 +114,7 @@ public class XMLCodec implements Codec {
                         rowID = attributeRow.getValue();
                         attributeRow = (Attr) attrs.item(1);
                         String rowHeight = attributeRow.getValue();
-                        
+
                         NodeList fstNmElmntLst = fstElmnt.getElementsByTagName("column");
 
                         for (int i = 0; i < fstNmElmntLst.getLength(); i++) {
@@ -126,7 +126,7 @@ public class XMLCodec implements Codec {
 
                             attribute = (Attr) attrsAtr.item(0);
                             String columnWidth = attribute.getValue();
-                            
+
                             Border border;
                             int valign, halign;
                             Color fore, back;
@@ -207,12 +207,12 @@ public class XMLCodec implements Codec {
                             String bottom = aux3[0];
                             String right = aux[4].substring(0, aux[4].length() - 1);
                             border = BorderFactory.createEmptyBorder(Integer.parseInt(top), Integer.parseInt(left), Integer.parseInt(bottom), Integer.parseInt(right));
-                            
+
                             int pos = getPosition(columnID);
-                            
+
                             work.getSpreadsheet(0).setTitle(title);
-                            ((StylableSpreadsheet)work.getSpreadsheet(0).getExtension(StyleExtension.NAME)).setColumnWidth(pos, Integer.parseInt(columnWidth));
-                            ((StylableSpreadsheet)work.getSpreadsheet(0).getExtension(StyleExtension.NAME)).setRowHeight(Integer.parseInt(rowID), Integer.parseInt(rowHeight));
+                            ((StylableSpreadsheet) work.getSpreadsheet(0).getExtension(StyleExtension.NAME)).setColumnWidth(pos, Integer.parseInt(columnWidth));
+                            ((StylableSpreadsheet) work.getSpreadsheet(0).getExtension(StyleExtension.NAME)).setRowHeight(Integer.parseInt(rowID), Integer.parseInt(rowHeight));
                             ((StylableCell) work.getSpreadsheet(0).getCell(pos, Integer.parseInt(rowID)).getExtension(StyleExtension.NAME)).setFont(font);
                             ((StylableCell) work.getSpreadsheet(0).getCell(pos, Integer.parseInt(rowID)).getExtension(StyleExtension.NAME)).setBackgroundColor(back);
                             ((StylableCell) work.getSpreadsheet(0).getCell(pos, Integer.parseInt(rowID)).getExtension(StyleExtension.NAME)).setForegroundColor(fore);
@@ -242,36 +242,41 @@ public class XMLCodec implements Codec {
         StylableCell stylableCell;
         StylableSpreadsheet st;
         sheet = workbook.getSpreadsheet(0);
+
         writer.print("<?xml version='1.0' encoding='UTF-8'?>\n");
-        writer.print("<cleanSheets title='"+sheet.getTitle()+"'>\n");
+        writer.print("<cleanSheets title='" + sheet.getTitle() + "'>\n");
+
 //        for (int i = 0; i < workbook.getSpreadsheetCount(); i++) {
 //            sheet = workbook.getSpreadsheet(i);
-            st = (StylableSpreadsheet) sheet.getExtension(StyleExtension.NAME);
+
+        st = (StylableSpreadsheet) sheet.getExtension(StyleExtension.NAME);
+
 //            writer.print("\t<spreadsheet title='" + sheet.getTitle() + "'>\n");
-            for (int row = 0; row < sheet.getRowCount(); row++) {
-                int rowcount = sheet.getColumnCount();
 
-                writer.print("\t\t<row idr='" + row + "' rowHeight='" + st.getRowHeight(row) + "'>\n");
-                
-                for (int column = 0; column <= sheet.getColumnCount(); column++) {
-                    String aux = sheet.getCell(column, row).getContent();
-                    stylableCell = (StylableCell) sheet.getCell(column, row).getExtension(StyleExtension.NAME);
-                    if (aux.trim() != "") {
-                        writer.print("\t\t\t<column idc='" + columns[column] + "' columnWidth='" + st.getColumnWidth(0) + "'>\n");
-                        writer.print("\t\t\t\t<content>" + sheet.getCell(column, row).getContent() + "</content>\n");
-                        writer.print("\t\t\t\t<font>" + stylableCell.getFont() + "</font>\n");
-                        writer.print("\t\t\t\t<valign>" + stylableCell.getVerticalAlignment() + "</valign>\n");
-                        writer.print("\t\t\t\t<halign>" + stylableCell.getHorizontalAlignment() + "</halign>\n");
-                        writer.print("\t\t\t\t<foreColor>" + stylableCell.getForegroundColor() + "</foreColor>\n");
-                        writer.print("\t\t\t\t<backColor>" + stylableCell.getBackgroundColor() + "</backColor>\n");
-                        writer.print("\t\t\t\t<border>" + stylableCell.getBorder().getBorderInsets(null) + "</border>\n");
-                        writer.print("\t\t\t</column>\n");
-                    }
+        for (int row = 0; row < sheet.getRowCount(); row++) {
+            int rowcount = sheet.getColumnCount();
+
+            writer.print("\t\t<row idr='" + row + "' rowHeight='" + st.getRowHeight(row) + "'>\n");
+
+            for (int column = 0; column <= sheet.getColumnCount(); column++) {
+                String aux = sheet.getCell(column, row).getContent();
+                stylableCell = (StylableCell) sheet.getCell(column, row).getExtension(StyleExtension.NAME);
+
+                if (aux.trim() != "") {
+                    writer.print("\t\t\t<column idc='" + columns[column] + "' columnWidth='" + st.getColumnWidth(0) + "'>\n");
+                    writer.print("\t\t\t\t<content>" + sheet.getCell(column, row).getContent() + "</content>\n");
+                    writer.print("\t\t\t\t<font>" + stylableCell.getFont() + "</font>\n");
+                    writer.print("\t\t\t\t<valign>" + stylableCell.getVerticalAlignment() + "</valign>\n");
+                    writer.print("\t\t\t\t<halign>" + stylableCell.getHorizontalAlignment() + "</halign>\n");
+                    writer.print("\t\t\t\t<foreColor>" + stylableCell.getForegroundColor() + "</foreColor>\n");
+                    writer.print("\t\t\t\t<backColor>" + stylableCell.getBackgroundColor() + "</backColor>\n");
+                    writer.print("\t\t\t\t<border>" + stylableCell.getBorder().getBorderInsets(null) + "</border>\n");
+                    writer.print("\t\t\t</column>\n");
                 }
-                writer.print("\t\t</row>\n\n");
-
-
             }
+
+            writer.print("\t\t</row>\n\n");
+        }
 //            writer.print("\t</spreadsheet>\n\n");
 //        }
 
