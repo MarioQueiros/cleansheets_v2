@@ -4,13 +4,15 @@
  */
 package csheets.ui.share;
 
-import csheets.sp.Client;
+import csheets.core.Cell;
+import csheets.core.Spreadsheet;
 import csheets.sp.ConnectionController;
 import csheets.ui.ctrl.UIController;
 import csheets.ui.sheet.SpreadsheetTableModel;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -32,8 +34,6 @@ public class ConnectFrame extends JFrame{
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField6;
     private javax.swing.JTextField jTextField7;
-    private String ip;
-    private int rows,columns;
     private UIController uiController;
     private ConnectionController connectController;
     
@@ -172,68 +172,53 @@ public class ConnectFrame extends JFrame{
     
     }
 
-    int getRows() {
-        return rows;
-    }
-    
-    int getColumns(){
-        return columns;
-    }
-
-    String getIP() {
-        return ip;
-    }
-
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {  
         boolean error;
-        String ip1,ip2,ip3,ip4;
-        int col=0,row=0;
+        String ip1,ip2,ip3,ip4,ip;
+        String col="";
+        int row=0;
+        InetAddress ad;
+        Cell firstCell = null;
         
         ip1=jTextField1.getText();
         ip2=jTextField2.getText();
         ip3=jTextField3.getText();
         ip4=jTextField4.getText();
-        /*
+        
        
         
-         try{
-            col=Integer.parseInt(jTextField6.getText());
-            row=Integer.parseInt(jTextField7.getText());
-            error=checkDataInsered(ip1,ip2,ip3,ip4,col,row);
+        try{
+            col=jTextField7.getText();
+            row=Integer.parseInt(jTextField6.getText());
+            firstCell=checkDataInsered(ip1,ip2,ip3,ip4,col,row,firstCell);
         }catch(Exception e){
-            error=true;
+            firstCell=null;
         }
         
-        
-        if(error==false){
-            ip=ip1+"."+ip2+"."+ip3+"."+ip4;
-
-            rows=row;
-            columns=col;
-            
-            JOptionPane.showMessageDialog(null,"IP: "+ip+" Area: Linhas: "+rows+" Colunas: "+columns);
-            
-        }
-        else{
-            JOptionPane.showMessageDialog(null,"Error in data insered!");
-        }*/
-        
-        String str = "";
         try {
+            if(firstCell!=null){
+                ip=ip1+"."+ip2+"."+ip3+"."+ip4;
+
+                ad = InetAddress.getByName(ip);
                 
-                InetAddress ad = InetAddress.getByName("localhost");
-                connectController.connect(ad,"A1",uiController.getActiveWorkbook(),uiController.getActiveSpreadsheet());
+                connectController.connect(ad,firstCell,uiController.getActiveSpreadsheet());
+            }
+            else{
+                JOptionPane.showMessageDialog(null,"Error in data insered!");
+            }
         } catch (UnknownHostException ex) {
-                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null,"Error connecting to the Host!");
         }
+        
+        
 
       
     }
     
     
-    private boolean checkDataInsered(String ip1,String ip2,String ip3,String ip4,int col, int row){
+    private Cell checkDataInsered(String ip1,String ip2,String ip3,String ip4,String col, int row, Cell firstCell){
         
-        int numberAux1=0,numberAux2=0,numberAux3=0,numberAux4=0;
+        int numberAux1=0,numberAux2=0,numberAux3=0,numberAux4=0,colFirst=-1;
         
         try{
             numberAux1=Integer.parseInt(ip1);
@@ -241,7 +226,7 @@ public class ConnectFrame extends JFrame{
             numberAux3=Integer.parseInt(ip3);
             numberAux4=Integer.parseInt(ip4);
             if((numberAux1<0||numberAux1>255)||(numberAux2<0||numberAux2>255)||(numberAux3<0||numberAux3>255)||(numberAux4<0||numberAux4>255)){
-                return true;
+                return null;
             }
             SpreadsheetTableModel aux = new SpreadsheetTableModel(uiController.getActiveSpreadsheet(),uiController);
             int activeSpreadsheetRows = aux.getRowCount();
@@ -249,18 +234,32 @@ public class ConnectFrame extends JFrame{
 
 
             if(row < 0 || row > activeSpreadsheetRows){
-                return true;
+                return null;
             }
-
-             if(col < 0 || col > activeSpreadsheetColumns){
-                return true;
+            
+            String[] expectedColumns = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+                "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG",
+                "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ"};
+        
+        
+            col=col.toUpperCase();
+            for(int i=0;i<activeSpreadsheetColumns;i++){
+                if(expectedColumns[i].equals(col)) {
+                    colFirst=i;
+                }
+            }
+            
+            if( colFirst == -1){
+                return null;
             }
         }
         catch(Exception e){
-            return true;
+            return null;
         }
         
-        return false;
+        firstCell = uiController.getActiveSpreadsheet().getCell(colFirst,(row-1));
+        
+        return firstCell;
     }
     
      void setUIController(UIController uiController) {

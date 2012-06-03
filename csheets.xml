@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>CleanSheets User Properties (1/Jun/2012 1:46:16)</comment>
+<comment>CleanSheets User Properties (3/Jun/2012 15:42:38)</comment>
 <entry key="filetype2.description">Extensible Markup Language (*.xml)</entry>
 <entry key="filetype0.extension">cls</entry>
 <entry key="dependencies.ui.sidebar">true</entry>
