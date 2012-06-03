@@ -7,8 +7,8 @@ package csheets.sp;
 import csheets.CleanSheets;
 import csheets.SpreadsheetAppEvent;
 import csheets.SpreadsheetAppListener;
+import csheets.core.Cell;
 import csheets.core.Spreadsheet;
-import csheets.core.Workbook;
 import csheets.ui.ctrl.EditEvent;
 import csheets.ui.ctrl.EditListener;
 import csheets.ui.ctrl.SelectionEvent;
@@ -77,7 +77,6 @@ public class ConnectionController implements EditListener,SpreadsheetAppListener
                 t1.start();
                 
                 
-                
             }else if((e.getConnection().getClass().getName().contains("Client"))&&(isConnectedTo(e.getConnection().getAddress())==false)){
                 
                 ((Client)e.getConnection()).setType("Client");
@@ -86,7 +85,6 @@ public class ConnectionController implements EditListener,SpreadsheetAppListener
                 t1.setName("Client : "+e.getConnection().getAddress());
                 threadManager.add(t1);
                 t1.start();
-                
                 
             }else if((isConnectedTo(e.getConnection().getAddress())==true)){
                 JOptionPane.showMessageDialog(null,"Connection already established as a client to the selected server!");
@@ -102,7 +100,22 @@ public class ConnectionController implements EditListener,SpreadsheetAppListener
         }
 
         public void connectionRemoved(ConnectionEvent e){
-            connections.remove(e.getConnection());
+            try{
+                connections.remove(e.getConnection());
+                for(int i=0;i<threadManager.size();i++){
+                    if(threadManager.get(i).getName().contains(e.getConnection().getType()+" : "+e.getConnection().getAddress())){
+                        if(!threadManager.get(i).isInterrupted()){
+                            threadManager.get(i).join();
+                            threadManager.get(i).interrupt();
+                            JOptionPane.showMessageDialog(null,"Connection Closed!");
+
+                        }
+                        break;
+                    }
+                }
+            }catch(Exception ex){
+                JOptionPane.showMessageDialog(null,"Error disconnecting!");
+            }
         }
 
         public void connectionContentModified(ConnectionEvent e){
@@ -128,8 +141,10 @@ public class ConnectionController implements EditListener,SpreadsheetAppListener
 
                 if(event.getWorkbook() == connections.get(i).getWorkbook()){
                     for(int j=0;j<event.getWorkbook().getSpreadsheetCount();j++){
-                        if(event.getWorkbook().getSpreadsheet(j) == connections.get(i).getSpreasheet())
+                        if(event.getWorkbook().getSpreadsheet(j) == connections.get(i).getSpreasheet()){
                             fireConnectionEvent(connections.get(i),ConnectionEvent.Type.REMOVED);
+                            break;
+                        }
                     }
                 }
             }
@@ -168,12 +183,13 @@ public class ConnectionController implements EditListener,SpreadsheetAppListener
         }
 
 
-        public void connect(InetAddress ip, String cell, Workbook workbook, Spreadsheet spreadsheet){
-            fireConnectionEvent(new Client(ip,cell),ConnectionEvent.Type.CREATED);
+        public void connect(InetAddress ip, Cell cell, Spreadsheet spreadsheet){
+            fireConnectionEvent(new Client(ip,cell, spreadsheet,this),ConnectionEvent.Type.CREATED);
         }
 
-        public void createConnect(String firstCell, String lastCell,Workbook workbook, Spreadsheet spreadsheet){
-            fireConnectionEvent(new Host(firstCell,lastCell),ConnectionEvent.Type.CREATED);
+        public void createConnect(List <Cell> cellConnected, int rowNumber, int colNumber, Spreadsheet spreadsheet){
+            
+            fireConnectionEvent(new Host(cellConnected, rowNumber, colNumber, spreadsheet,this),ConnectionEvent.Type.CREATED);
         }
 
         public void addConnectionListener(ConnectionListener listener) {
@@ -199,6 +215,7 @@ public class ConnectionController implements EditListener,SpreadsheetAppListener
             for(int i=0;i<threadManager.size();i++){
                 if(threadManager.get(i).getName().contains(selectedItem)){
                     typeAndAddress = threadManager.get(i).getName();
+                    break;
                 }
             }
             
@@ -206,9 +223,11 @@ public class ConnectionController implements EditListener,SpreadsheetAppListener
                 if(typeAndAddress.contains(connections.get(i).getAddress().toString())){
                     connect = connections.get(i);
                     connect.closeSockets();
+                    connect.removeListeners();
                 }
             }
             if(connect != null){
+                
                 fireConnectionEvent(connect,ConnectionEvent.Type.REMOVED);
             }
         }
@@ -279,7 +298,7 @@ public class ConnectionController implements EditListener,SpreadsheetAppListener
             return connectController;
         }
         
-        /**
+                /**
 		 * Asks the event queue to create a component at a later time.
 		 * (Included for conformity.)
 		 */

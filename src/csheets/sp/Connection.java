@@ -4,23 +4,30 @@
  */
 package csheets.sp;
 
+import csheets.core.Address;
+import csheets.core.Cell;
+import csheets.core.CellListener;
 import csheets.core.Spreadsheet;
 import csheets.core.Workbook;
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.util.List;
 
 /**
  *
  * @author Tiago
  */
-public abstract class Connection implements Serializable{
+public abstract class Connection implements Serializable, Runnable, CellListener{
     
     protected final int PORT=53531;
     protected String type;
     protected InetAddress address;
-    protected Workbook connectedWorkbook;
     protected Spreadsheet connectedSpreadsheet;
-
+    protected List<Cell> connectedCells;
+    protected Workbook connectedWorkbook;
+    protected List<Address> connectedFrom;
+    protected ConnectionController connectController;
+    
     public Workbook getWorkbook() {
         return connectedWorkbook;
     }
@@ -36,12 +43,12 @@ public abstract class Connection implements Serializable{
     public String getType() {
         return type;
     }
-
-    abstract void closeSockets();
-
+    
     void setType(String string) {
         type = string;
     }
 
+    abstract void closeSockets();
     
+    abstract void removeListeners();
 }
