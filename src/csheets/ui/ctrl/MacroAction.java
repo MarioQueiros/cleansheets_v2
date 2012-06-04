@@ -20,8 +20,6 @@ public class MacroAction extends BaseAction {
         this.uiController = uiController;               
     }
    
-    
-    
     protected String getName() {
         return "Criacao de Macros";
     }
