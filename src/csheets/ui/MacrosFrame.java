@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
-
 /**
  *
  * @author Hugo Dias
@@ -141,10 +140,11 @@ public class MacrosFrame extends JFrame {
 
             //Verifica se a macro ja esta criada e verificar se o nome dela e "Macros"
             if (jTextField1.getText().equals("Macros") || jTextField1.getText().equals("Introduzir nome da macro aqui...")) {
-                JOptionPane.showMessageDialog(null, "Não pode criar uma macro com esse nome!");
+                JOptionPane.showMessageDialog(null, "Nao pode criar uma macro com esse nome!");
                 flag = 5;
             }
 
+            //Verificar se o nome da Macro ja existe
             for (int j = 0; j < numeroMacros; j++) {
                 if (nomeMacro.equals(jComboBox1.getItemAt(j))) {
                     int resposta = 0;
@@ -176,11 +176,11 @@ public class MacrosFrame extends JFrame {
                 } else if (flag == 3) {
                     JOptionPane.showMessageDialog(null, "Existe uma ou mais instrucoes na macro em a fórmula nao esta correctamente implementada! Por favor verifique novamente a macro.");
                 } else if (flag == 4) {
-                    JOptionPane.showMessageDialog(null, "Deverá colocar um nome na Macro!");
+                    JOptionPane.showMessageDialog(null, "Devera colocar um nome na Macro!");
                 }
             }
 
-            //Este if serve para actualizar a macro que já foi criada anteriormente
+            //Este if serve para actualizar a macro que ja foi criada anteriormente
             if (flag == 6) {
                 int totalMacros = jComboBox1.getItemCount();
                 int pos = 0;
@@ -205,7 +205,7 @@ public class MacrosFrame extends JFrame {
                 } else if (flag == 3) {
                     JOptionPane.showMessageDialog(null, "Existe uma ou mais instrucoes na macro em a fórmula nao esta correctamente implementada! Por favor verifique novamente a macro.");
                 } else if (flag == 4) {
-                    JOptionPane.showMessageDialog(null, "Deverá colocar um nome na Macro!");
+                    JOptionPane.showMessageDialog(null, "Devera colocar um nome na Macro!");
                 }
             }
         }
@@ -224,7 +224,7 @@ public class MacrosFrame extends JFrame {
         int pos = 0;
 
         //Este if serve para verificar que o programa nao faz nada quando se selecciona na combobox a palavra "Macros" porque esta
-        //está predefinida na combobox e nao tem nenhuma macro la dentro
+        //esta predefinida na combobox e nao tem nenhuma macro la dentro
         if (jComboBox1.getSelectedItem().equals("Macros")) {
             jTextArea1.setText("");
         } else {
