@@ -60,16 +60,22 @@ public class Frame extends JFrame implements SelectionListener {
 	/** The CleanSheets application */
 	private CleanSheets app;
 
+        /** The Connections Controller */
+        private ConnectionController connectController;
+        
 	/**
 	 * Creates a new frame.
 	 * @param app the CleanSheets application
 	 */
-	public Frame(CleanSheets app) {
+	public Frame(CleanSheets app, ConnectionController connectController) {
 		// Stores members and creates controllers
 		this.app = app;
+                
 		UIController uiController = new UIController(app);
                 
-                ConnectionController connectionController = new ConnectionController(app,uiController);
+                connectController.addUIListeners(uiController);
+                this.connectController = connectController;
+                
                 
 		// Creates action manager
 		FileChooser chooser = null;
@@ -119,9 +125,9 @@ public class Frame extends JFrame implements SelectionListener {
 
                 // Registers page share actions
                 
-		actionManager.registerAction("host", new HostAction(app,uiController,connectionController));
-		actionManager.registerAction("client", new ClientAction(app,uiController,connectionController));
-		actionManager.registerAction("disconnect", new DisconnectAction(app,uiController));
+		actionManager.registerAction("host", new HostAction(app,uiController,connectController));
+		actionManager.registerAction("client", new ClientAction(app,uiController,connectController));
+		actionManager.registerAction("disconnect", new DisconnectAction(app,uiController,connectController));
 
 		// Creates spreadsheet components
 		WorkbookPane workbookPane = new WorkbookPane(uiController, actionManager);
@@ -203,6 +209,10 @@ public class Frame extends JFrame implements SelectionListener {
 			setTitle(TITLE);
 	}
 
+    
+
+
+    
 	/**
 	 * A utility for creating a Frame on the AWT event dispatching thread.
 	 * @author Einar Pehrson
@@ -214,13 +224,17 @@ public class Frame extends JFrame implements SelectionListener {
 
 		/** The CleanSheets application */
 		private CleanSheets app;
+                
+                /** The Connections Controller */
+                ConnectionController connectController;
 
 		/**
 		 * Creates a new frame creator.
 		 * @param app the CleanSheets application
 		 */
-		public Creator(CleanSheets app) {
+		public Creator(CleanSheets app, ConnectionController connectController) {
 			this.app = app;
+                        this.connectController = connectController;
 		}
 
 		/**
@@ -248,7 +262,7 @@ public class Frame extends JFrame implements SelectionListener {
 		}
 
 		public void run() {
-			frame = new Frame(app);
+			frame = new Frame(app,connectController);
 		}
 	}
 }
