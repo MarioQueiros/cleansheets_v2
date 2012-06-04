@@ -107,7 +107,7 @@ public class ConnectionController implements EditListener,SpreadsheetAppListener
                         if(!threadManager.get(i).isInterrupted()){
                             threadManager.get(i).join();
                             threadManager.get(i).interrupt();
-                            JOptionPane.showMessageDialog(null,"Connection Closed!");
+                            
 
                         }
                         break;
@@ -116,6 +116,7 @@ public class ConnectionController implements EditListener,SpreadsheetAppListener
             }catch(Exception ex){
                 JOptionPane.showMessageDialog(null,"Error disconnecting!");
             }
+            JOptionPane.showMessageDialog(null,"Connection Closed!");
         }
 
         public void connectionContentModified(ConnectionEvent e){
@@ -184,12 +185,12 @@ public class ConnectionController implements EditListener,SpreadsheetAppListener
 
 
         public void connect(InetAddress ip, Cell cell, Spreadsheet spreadsheet){
-            fireConnectionEvent(new Client(ip,cell, spreadsheet,this),ConnectionEvent.Type.CREATED);
+            fireConnectionEvent(new Client(ip,cell, spreadsheet,this,uiController),ConnectionEvent.Type.CREATED);
         }
 
         public void createConnect(List <Cell> cellConnected, int rowNumber, int colNumber, Spreadsheet spreadsheet){
             
-            fireConnectionEvent(new Host(cellConnected, rowNumber, colNumber, spreadsheet,this),ConnectionEvent.Type.CREATED);
+            fireConnectionEvent(new Host(cellConnected, rowNumber, colNumber, spreadsheet,this,uiController),ConnectionEvent.Type.CREATED);
         }
 
         public void addConnectionListener(ConnectionListener listener) {

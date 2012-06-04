@@ -9,6 +9,8 @@ import csheets.core.Cell;
 import csheets.core.CellListener;
 import csheets.core.Spreadsheet;
 import csheets.core.Workbook;
+import csheets.ui.ctrl.EditListener;
+import csheets.ui.ctrl.UIController;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.List;
  *
  * @author Tiago
  */
-public abstract class Connection implements Serializable, Runnable, CellListener{
+public abstract class Connection implements Serializable, Runnable, CellListener,EditListener{
     
     protected final int PORT=53531;
     protected String type;
@@ -27,6 +29,7 @@ public abstract class Connection implements Serializable, Runnable, CellListener
     protected Workbook connectedWorkbook;
     protected List<Address> connectedFrom;
     protected ConnectionController connectController;
+    protected UIController uiController;
     
     public Workbook getWorkbook() {
         return connectedWorkbook;
@@ -51,4 +54,11 @@ public abstract class Connection implements Serializable, Runnable, CellListener
     abstract void closeSockets();
     
     abstract void removeListeners();
+
+    /**
+     * @return the connectedCells
+     */
+    public List<Cell> getConnectedCells() {
+        return connectedCells;
+    }
 }

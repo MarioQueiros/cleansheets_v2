@@ -109,6 +109,7 @@ public class CreateConnectionFrame extends JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }
     
     public void jButton1ActionPerformed(java.awt.event.ActionEvent evt){
@@ -130,6 +131,7 @@ public class CreateConnectionFrame extends JFrame {
         if(cellConnected!=null){
             
             connectController.createConnect(cellConnected,rowNumber,colNumber,uiController.getActiveSpreadsheet());
+            setVisible(false);
         }
         else{
             
