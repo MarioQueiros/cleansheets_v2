@@ -115,7 +115,6 @@ public class Frame extends JFrame implements SelectionListener {
 		actionManager.registerAction("about", new AboutAction());
                 
                 // Registers macros actions
-		
 		actionManager.registerAction("Criacao de Novas Macros", new MacroAction(uiController));
 
                 // Registers page share actions

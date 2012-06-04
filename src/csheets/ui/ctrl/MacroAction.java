@@ -31,9 +31,9 @@ public class MacroAction extends BaseAction {
     
     
     
+   
     public void actionPerformed(ActionEvent event) {
-        MacrosFrame aux = new MacrosFrame(uiController); 
-        
+        MacrosFrame aux = new MacrosFrame(uiController);         
         
         aux.setLocation(500, 250);
         aux.setVisible(true);

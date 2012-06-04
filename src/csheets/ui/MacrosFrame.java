@@ -108,9 +108,6 @@ public class MacrosFrame extends JFrame {
             }
         });
 
-
-
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -128,7 +125,7 @@ public class MacrosFrame extends JFrame {
         String verificarTexto;
         verificarTexto = jTextArea1.getText();
 
-        //Caso nao tenha sido introduzida nenhuma instru??o para a macro, mostrar mensagem ao utilizador
+        //Caso nao tenha sido introduzida nenhuma instrucao para a macro, mostrar mensagem ao utilizador
         if (verificarTexto.equals("")) {
             JOptionPane.showMessageDialog(null, "Nao inseriu nenhuma instrucao para uma macro.");
         } else {
@@ -141,15 +138,22 @@ public class MacrosFrame extends JFrame {
             nomeMacro = jTextField1.getText();
 
             flag = 0;
+
+            //Verifica se a macro ja esta criada e verificar se o nome dela e "Macros"
+            if (jTextField1.getText().equals("Macros") || jTextField1.getText().equals("Introduzir nome da macro aqui...")) {
+                JOptionPane.showMessageDialog(null, "Não pode criar uma macro com esse nome!");
+                flag = 5;
+            }
+
             for (int j = 0; j < numeroMacros; j++) {
                 if (nomeMacro.equals(jComboBox1.getItemAt(j))) {
                     int resposta = 0;
 
-                    if (flag != 1) {
-                        resposta = JOptionPane.showConfirmDialog(this, "A macro '" + nomeMacro + "' já está criada! Pretende substituir o valor da mesma?", "Atencao!", JOptionPane.WARNING_MESSAGE);
+                    if (flag != 1 && flag != 5) {
+                        resposta = JOptionPane.showConfirmDialog(this, "A macro '" + nomeMacro + "' ja esta criada! Pretende substituir o valor da mesma?", "Atencao!", JOptionPane.WARNING_MESSAGE);
                     }
-                    if (resposta == 0 && flag != 1) {
-                        flag = 2;
+                    if (resposta == 0 && flag != 1 && flag != 5) {
+                        flag = 6;
                     } else if (resposta == 2) {
                         flag = 1;
                     }
@@ -158,127 +162,50 @@ public class MacrosFrame extends JFrame {
 
             if (flag == 0) {
 
-                for (int i = 0; i < textoMacro.length; i++) {
-
-                    aux = textoMacro[i].split(":=");
-
-                    if (aux.length == 1) {
-                        JOptionPane.showMessageDialog(null, "Nao colocou nenhuma formula. Por favor tente novamente.");
-                    } else {
-                        Pattern p = Pattern.compile("([a-zA-Z])([1-9]+[0-9]*)");
-                        Matcher m = p.matcher(aux[0]);
-
-                        //Verificar se a expressao e valida
-                        if (m.matches() == true) {
-
-                            if (i + 1 == textoMacro.length && flag != 1) {
-                                jComboBox1.addItem(nomeMacro);
-                            }
-
-                            String x = aux[0];
-
-                            String auxiliar;
-                            auxiliar = aux[1];
-
-                            aux[1] = "=" + auxiliar;
-
-
-                            char[] letra = x.substring(0, 1).toCharArray();
-                            char[] numero = x.substring(1, 2).toCharArray();
-
-                            int posx, posy;
-
-                            posx = numero[0] - 49;
-                            posy = letra[0] - 65;
-
-                            try {
-                                this.uiController.getActiveSpreadsheet().getCell(posy, posx).setContent(aux[1]);
-                            } catch (FormulaCompilationException ex) {
-                                JOptionPane.showMessageDialog(null, "A formula " + aux[1] + " nao esta correctamente implementada. Por favor tente novamente.");
-                            }
-
-                        } else {
-                            flag = 1;
-                        }
-
-
-                    }
-
-                    if (flag == 1) {
-                        JOptionPane.showMessageDialog(null, "Expressao nao esta correcta. O formato devera de ser por exemplo A1:=(seguido da formula pretendida)");
-                    } else {
-                        //Adicionar a uma lista a macro criada
-                        listaMacros.add(jTextArea1.getText());
-                    }
-                }
+                flag = colocarCelula(textoMacro, flag);
 
                 if (flag == 0) {
+                    //Caso nao tenha havido problemas com a macro, adicionar a uma lista a macro criada e a combobox
+                    listaMacros.add(jTextArea1.getText());
+                    jComboBox1.addItem(nomeMacro);
                     JOptionPane.showMessageDialog(null, "A macro '" + jTextField1.getText() + "' foi criada com sucesso!");
+                } else if (flag == 1) {
+                    JOptionPane.showMessageDialog(null, "Expressao nao esta correcta. O formato devera de ser por exemplo A1:=(seguido da formula pretendida)");
+                } else if (flag == 2) {
+                    JOptionPane.showMessageDialog(null, "Existe uma ou mais instrucoes na macro que nao tem formula. Por favor verifique novamente a macro.");
+                } else if (flag == 3) {
+                    JOptionPane.showMessageDialog(null, "Existe uma ou mais instrucoes na macro em a fórmula nao esta correctamente implementada! Por favor verifique novamente a macro.");
+                } else if (flag == 4) {
+                    JOptionPane.showMessageDialog(null, "Deverá colocar um nome na Macro!");
                 }
-
             }
 
             //Este if serve para actualizar a macro que já foi criada anteriormente
-            if (flag == 2) {
+            if (flag == 6) {
                 int totalMacros = jComboBox1.getItemCount();
                 int pos = 0;
+                flag = 0;
 
+                flag = colocarCelula(textoMacro, flag);
 
-                for (int j = 0; j < totalMacros; j++) {
-                    if (jComboBox1.getItemAt(j).equals(jTextField1.getText())) {
-                        listaMacros.set(j - 1, jTextArea1.getText());
+                if (flag == 0) {
 
-                        for (int i = 0; i < textoMacro.length; i++) {
-
-                            aux = textoMacro[i].split(":=");
-
-
-                            if (aux.length == 1) {
-                                JOptionPane.showMessageDialog(null, "Nao colocou nenhuma formula. Por favor tente novamente.");
-                            } else {
-
-
-                                Pattern p = Pattern.compile("([a-zA-Z])([1-9]+[0-9]*)");
-                                Matcher m = p.matcher(aux[0]);
-
-                                //Verificar se a expressao e valida
-                                if (m.matches() == true) {
-
-                                    String x = aux[0];
-
-                                    String auxiliar;
-                                    auxiliar = aux[1];
-
-                                    aux[1] = "=" + auxiliar;
-
-                                    char[] letra = x.substring(0, 1).toCharArray();
-                                    char[] numero = x.substring(1, 2).toCharArray();
-
-                                    int posx, posy;
-
-                                    posx = numero[0] - 49;
-                                    posy = letra[0] - 65;
-
-                                    try {
-                                        this.uiController.getActiveSpreadsheet().getCell(posy, posx).setContent(aux[1]);
-                                    } catch (FormulaCompilationException ex) {
-                                        JOptionPane.showMessageDialog(null, "A formula " + aux[1] + " nao esta correctamente implementada. Por favor tente novamente.");
-                                    }
-
-                                } else {
-                                    flag = 1;
-                                }
-                            }
-                        }
-
-                        if (flag == 2) {
-                            JOptionPane.showMessageDialog(null, "A macro '" + jTextField1.getText() + "' foi alterada com sucesso!");
-                        }
-
-                        if (flag == 1) {
-                            JOptionPane.showMessageDialog(null, "Expressao nao esta correcta. O formato devera de ser por exemplo A1:=(seguido da formula pretendida)");
+                    //Ira actualizar a arraylist que guarda as macros com o novo conteudo da macro
+                    for (int j = 0; j < totalMacros; j++) {
+                        if (jComboBox1.getItemAt(j).equals(jTextField1.getText())) {
+                            listaMacros.set(j - 1, jTextArea1.getText());
                         }
                     }
+                    JOptionPane.showMessageDialog(null, "A macro '" + jTextField1.getText() + "' foi alterada com sucesso!");
+
+                } else if (flag == 1) {
+                    JOptionPane.showMessageDialog(null, "Expressao nao esta correcta. O formato devera de ser por exemplo A1:=(seguido da formula pretendida)");
+                } else if (flag == 2) {
+                    JOptionPane.showMessageDialog(null, "Existe uma ou mais instrucoes na macro que nao tem formula. Por favor verifique novamente a macro.");
+                } else if (flag == 3) {
+                    JOptionPane.showMessageDialog(null, "Existe uma ou mais instrucoes na macro em a fórmula nao esta correctamente implementada! Por favor verifique novamente a macro.");
+                } else if (flag == 4) {
+                    JOptionPane.showMessageDialog(null, "Deverá colocar um nome na Macro!");
                 }
             }
         }
@@ -312,5 +239,65 @@ public class MacrosFrame extends JFrame {
 
             jTextArea1.setText(listaMacros.get(pos - 1));
         }
+    }
+
+    public int colocarCelula(String[] textoMacro, int flag) {
+        int posx=0, posy=0;
+        
+        
+        for (int i = 0; i < textoMacro.length; i++) {
+
+            aux = textoMacro[i].split(":=");
+
+            Pattern p = Pattern.compile("([a-zA-Z])([1-9]+[0-9]*)");
+            Matcher m = p.matcher(aux[0]);
+
+            //Verificar se a expressao e valida
+            if (m.matches() == true) {
+
+                //Verificar caso tenha sido colocado "A1:="
+                if (aux.length == 1) {
+                    int aux = i + 1;
+                    flag = 2;
+                } else if (jTextField1.getText().equals("")) {
+                    flag = 4;
+                } else {
+                    String auxiliar;
+                    auxiliar = aux[1];
+
+                    aux[1] = "=" + auxiliar;
+
+                    for (int l = 0; l < aux[0].length(); l++) {
+                        char[] caracter = aux[0].substring(l, l+1).toCharArray();
+                        
+                        if (Character.isDigit(caracter[0])){
+                            //Numeros
+                            int auxiliarPosNumeros = caracter[0] - 48;
+                            
+                            String auxiliarPosString = Integer.toString(auxiliarPosNumeros);
+                            
+                            posx = Integer.parseInt(posx+auxiliarPosString);
+                        }else{
+                            //Letras
+                            int auxiliarPosLetras = caracter[0] - 65;
+                            
+                            String auxiliarPosString = Integer.toString(auxiliarPosLetras);
+                            
+                            posy = Integer.parseInt(posy+auxiliarPosString);
+                        }
+                    }
+
+                    try {
+                        this.uiController.getActiveSpreadsheet().getCell(posy, posx-1).setContent(aux[1]);
+                    } catch (FormulaCompilationException ex) {
+                        flag = 3;
+                    }
+                }
+
+            } else {
+                flag = 1;
+            }
+        }
+        return flag;
     }
 }
