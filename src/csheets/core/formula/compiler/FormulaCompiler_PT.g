@@ -37,9 +37,12 @@ options {
 	: ( expression | literal ) EOF
 	; */
 expression
-	: EQ! comparison EOF!
+	: EQ! (comparison | anothercell) EOF!
 	;
-
+anothercell
+	: CELL_REF EQF comparison
+	;
+	
 comparison
 	: concatenation
 		( ( EQ^ | NEQ^ | GT^ | LT^ | LTEQ^ | GTEQ^ ) concatenation )?
@@ -145,6 +148,7 @@ protected DIGIT : '0'..'9' ;
 
 /* Comparison operators */
 EQ		: "#" ;
+EQF		: ":=" ;
 NEQ		: "<>" ;
 LTEQ	: "<=" ;
 GTEQ	: ">=" ;
