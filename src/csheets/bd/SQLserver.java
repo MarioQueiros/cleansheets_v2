@@ -4,6 +4,7 @@
  */
 package csheets.bd;
 
+import csheets.ui.ctrl.UIController;
 import java.sql.*;
 
 /**
@@ -119,4 +120,47 @@ public class SQLserver implements IBaseDados {
             return false;
         }
     }
+    
+        public boolean carregarInformacao(String nome_tab, UIController ui, String nome_bd,  String tipobd, String end, String porta, String user, String pass){
+         try {
+            nome_tabela = nome_tab;
+
+            verificarPass(pass);
+
+            String url = "";
+
+            DriverManager.registerDriver(new com.microsoft.sqlserver.jdbc.SQLServerDriver());
+            url = "jdbc:sqlserver://" + end + ":" + porta + ";databaseName=" + nome_bd;
+
+            conn = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+            conn.setAutoCommit(false);
+            Statement st = (Statement) conn.createStatement();
+            String query="select * from "+nome_tab; 
+            String query_conta_col="SELECT count(*) FROM information_schema.columns WHERE table_name = '"+nome_tab+"'";
+            
+            ResultSet rs=st.executeQuery(query_conta_col);
+            int nrcolunas=0;
+            //Ir buscar o número de colunas que a tabela tem
+            while(rs.next())
+             nrcolunas=rs.getInt(1);
+            
+            rs=st.executeQuery(query);
+             int row=0;
+            while(rs.next()){
+               for(int i=1;i<=nrcolunas;i++)
+                ui.getActiveSpreadsheet().getCell(i-1, row).setContent(rs.getString(i));
+               row++;
+            }
+                
+        
+            st.close();
+            conn.commit();
+            conn.close();
+            return true;
+        } catch (Exception e) {
+            // e.printStackTrace();
+            return false;
+        }
+     }
 }

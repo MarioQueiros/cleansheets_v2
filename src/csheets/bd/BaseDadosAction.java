@@ -39,8 +39,12 @@ public class BaseDadosAction extends BaseAction {
             escolherAreaCelulas();
             preencherVectorCoord();
             preencherMatrizFinal();
-            IBaseDados bd = BaseDadosFactory.getBD(tipo_bd);
+            IBaseDados bd;
+            
+            if(!flag_geral){
+            bd = BaseDadosFactory.getBD(tipo_bd);
             formulario(bd);
+            }
         }
     }
 
