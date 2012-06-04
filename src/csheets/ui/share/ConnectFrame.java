@@ -62,7 +62,7 @@ public class ConnectFrame extends JFrame{
 
         jLabel1.setText("IP Address");
 
-        jLabel2.setText("Area");
+        jLabel2.setText("First Cell");
 
         jTextField1.setColumns(3);
         jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -71,7 +71,7 @@ public class ConnectFrame extends JFrame{
 
         jTextField2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
-        jButton1.setText("Create Connection!");
+        jButton1.setText("Connect!");
         
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -89,14 +89,14 @@ public class ConnectFrame extends JFrame{
 
         jTextField4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
-        jLabel8.setText("Select the IP Address and the dimension of the Area to be synced.");
+        jLabel8.setText("Select the IP Address and the first cell of the area to be synced.");
 
         jTextField6.setColumns(3);
         jTextField6.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField6.setToolTipText("");
         
 
-        jLabel6.setText("x");
+        jLabel6.setText("");
 
         jTextField7.setColumns(3);
         jTextField7.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -169,7 +169,7 @@ public class ConnectFrame extends JFrame{
         );
 
         pack();
-    
+        setLocationRelativeTo(null);
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {  
@@ -202,6 +202,7 @@ public class ConnectFrame extends JFrame{
                 ad = InetAddress.getByName(ip);
                 
                 connectController.connect(ad,firstCell,uiController.getActiveSpreadsheet());
+                setVisible(false);
             }
             else{
                 JOptionPane.showMessageDialog(null,"Error in data insered!");

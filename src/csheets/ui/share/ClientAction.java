@@ -20,8 +20,6 @@ public class ClientAction extends BaseAction{
     
     
     ConnectFrame cFrame= new ConnectFrame();
-    AreaFrame aFrame= new AreaFrame();
-    Dimension d = new Dimension();
     
     String ip;
     Connection connection;
@@ -39,8 +37,6 @@ public class ClientAction extends BaseAction{
         cFrame.setConnectionController(connectController);
         cFrame.setVisible(false);
         
-        /*aFrame.setController(uiController);
-        aFrame.setVisible(false);*/
     }
     
     @Override
@@ -51,15 +47,6 @@ public class ClientAction extends BaseAction{
     @Override
     public void actionPerformed(ActionEvent e) {
             cFrame.setVisible(true);
-        
-        
-            /*cFrame.setVisible(true);
-            
-            d.width=cFrame.getColumns();
-            d.height=cFrame.getRows();
-            
-            
-            aFrame.getFirstCell();*/
         
         
     }
