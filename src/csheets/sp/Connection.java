@@ -51,4 +51,11 @@ public abstract class Connection implements Serializable, Runnable, CellListener
     abstract void closeSockets();
     
     abstract void removeListeners();
+
+    /**
+     * @return the connectedCells
+     */
+    public List<Cell> getConnectedCells() {
+        return connectedCells;
+    }
 }

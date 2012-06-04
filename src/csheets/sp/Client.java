@@ -70,8 +70,8 @@ public class Client extends Connection{
     @Override
     public void contentChanged(Cell cell) {
         PrintWriter out;
-        for(int i=0;i<connectedCells.size();i++){
-            if(cell.equals(connectedCells.get(i))){
+        for(int i=0;i<getConnectedCells().size();i++){
+            if(cell.equals(getConnectedCells().get(i))){
                 synchronized(syncSockets){
                     try{
                         out = new PrintWriter(socket.getOutputStream(), true);
@@ -123,11 +123,11 @@ public class Client extends Connection{
                                 }
                                 cellInfo = stream.split(",");
 
-                                for(int i=0;i<connectedCells.size();i++){
-                                    for(int j=0;j<connectedCells.size();j++){
+                                for(int i=0;i<getConnectedCells().size();i++){
+                                    for(int j=0;j<getConnectedCells().size();j++){
                                         if(connectedFrom.get(i).toString().contains(cellInfo[0])){
                                             try {
-                                                connectedCells.get(i).setContent(cellInfo[1]);
+                                                getConnectedCells().get(i).setContent(cellInfo[1]);
                                             } catch (FormulaCompilationException ex) {
                                                 JOptionPane.showMessageDialog(null, "Error on receiving connected content!");
 
@@ -174,7 +174,7 @@ public class Client extends Connection{
                     
                     for(int i=0;i<rowNumber;i++){
                         for(int j=0;j<colNumber;j++){
-                            connectedCells.add(connectedSpreadsheet.getCell((firstCellColumn + j),(firstCellRow + i)));
+                            getConnectedCells().add(connectedSpreadsheet.getCell((firstCellColumn + j),(firstCellRow + i)));
                             
                             Address addrAux = new Address((firstColFromConnected+j),(firstRowFromConnected+i));
                             connectedFrom.add(addrAux);

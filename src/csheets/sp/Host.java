@@ -6,7 +6,6 @@ package csheets.sp;
 
 import csheets.core.Address;
 import csheets.core.Cell;
-import csheets.core.CellListener;
 import csheets.core.Spreadsheet;
 import csheets.core.formula.compiler.FormulaCompilationException;
 import java.io.BufferedReader;
@@ -35,18 +34,11 @@ public class Host extends Connection {
     public Host(List <Cell> cellConnected, int rowNumber, int colNumber , Spreadsheet connectedSpreadsheet, ConnectionController connectController){
             
             try{
-                address = InetAddress.getByName("localhost");
+                address = InetAddress.getLocalHost();
                 servSocket = new ServerSocket(PORT,0,address);
-                
-                //Color color = JColorChooser.showDialog(null,"Choose Background Color",null);
                 
                 this.connectController=connectController;
                 this.connectedCells = cellConnected;
-                /*for(int i=0;i<cellConnected.size();i++){
-                            StylableCell stylableCell = (StylableCell)cellConnected.get(i).getExtension(StyleExtension.NAME);
-                            stylableCell.setBackgroundColor(color);
-                            connectedCells.add(stylableCell);
-                }*/
                 
                 this.connectedSpreadsheet = connectedSpreadsheet;
                 connectedWorkbook = connectedSpreadsheet.getWorkbook();
@@ -78,8 +70,8 @@ public class Host extends Connection {
     @Override
     public void contentChanged(Cell cell) {
         PrintWriter out;
-        for(int i=0;i<connectedCells.size();i++){
-            if(cell.equals(connectedCells.get(i))){
+        for(int i=0;i<getConnectedCells().size();i++){
+            if(cell.equals(getConnectedCells().get(i))){
                 synchronized(syncSockets){
                     try{
                         out = new PrintWriter(clntSocket.getOutputStream(), true);
@@ -129,10 +121,10 @@ public class Host extends Connection {
                             cellInfo = stream.split(",");
                             
                             synchronized(syncSockets){
-                                for(int i=0;i<connectedCells.size();i++){
+                                for(int i=0;i<getConnectedCells().size();i++){
                                     if(connectedFrom.get(i).toString().contains(cellInfo[0])){
                                         try {
-                                            connectedCells.get(i).setContent(cellInfo[1]);
+                                            getConnectedCells().get(i).setContent(cellInfo[1]);
                                         } catch (FormulaCompilationException ex) {
                                             JOptionPane.showMessageDialog(null, "Error on receiving connected content!");
                                         }
@@ -161,7 +153,7 @@ public class Host extends Connection {
                   clntSocket = servSocket.accept();
                   BufferedReader in = new BufferedReader(new InputStreamReader(clntSocket.getInputStream()));
                   PrintWriter out = new PrintWriter(clntSocket.getOutputStream(), true);
-                  out.println(rowNumber+","+colNumber+","+connectedCells.get(0).getAddress().getColumn()+","+connectedCells.get(0).getAddress().getRow()+"\n");
+                  out.println(rowNumber+","+colNumber+","+getConnectedCells().get(0).getAddress().getColumn()+","+getConnectedCells().get(0).getAddress().getRow()+"\n");
                   
                   stream = in.readLine();
                   data = stream.split(",");
