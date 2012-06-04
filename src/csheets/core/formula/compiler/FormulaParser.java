@@ -64,8 +64,20 @@ public FormulaParser(ParserSharedInputState state) {
 		AST expression_AST = null;
 		
 		match(EQ);
-		comparison();
-		astFactory.addASTChild(currentAST, returnAST);
+		{
+		if ((_tokenSet_0.member(LA(1)))) {
+			comparison();
+			astFactory.addASTChild(currentAST, returnAST);
+		}
+		else if ((LA(1)==CELL_REF)) {
+			anothercell();
+			astFactory.addASTChild(currentAST, returnAST);
+		}
+		else {
+			throw new NoViableAltException(LT(1), getFilename());
+		}
+		
+		}
 		match(Token.EOF_TYPE);
 		expression_AST = (AST)currentAST.root;
 		returnAST = expression_AST;
@@ -164,6 +176,26 @@ public FormulaParser(ParserSharedInputState state) {
 		returnAST = comparison_AST;
 	}
 	
+	public final void anothercell() throws RecognitionException, TokenStreamException {
+		
+		returnAST = null;
+		ASTPair currentAST = new ASTPair();
+		AST anothercell_AST = null;
+		
+		AST tmp9_AST = null;
+		tmp9_AST = astFactory.create(LT(1));
+		astFactory.addASTChild(currentAST, tmp9_AST);
+		match(CELL_REF);
+		AST tmp10_AST = null;
+		tmp10_AST = astFactory.create(LT(1));
+		astFactory.addASTChild(currentAST, tmp10_AST);
+		match(EQF);
+		comparison();
+		astFactory.addASTChild(currentAST, returnAST);
+		anothercell_AST = (AST)currentAST.root;
+		returnAST = anothercell_AST;
+	}
+	
 	public final void concatenation() throws RecognitionException, TokenStreamException {
 		
 		returnAST = null;
@@ -173,18 +205,18 @@ public FormulaParser(ParserSharedInputState state) {
 		arithmetic_lowest();
 		astFactory.addASTChild(currentAST, returnAST);
 		{
-		_loop7:
+		_loop9:
 		do {
 			if ((LA(1)==AMP)) {
-				AST tmp9_AST = null;
-				tmp9_AST = astFactory.create(LT(1));
-				astFactory.makeASTRoot(currentAST, tmp9_AST);
+				AST tmp11_AST = null;
+				tmp11_AST = astFactory.create(LT(1));
+				astFactory.makeASTRoot(currentAST, tmp11_AST);
 				match(AMP);
 				arithmetic_lowest();
 				astFactory.addASTChild(currentAST, returnAST);
 			}
 			else {
-				break _loop7;
+				break _loop9;
 			}
 			
 		} while (true);
@@ -202,24 +234,24 @@ public FormulaParser(ParserSharedInputState state) {
 		arithmetic_low();
 		astFactory.addASTChild(currentAST, returnAST);
 		{
-		_loop11:
+		_loop13:
 		do {
 			if ((LA(1)==PLUS||LA(1)==MINUS)) {
 				{
 				switch ( LA(1)) {
 				case PLUS:
 				{
-					AST tmp10_AST = null;
-					tmp10_AST = astFactory.create(LT(1));
-					astFactory.makeASTRoot(currentAST, tmp10_AST);
+					AST tmp12_AST = null;
+					tmp12_AST = astFactory.create(LT(1));
+					astFactory.makeASTRoot(currentAST, tmp12_AST);
 					match(PLUS);
 					break;
 				}
 				case MINUS:
 				{
-					AST tmp11_AST = null;
-					tmp11_AST = astFactory.create(LT(1));
-					astFactory.makeASTRoot(currentAST, tmp11_AST);
+					AST tmp13_AST = null;
+					tmp13_AST = astFactory.create(LT(1));
+					astFactory.makeASTRoot(currentAST, tmp13_AST);
 					match(MINUS);
 					break;
 				}
@@ -233,7 +265,7 @@ public FormulaParser(ParserSharedInputState state) {
 				astFactory.addASTChild(currentAST, returnAST);
 			}
 			else {
-				break _loop11;
+				break _loop13;
 			}
 			
 		} while (true);
@@ -251,24 +283,24 @@ public FormulaParser(ParserSharedInputState state) {
 		arithmetic_medium();
 		astFactory.addASTChild(currentAST, returnAST);
 		{
-		_loop15:
+		_loop17:
 		do {
 			if ((LA(1)==MULTI||LA(1)==DIV)) {
 				{
 				switch ( LA(1)) {
 				case MULTI:
 				{
-					AST tmp12_AST = null;
-					tmp12_AST = astFactory.create(LT(1));
-					astFactory.makeASTRoot(currentAST, tmp12_AST);
+					AST tmp14_AST = null;
+					tmp14_AST = astFactory.create(LT(1));
+					astFactory.makeASTRoot(currentAST, tmp14_AST);
 					match(MULTI);
 					break;
 				}
 				case DIV:
 				{
-					AST tmp13_AST = null;
-					tmp13_AST = astFactory.create(LT(1));
-					astFactory.makeASTRoot(currentAST, tmp13_AST);
+					AST tmp15_AST = null;
+					tmp15_AST = astFactory.create(LT(1));
+					astFactory.makeASTRoot(currentAST, tmp15_AST);
 					match(DIV);
 					break;
 				}
@@ -282,7 +314,7 @@ public FormulaParser(ParserSharedInputState state) {
 				astFactory.addASTChild(currentAST, returnAST);
 			}
 			else {
-				break _loop15;
+				break _loop17;
 			}
 			
 		} while (true);
@@ -303,9 +335,9 @@ public FormulaParser(ParserSharedInputState state) {
 		switch ( LA(1)) {
 		case POWER:
 		{
-			AST tmp14_AST = null;
-			tmp14_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp14_AST);
+			AST tmp16_AST = null;
+			tmp16_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp16_AST);
 			match(POWER);
 			arithmetic_high();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -350,9 +382,9 @@ public FormulaParser(ParserSharedInputState state) {
 		switch ( LA(1)) {
 		case PERCENT:
 		{
-			AST tmp15_AST = null;
-			tmp15_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp15_AST);
+			AST tmp17_AST = null;
+			tmp17_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp17_AST);
 			match(PERCENT);
 			break;
 		}
@@ -394,15 +426,15 @@ public FormulaParser(ParserSharedInputState state) {
 		switch ( LA(1)) {
 		case MINUS:
 		{
-			AST tmp16_AST = null;
-			tmp16_AST = astFactory.create(LT(1));
-			astFactory.makeASTRoot(currentAST, tmp16_AST);
+			AST tmp18_AST = null;
+			tmp18_AST = astFactory.create(LT(1));
+			astFactory.makeASTRoot(currentAST, tmp18_AST);
 			match(MINUS);
 			break;
 		}
+		case CELL_REF:
 		case LPAR:
 		case FUNCTION:
-		case CELL_REF:
 		case NAME:
 		case NUMBER:
 		case STRING:
@@ -474,16 +506,16 @@ public FormulaParser(ParserSharedInputState state) {
 		ASTPair currentAST = new ASTPair();
 		AST function_call_AST = null;
 		
-		AST tmp19_AST = null;
-		tmp19_AST = astFactory.create(LT(1));
-		astFactory.makeASTRoot(currentAST, tmp19_AST);
+		AST tmp21_AST = null;
+		tmp21_AST = astFactory.create(LT(1));
+		astFactory.makeASTRoot(currentAST, tmp21_AST);
 		match(FUNCTION);
 		{
 		switch ( LA(1)) {
+		case CELL_REF:
 		case MINUS:
 		case LPAR:
 		case FUNCTION:
-		case CELL_REF:
 		case NAME:
 		case NUMBER:
 		case STRING:
@@ -491,7 +523,7 @@ public FormulaParser(ParserSharedInputState state) {
 			comparison();
 			astFactory.addASTChild(currentAST, returnAST);
 			{
-			_loop26:
+			_loop28:
 			do {
 				if ((LA(1)==SEMI)) {
 					match(SEMI);
@@ -499,7 +531,7 @@ public FormulaParser(ParserSharedInputState state) {
 					astFactory.addASTChild(currentAST, returnAST);
 				}
 				else {
-					break _loop26;
+					break _loop28;
 				}
 				
 			} while (true);
@@ -530,23 +562,23 @@ public FormulaParser(ParserSharedInputState state) {
 		switch ( LA(1)) {
 		case CELL_REF:
 		{
-			AST tmp22_AST = null;
-			tmp22_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp22_AST);
+			AST tmp24_AST = null;
+			tmp24_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp24_AST);
 			match(CELL_REF);
 			{
 			switch ( LA(1)) {
 			case COLON:
 			{
 				{
-				AST tmp23_AST = null;
-				tmp23_AST = astFactory.create(LT(1));
-				astFactory.makeASTRoot(currentAST, tmp23_AST);
+				AST tmp25_AST = null;
+				tmp25_AST = astFactory.create(LT(1));
+				astFactory.makeASTRoot(currentAST, tmp25_AST);
 				match(COLON);
 				}
-				AST tmp24_AST = null;
-				tmp24_AST = astFactory.create(LT(1));
-				astFactory.addASTChild(currentAST, tmp24_AST);
+				AST tmp26_AST = null;
+				tmp26_AST = astFactory.create(LT(1));
+				astFactory.addASTChild(currentAST, tmp26_AST);
 				match(CELL_REF);
 				break;
 			}
@@ -580,9 +612,9 @@ public FormulaParser(ParserSharedInputState state) {
 		}
 		case NAME:
 		{
-			AST tmp25_AST = null;
-			tmp25_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp25_AST);
+			AST tmp27_AST = null;
+			tmp27_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp27_AST);
 			match(NAME);
 			reference_AST = (AST)currentAST.root;
 			break;
@@ -604,18 +636,18 @@ public FormulaParser(ParserSharedInputState state) {
 		switch ( LA(1)) {
 		case NUMBER:
 		{
-			AST tmp26_AST = null;
-			tmp26_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp26_AST);
+			AST tmp28_AST = null;
+			tmp28_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp28_AST);
 			match(NUMBER);
 			literal_AST = (AST)currentAST.root;
 			break;
 		}
 		case STRING:
 		{
-			AST tmp27_AST = null;
-			tmp27_AST = astFactory.create(LT(1));
-			astFactory.addASTChild(currentAST, tmp27_AST);
+			AST tmp29_AST = null;
+			tmp29_AST = astFactory.create(LT(1));
+			astFactory.addASTChild(currentAST, tmp29_AST);
 			match(STRING);
 			literal_AST = (AST)currentAST.root;
 			break;
@@ -635,6 +667,8 @@ public FormulaParser(ParserSharedInputState state) {
 		"<2>",
 		"NULL_TREE_LOOKAHEAD",
 		"EQ",
+		"CELL_REF",
+		"EQF",
 		"NEQ",
 		"GT",
 		"LT",
@@ -651,7 +685,6 @@ public FormulaParser(ParserSharedInputState state) {
 		"RPAR",
 		"FUNCTION",
 		"SEMI",
-		"CELL_REF",
 		"COLON",
 		"NAME",
 		"NUMBER",
@@ -670,5 +703,10 @@ public FormulaParser(ParserSharedInputState state) {
 		tokenTypeToASTClassMap=null;
 	};
 	
+	private static final long[] mk_tokenSet_0() {
+		long[] data = { 120078368L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	
 	}
