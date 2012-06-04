@@ -99,11 +99,16 @@ public class DisconnectFrame extends JFrame{
     void refreshJComboBox(){
         List <Connection> connections = connectController.getConnections();
         String [] comboBoxSelections = new String [connections.size()];
-        
-        for(int i=0;i<connections.size();i++){
-            comboBoxSelections[i] = connections.get(i).getType()+" : "+connections.get(i).getAddress() +"; From "
-                    +connections.get(i).getConnectedCells().get(0).getAddress()+" to "
-                    +connections.get(i).getConnectedCells().get(connections.get(i).getConnectedCells().size()-1).getAddress();
+        if(!connections.isEmpty()){
+            for(int i=0;i<connections.size();i++){
+                try{
+                    comboBoxSelections[i] = connections.get(i).getType()+" : "+connections.get(i).getAddress() +"; From "
+                            +connections.get(i).getConnectedCells().get(0).getAddress()+" to "
+                            +connections.get(i).getConnectedCells().get(connections.get(i).getConnectedCells().size()-1).getAddress();
+                }catch(IndexOutOfBoundsException e){
+                    comboBoxSelections[i] = "Connection with Errors!";
+                }
+            }
         }
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(comboBoxSelections));
         repaint();
