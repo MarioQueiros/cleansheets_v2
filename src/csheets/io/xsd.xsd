@@ -6,7 +6,7 @@
                 <xs:element name="row" maxOccurs="128">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="column" maxOccurs="52">
+                            <xs:element name="column" maxOccurs="52" minOccurs="0">
                                 <xs:complexType>
                                     <xs:sequence>
                                         <xs:element name="content"></xs:element>
@@ -27,6 +27,7 @@
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
+            <xs:attribute name="title" type="xs:string" use="required" />
         </xs:complexType>
     </xs:element>
     
