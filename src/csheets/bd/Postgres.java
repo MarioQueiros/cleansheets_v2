@@ -113,7 +113,7 @@ public class Postgres implements IBaseDados {
     }
 
     public void preencherInformacao(String[][] matriz) throws SQLException {
-
+        //verificar se existem elementos repetidos
         Statement st = (Statement) conn.createStatement();
         for (int i = 0; i < matriz.length; i++) {
             String infor = "insert into " + nome_tabela + " values ( ";

@@ -246,7 +246,7 @@ public class BaseDadosAction extends BaseAction {
                 JOptionPane.showMessageDialog(null, "Colunas inválidas");
             }
 
-            chave = JOptionPane.showInputDialog(null, "Quais as colunas que pretende que sejam chave PK da sua tabela?\nSe tem NOME | NIF | MORADA e pretende que nif e morada sejam pk escreva 2;3");
+            chave = JOptionPane.showInputDialog(null, "Quais as colunas que pretende que sejam chave PK da sua tabela?\nSe tem NOME | NIF | MORADA e pretende que nif e morada sejam PK escreva 2;3");
             if (chave != null) {
                 pk = chave.split(";");
                 pk_f = a.validarPK(pk, matriz_sel);
