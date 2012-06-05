@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 import csheets.ui.ctrl.BaseAction;
 import csheets.ui.ctrl.UIController;
 
-public class BaseDadosAction extends BaseAction {
+public class BaseDadosAddRefreshAction extends BaseAction {
 
     /** The user interface controller */
     protected UIController uiController;
@@ -26,7 +26,7 @@ public class BaseDadosAction extends BaseAction {
     String pk[] = new String[52];
     int[] linhas = new int[nrlinhas];
     int[] vec = new int[4]; //Vector com os extremos seleccionados
-    String tipo_bd, chave;
+    String tipo_bd, nome_tabela;
 
     public class ThreadBD implements Runnable {
 
@@ -54,7 +54,7 @@ public class BaseDadosAction extends BaseAction {
      * @param uiController the user interface controller
      * 
      */
-    public BaseDadosAction(UIController uiController) {
+    public BaseDadosAddRefreshAction(UIController uiController) {
         this.uiController = uiController;
 
         //Colunas e linhas das sheets
@@ -69,6 +69,7 @@ public class BaseDadosAction extends BaseAction {
             }
         }
 
+
     }
 
     public void reset() {
@@ -79,7 +80,7 @@ public class BaseDadosAction extends BaseAction {
     }
 
     protected String getName() {
-        return "Gravar";
+        return "Actualizar/Adicionar";
     }
 
     protected void defineProperties() {
@@ -215,7 +216,7 @@ public class BaseDadosAction extends BaseAction {
                 JOptionPane.showMessageDialog(null, "Esse sistema SGDB não está disponível, digite novamente!");
             }
 
-            tipo_bd = JOptionPane.showInputDialog(null, "Em que tipo de SGBD pretende gravar? (Postgres/MySQL/SQLserver)");
+            tipo_bd = JOptionPane.showInputDialog(null, "De que tipo de SGBD pretende carregar? (Postgres/MySQL/SQLserver)");
             if (tipo_bd == null) {
                 flag_geral = true;
                 break;
@@ -231,115 +232,93 @@ public class BaseDadosAction extends BaseAction {
 
     }
 
-    public void escolhaPK(IBaseDados a, String[][] matriz) {
-        //Qual o SGBD que pretende
-
-        boolean pk_f = false, pk_message = false;
+    public void formulario(IBaseDados a) {
+        String dados_bd = "";
+        boolean flagbd = false, flagbd_message = false;
         do {
 
             if (flag_geral) {
                 break;
             }
 
-
-            if (pk_message) {
-                JOptionPane.showMessageDialog(null, "Colunas inválidas");
+            //Indicar o nome da base de dados destino e o nome da tabela
+            if (flagbd_message) {
+                JOptionPane.showMessageDialog(null, "Dados inválidos e/ou base de dados indisponível!");
             }
 
-            chave = JOptionPane.showInputDialog(null, "Quais as colunas que pretende que sejam chave PK da sua tabela?\nSe tem NOME | NIF | MORADA e pretende que nif e morada sejam PK escreva 2;3");
-            if (chave != null) {
-                pk = chave.split(";");
-                pk_f = a.validarPK(pk, matriz_sel);
-            }
-            if (chave == null) {
-                flag_geral = true;
-            }
-            if (tipo_bd == null) {
+            dados_bd = JOptionPane.showInputDialog(null, "Indique base de dados destino, endereço ou ip de conexão, porta , user e pass no seguinte formato : \n"
+                    + "nomebd;conexao;porta;user;pass  (Se não há pass use o seguinte token no lugar de pass !#n0p@ss#!)");
+            if (dados_bd == null) {
                 flag_geral = true;
                 break;
             }
-            if (!pk_f) {
-                pk_message = true;
+
+            infor = dados_bd.split(";");
+            if (infor.length == 5) {
+                flagbd = a.connectarbd(infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
             }
-
-        } while (!pk_f);
-
-    }
-
-    public void formulario(IBaseDados a) {
-
-
-
-        if (a.verificarErro(matriz_sel)) {
-
-
-            escolhaPK(a, matriz_sel);
-            String dados_bd = "";
-            boolean flagbd = false, flagbd_message = false;
-            do {
-
-                if (flag_geral) {
-                    break;
-                }
-
-                //Indicar o nome da base de dados destino e o nome da tabela
-                if (flagbd_message) {
-                    JOptionPane.showMessageDialog(null, "Dados inválidos e/ou base de dados indisponível!");
-                }
-
-                dados_bd = JOptionPane.showInputDialog(null, "Indique base de dados destino, endereço ou ip de conexão, porta , user e pass no seguinte formato : \n"
-                        + "nomebd;conexao;porta;user;pass  (Se não há pass use o seguinte token no lugar de pass !#n0p@ss#!)");
-                if (dados_bd == null) {
-                    flag_geral = true;
-                    break;
-                }
-
-                infor = dados_bd.split(";");
-                if (infor.length == 5) {
-                    flagbd = a.connectarbd(infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
-                }
-                if (!flagbd) {
-                    flagbd_message = true;
-                }
-            } while (!flagbd);
-
-
-
-
-            boolean flagtab = false, flagtab_message = false;
-            do {
-
-                if (flag_geral) {
-                    break;
-                }
-                //Indicar o nome da base de dados destino e o nome da tabela
-                if (flagtab_message) {
-                    JOptionPane.showMessageDialog(null, "Tabela já existente na base de dados ou colunas com nome repetido e/ou inválido!");
-                }
-                String nome_tabela;
-                nome_tabela = JOptionPane.showInputDialog(null, "Indique o nome da tabela:");
-
-                flagtab = a.criarTabela(nome_tabela, infor[0], matriz_sel, tipo_bd, infor[1], infor[2], infor[3], infor[4]);
-                if (!flagtab) {
-                    flagtab_message = true;
-
-                    if (nome_tabela == null) {
-                        flag_geral = true;
-                        break;
-                    }
-
-                }
-            } while (!flagtab);
-            if (!flag_geral) {
-                JOptionPane.showMessageDialog(null, "Informação gravada com sucesso!");
+            if (!flagbd) {
+                flagbd_message = true;
             }
-        } else {
+        } while (!flagbd);
+
+
+
+
+        boolean flagtab = false, flagtab_message = false;
+        do {
+
             if (flag_geral) {
-                //Passa em frente
-            } else {
-                JOptionPane.showMessageDialog(null, "O nome das colunas é inválido");
+                break;
             }
+            //Indicar o nome da base de dados destino e o nome da tabela
+            if (flagtab_message) {
+                JOptionPane.showMessageDialog(null, "Tabela não existente na base de dados!");
+            }
+            
+            nome_tabela = JOptionPane.showInputDialog(null, "Indique o nome da tabela:");
+            if (nome_tabela == null) {
+                flag_geral = true;
+                break;
+            }
+            int colunas = -100;
+            colunas = a.getNrColunas(nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
+            if (colunas == -1 || colunas == 0) {
+                flagtab_message = true;
+
+            }
+            if (colunas != matriz_sel[0].length && colunas != -1 && colunas != 0) {
+                JOptionPane.showMessageDialog(null, "Número de colunas incompatíveis com a tabela que pretende actualizar!\n Verifique a estrutura da informação!");
+                flag_geral = true;
+                break;
+            }
+            if (colunas == matriz_sel[0].length) {
+                flagtab = true;
+            }
+
+            if (nome_tabela == null) {
+                flag_geral = true;
+                break;
+            }
+
+
+        } while (!flagtab);
+        if (!flag_geral) {
+            int nrls = matriz_sel.length;
+            int aux = 0;
+            while (aux < nrls) {
+                String vector[] = new String[matriz_sel[0].length];
+                //Código sobre Inserts & etc aqui.
+                for (int i = 0; i < matriz_sel[0].length; i++) {
+                    vector[i] = matriz_sel[aux][i];
+                }
+                a.addNewInf(nome_tabela,infor[0], vector,  tipo_bd, infor[1], infor[2], infor[3], infor[4]);
+                aux++;
+            }
+
+            JOptionPane.showMessageDialog(null, "Informação exportada com sucesso!");
         }
+
     }
 
     /**
@@ -361,7 +340,7 @@ public class BaseDadosAction extends BaseAction {
 
 
         } catch (Exception ex) {
-            // ex.printStackTrace();
+            ex.printStackTrace();
             // para ja ignoramos a excepcao
         }
     }
