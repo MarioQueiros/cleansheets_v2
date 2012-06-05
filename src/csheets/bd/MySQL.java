@@ -30,7 +30,7 @@ public class MySQL implements IBaseDados {
     }
 
     public boolean validarPK(String[] v, String[][] matriz_sele) {
-        
+        //verificar se existem elementos repetidos
         for (int k = 0; k < v.length-1; ++k) {
             for (int l = k + 1; l < v.length; l++) {
                 if (v[k].equalsIgnoreCase(v[l])) {
