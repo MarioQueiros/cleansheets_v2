@@ -28,6 +28,7 @@ import java.util.List;
 import antlr.ANTLRException;
 import antlr.collections.AST;
 import csheets.core.Cell;
+import csheets.core.IllegalValueTypeException;
 import csheets.core.Value;
 import csheets.core.formula.*;
 import csheets.core.formula.lang.CellReference;
@@ -49,6 +50,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
      * The character that signals that a cell's content is a formula ('#')
      */
     public static final char FORMULA_STARTER = '#';
+    private String content;
 
     /**
      * Creates the Excel expression compiler.
@@ -62,6 +64,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
 
     public Expression compile(Cell cell, String source) throws FormulaCompilationException {
         // Creates the lexer and parser
+        content = source;
         FormulaParser parser = new FormulaParser(
                 new FormulaLexer_PT(new StringReader(source)));
 
@@ -84,18 +87,38 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
      */
     protected Expression convert(Cell cell, AST node) throws FormulaCompilationException {
         //System.out.println("Converting node '" + node.getText() + "' of tree '" + node.toStringTree() + "' with " + node.getNumberOfChildren() + " children.");
-        AST nodeT1 = null, nodeT2 = null;
         try {
-            nodeT1 = node.getNextSibling();
-            nodeT2 = nodeT1.getNextSibling();
-            if (nodeT1.getText().equalsIgnoreCase(":=")) {  
-                CellReference cr = new CellReference(cell.getSpreadsheet(), node.getText());
-                Cell alvo = cr.getCell();
-                Expression e = convert(alvo, nodeT2);
-                //Formula f = new Formula(alvo, e);
+            AST nodeP, nodeFunc, nodeRef;
+            CellReference cr;
+            Cell alvo;
+            Expression e;
+            nodeP = node.getNextSibling();
+            if (nodeP.getText().equalsIgnoreCase(":=")) {  //Formato alinea a)
+                nodeFunc = nodeP.getNextSibling();
+                cr = new CellReference(cell.getSpreadsheet(), node.getText());
+                alvo = cr.getCell();
+                e = convert(alvo, nodeFunc);
                 alvo.setContent(e.evaluate().toString());
+                return e;
+                //return new Literal(Value.parseValue(content, Value.Type.BOOLEAN, Value.Type.DATE));
+            } else if (node.getText().equalsIgnoreCase("{")) {   //Formato alinea b)
+                nodeP = node; //P = proximo                
+                do {
+                    nodeRef = nodeP.getNextSibling();//Exemplo:#{a1:=soma(4;5);a2:=se(a1>10;"grande";"pequeno")}  nodeRef="a1"
+                    nodeFunc = nodeRef.getNextSibling().getNextSibling(); //nodeFunc=Sum(a1:a11)
+                    nodeP = nodeFunc.getNextSibling();//nodeP = ";"     
+                    cr = new CellReference(cell.getSpreadsheet(), nodeRef.getText());
+                    alvo = cr.getCell();
+                    e = convert(alvo, nodeFunc);
+                    alvo.setContent(e.evaluate().toString());
+                } while (nodeP.getText().equalsIgnoreCase(";"));
+                return e;
+                //return new Literal(Value.parseValue(content, Value.Type.BOOLEAN, Value.Type.DATE));
             }
-        } catch (Exception e) {
+
+
+        } catch (Exception ex) {
+            // System.out.println("Nao esta no formato pedido na alinea a) da it 2");
         }
 
         if (node.getNumberOfChildren() == 0) {
@@ -113,8 +136,8 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
                      * getRange(node.getText()) (Reference)
                      */
                 }
-            } catch (ParseException e) {
-                throw new FormulaCompilationException(e);
+            } catch (ParseException ex) {
+                throw new FormulaCompilationException(ex);
             }
         }
 
@@ -122,7 +145,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
         Function function = null;
         try {
             function = Language.getInstance().getFunction_PT(node.getText());
-        } catch (UnknownElementException e) {
+        } catch (UnknownElementException ex) {
         }
 
         if (function != null) {

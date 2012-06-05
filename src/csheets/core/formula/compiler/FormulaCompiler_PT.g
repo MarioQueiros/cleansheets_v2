@@ -37,12 +37,17 @@ options {
 	: ( expression | literal ) EOF
 	; */
 expression
-	: EQ! (anothercell |comparison) EOF!
+	: EQ! (key | ref_cell |comparison) EOF!
 	;	
 	
-anothercell
+ref_cell
 	: CELL_REF (EQF comparison)?
 	;
+
+key
+	: LKey CELL_REF (EQF comparison)? ((SEMI CELL_REF (EQF comparison)?))* RKey
+	;
+	
 comparison
 	: concatenation
 		( ( EQ^ | NEQ^ | GT^ | LT^ | LTEQ^ | GTEQ^ ) concatenation )?
@@ -180,7 +185,8 @@ COMMA	: ',' ;
 SEMI	: ';' ;
 LPAR	: '(' ;
 RPAR	: ')' ;
-
+RKey	: '}' ;
+LKey	: '{' ;
 
 /* White-space (ignored) */
 WS: ( ' '
