@@ -33,15 +33,19 @@ public class SQLserver implements IBaseDados {
     }
 
     public boolean validarPK(String[] v, String[][] matriz_sele) {
+        if (v.length == 0) {
+            return false;
+        }
+
         //verificar se existem elementos repetidos  
-        for (int k = 0; k < v.length-1; ++k) {
+        for (int k = 0; k < v.length - 1; ++k) {
             for (int l = k + 1; l < v.length; l++) {
                 if (v[k].equalsIgnoreCase(v[l])) {
                     return false;
                 }
             }
         }
-        
+
         int nrcolunas = matriz_sele[0].length;
         int num = -1;
         for (int i = 0; i < v.length; i++) {
@@ -69,7 +73,7 @@ public class SQLserver implements IBaseDados {
 
             String url = "";
 
-            DriverManager.registerDriver(new org.postgresql.Driver());
+            DriverManager.registerDriver(new com.microsoft.sqlserver.jdbc.SQLServerDriver());
             url = "jdbc:sqlserver://" + end + ":" + porta + ";databaseName=" + nome_bd;
 
             conn = (Connection) DriverManager.getConnection(
@@ -211,5 +215,76 @@ public class SQLserver implements IBaseDados {
             // e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public int getNrColunas(String nome_tab, String nome_bd, String tipobd, String end, String porta, String user, String pass) {
+        try {
+            nome_tabela = nome_tab;
+
+            verificarPass(pass);
+
+            String url = "";
+
+            DriverManager.registerDriver(new com.microsoft.sqlserver.jdbc.SQLServerDriver());
+            url = "jdbc:sqlserver://" + end + ":" + porta + ";databaseName=" + nome_bd;
+
+
+            conn = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+            conn.setAutoCommit(false);
+            Statement st = (Statement) conn.createStatement();
+            String query = "select * from " + nome_tab;
+            String query_conta_col = "SELECT count(*) FROM information_schema.columns WHERE table_name = '" + nome_tab + "'";
+            ResultSet rs = st.executeQuery(query_conta_col);
+            int nrcolunas = 0;
+            //Ir buscar o número de colunas que a tabela tem
+            while (rs.next()) {
+                nrcolunas = rs.getInt(1);
+            }
+
+            return nrcolunas;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    public boolean addNewInf(String nome_tab, String nome_bd, String[] v, String tipobd, String end, String porta, String user, String pass) {
+        nome_tabela = nome_tab;
+        //Statement st = (Statement) conn.createStatement();
+        String infor = "insert into " + nome_tabela + " values ( ";
+        for (int i = 0; i < v.length; i++) {
+            if (i < v.length - 1) {
+                infor += "'" + v[i] + "' " + ",";
+            }
+            if (i == v.length - 1) {
+                infor += "'" + v[i] + "' " + " );";
+            }
+
+        }
+        //System.out.println(infor);
+
+        try {
+            String url = "";
+
+            DriverManager.registerDriver(new com.microsoft.sqlserver.jdbc.SQLServerDriver());
+            url = "jdbc:sqlserver://" + end + ":" + porta + ";databaseName=" + nome_bd;
+
+
+            conn = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+            conn.setAutoCommit(false);
+            Statement st = (Statement) conn.createStatement();
+            st.executeUpdate(infor);
+            st.close();
+            conn.commit();
+            conn.close();
+              return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+      
     }
 }
