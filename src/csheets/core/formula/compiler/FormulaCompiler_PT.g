@@ -37,12 +37,12 @@ options {
 	: ( expression | literal ) EOF
 	; */
 expression
-	: EQ! (comparison | anothercell) EOF!
-	;
-anothercell
-	: CELL_REF EQF comparison
-	;
+	: EQ! (anothercell |comparison) EOF!
+	;	
 	
+anothercell
+	: CELL_REF (EQF comparison)?
+	;
 comparison
 	: concatenation
 		( ( EQ^ | NEQ^ | GT^ | LT^ | LTEQ^ | GTEQ^ ) concatenation )?
@@ -82,13 +82,17 @@ atom
 	|	literal
 	|	LPAR! comparison RPAR!
 	;
-
+	
 function_call
 	:	FUNCTION^ 
 		( comparison ( SEMI! comparison )* )?
 		RPAR!
 	;
-
+	
+another_cell:
+	EQF function_call
+	;
+	
 reference
 	:	CELL_REF
 		( ( COLON^ ) CELL_REF )?
