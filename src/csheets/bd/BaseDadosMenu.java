@@ -18,7 +18,6 @@ public class BaseDadosMenu extends JMenu {
 
 		// Adds font actions
 		add(new BaseDadosAction(uiController));
-                addSeparator();
-                add(new BaseDadosLoadAction(uiController));
+          addSeparator();      add(new BaseDadosLoadAction(uiController));
 	}	
 }
