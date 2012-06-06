@@ -1,0 +1,33 @@
+// $ANTLR 2.7.5 (20050128): ../src/csheets/core/formula/compiler/FormulaCompiler_PT.g -> FormulaParserTokenTypes.txt$
+FormulaParser    // output token vocab name
+EQ=4
+CELL_REF=5
+EQF=6
+NEQ=7
+GT=8
+LT=9
+LTEQ=10
+GTEQ=11
+AMP=12
+PLUS=13
+MINUS=14
+MULTI=15
+DIV=16
+POWER=17
+PERCENT=18
+LPAR=19
+RPAR=20
+FUNCTION=21
+SEMI=22
+COLON=23
+NAME=24
+NUMBER=25
+STRING=26
+LETTER=27
+ALPHABETICAL=28
+QUOT=29
+DIGIT=30
+ABS=31
+EXCL=32
+COMMA=33
+WS=34
