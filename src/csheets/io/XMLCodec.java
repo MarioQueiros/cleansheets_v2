@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.io.*;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
@@ -295,25 +296,34 @@ public class XMLCodec implements Codec {
     }
 
     private void databaseSave(File file) throws FileNotFoundException, IOException {
-       SessionFactory factory = HibernateUtil.getSessionFactory();
+        SessionFactory factory = HibernateUtil.getSessionFactory();
         Session session = factory.openSession();
         org.hibernate.Transaction tx = session.beginTransaction();
-        
+
         Calendar calendar = Calendar.getInstance();
         java.util.Date now = calendar.getTime();
         java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
-        
-         String SQL_QUERY = "select max(id)from csheets.io.XMLVersionControl where"
-                + " ID is not null and filename=:idg";
-        org.hibernate.Query query = session.createQuery(SQL_QUERY);
+
+        String SQL_QUERY = "select * ";
+        System.out.println("file.getName():"+file.getName());
+        org.hibernate.Query query = session.createQuery("from csheets.io.XMLVersionControl where filename=:idg");
         query.setParameter("idg", file.getName());
         List list = query.list();
-        
-        
+        int maior=-1;
+        for (Iterator<XMLVersionControl> i = list.iterator(); i.hasNext();) {
+            XMLVersionControl cli = i.next();
+            if(cli.getM_id()>maior)
+            {
+                maior=cli.getM_id();
+            }
+        }
+        System.out.println("maior: "+ maior);
+//        int indice = (int) list.get(0);
         FileInputStream fs = new FileInputStream(file);
         java.sql.Blob blob = Hibernate.createBlob(fs);
         XMLVersionControlID xml = new XMLVersionControlID(file.getName(), currentTimestamp);
-        XMLVersionControl vc = new XMLVersionControl(xml, 1, blob);
+       // indice++;
+        XMLVersionControl vc = new XMLVersionControl(xml, ++maior, blob);
         session.flush();
         session.save(vc);
         tx.commit();
