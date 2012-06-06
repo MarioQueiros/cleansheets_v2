@@ -2,16 +2,19 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package csheets.sp;
+package csheets.ext.share.connect;
 
 import csheets.core.Address;
 import csheets.core.Cell;
 import csheets.core.CellListener;
 import csheets.core.Spreadsheet;
 import csheets.core.Workbook;
+import csheets.ext.share.PageSharingController;
 import csheets.ui.ctrl.EditListener;
 import csheets.ui.ctrl.UIController;
-import java.io.Serializable;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -19,7 +22,7 @@ import java.util.List;
  *
  * @author Tiago
  */
-public abstract class Connection implements Serializable, Runnable, CellListener,EditListener{
+public abstract class Connection extends Thread implements CellListener,EditListener{
     
     protected final int PORT=53531;
     protected String type;
@@ -28,14 +31,14 @@ public abstract class Connection implements Serializable, Runnable, CellListener
     protected List<Cell> connectedCells;
     protected Workbook connectedWorkbook;
     protected List<Address> connectedFrom;
-    protected ConnectionController connectController;
+    protected PageSharingController pageSharingController;
     protected UIController uiController;
     
     public Workbook getWorkbook() {
         return connectedWorkbook;
     }
     
-    public Spreadsheet getSpreasheet() {
+    public Spreadsheet getSpreadsheet() {
         return connectedSpreadsheet;
     }
 
@@ -47,18 +50,28 @@ public abstract class Connection implements Serializable, Runnable, CellListener
         return type;
     }
     
-    void setType(String string) {
+    public void setType(String string) {
         type = string;
     }
 
-    abstract void closeSockets();
+    public abstract void closeSockets();
     
-    abstract void removeListeners();
+    public abstract void removeListeners();
 
     /**
      * @return the connectedCells
      */
     public List<Cell> getConnectedCells() {
         return connectedCells;
+    }
+    
+    class AppendableObjectOutputStream extends ObjectOutputStream {
+
+        public AppendableObjectOutputStream(OutputStream os) throws IOException {
+            super(os);
+        }
+
+        protected void writeStreamHeader() {
+        }
     }
 }

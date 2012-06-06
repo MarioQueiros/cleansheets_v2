@@ -2,10 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package csheets.ui.share;
+package csheets.ext.share.ui;
 
-import csheets.sp.Connection;
-import csheets.sp.ConnectionController;
+import csheets.ext.share.PageSharingController;
+import csheets.ext.share.PageSharingEvent;
+import csheets.ext.share.PageSharingListener;
+import csheets.ext.share.connect.Connection;
 import csheets.ui.ctrl.UIController;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -17,16 +19,24 @@ import javax.swing.JOptionPane;
  *
  * @author Tiago
  */
-public class DisconnectFrame extends JFrame{
+public class DisconnectFrame extends JFrame implements PageSharingListener{
     
     private javax.swing.JButton jButton1;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private PageSharingController pageSharingController;
     private UIController uiController;
-    private ConnectionController connectController;
+    private List<DisconnectListener> disconnectListeners;
     
-    public DisconnectFrame(){
+    public DisconnectFrame(UIController uiController, PageSharingController pageSharingController){
+        this.uiController = uiController;
+        disconnectListeners = new ArrayList<DisconnectListener>();
+        
+        PageSharingController.getInstance().addConnectionListener(this);
+        addDisconnectListener(PageSharingController.getInstance());
+        
+        
         jLabel2 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jComboBox1 = new javax.swing.JComboBox();
@@ -88,23 +98,31 @@ public class DisconnectFrame extends JFrame{
         setLocationRelativeTo(null);
     }
 
-    void setConnectionController(ConnectionController connectController) {
-        this.connectController = connectController;
+    private void jButton1ActionPerformed(ActionEvent evt) {
+        if(jComboBox1.getSelectedItem()!=null){
+            String [] split = ((String)jComboBox1.getSelectedItem()).split(";");
+            fireConnectionRemoved(split[0]);
+            jComboBox1.removeItem(jComboBox1.getSelectedItem());
+        }
+        else{
+            JOptionPane.showMessageDialog(null,"Error in removing connection!");
+        }
     }
 
-    void setUIController(UIController uiController) {
-        this.uiController = uiController;
-    }
-
-    void refreshJComboBox(){
-        List <Connection> connections = connectController.getConnections();
+    @Override
+    public void connectionsChanged(PageSharingEvent event) {
+        List <Connection> connections = event.getConnectionList();
         String [] comboBoxSelections = new String [connections.size()];
         if(!connections.isEmpty()){
             for(int i=0;i<connections.size();i++){
                 try{
-                    comboBoxSelections[i] = connections.get(i).getType()+" : "+connections.get(i).getAddress() +"; From "
-                            +connections.get(i).getConnectedCells().get(0).getAddress()+" to "
-                            +connections.get(i).getConnectedCells().get(connections.get(i).getConnectedCells().size()-1).getAddress();
+                    comboBoxSelections[i] = connections.get(i).getType();
+                    comboBoxSelections[i] +=" : "+connections.get(i).getAddress().toString();
+                    comboBoxSelections[i] +="; From ";
+                    comboBoxSelections[i] +=connections.get(i).getConnectedCells().get(0).getAddress();
+                    comboBoxSelections[i] +=" to ";
+                    comboBoxSelections[i] +=connections.get(i).getConnectedCells().get(
+                            connections.get(i).getConnectedCells().size()-1).getAddress();
                 }catch(IndexOutOfBoundsException e){
                     comboBoxSelections[i] = "Connection with Errors!";
                 }
@@ -114,14 +132,27 @@ public class DisconnectFrame extends JFrame{
         repaint();
     }
     
-    private void jButton1ActionPerformed(ActionEvent evt) {
-        if(jComboBox1.getSelectedItem()!=null){
-            String [] split = ((String)jComboBox1.getSelectedItem()).split(";");
-            connectController.disconnect(split[0]);
-            jComboBox1.removeItem(jComboBox1.getSelectedItem());
-        }
-        else{
-            JOptionPane.showMessageDialog(null,"Error in removing connection!");
-        }
+    
+    public void addDisconnectListener(DisconnectListener listener) {
+        disconnectListeners.add(listener);
+    }
+
+    public void removeDisconnectListener(DisconnectListener listener) {
+        disconnectListeners.remove(listener);
+    }
+    
+    /**
+     * Notifies all registered listeners that the connections
+     * list was modified.
+     * @param workbook the workbook that was modified
+     */
+    private void fireConnectionRemoved(String connection) {
+        DisconnectEvent disconnectEvent = new DisconnectEvent(this,connection);
+        
+        for (DisconnectListener listener : disconnectListeners.toArray(
+				new DisconnectListener[disconnectListeners.size()]))
+			listener.disconnect(disconnectEvent);
+	
+        
     }
 }
