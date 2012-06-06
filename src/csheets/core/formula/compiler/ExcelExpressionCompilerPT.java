@@ -50,7 +50,6 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
      * The character that signals that a cell's content is a formula ('#')
      */
     public static final char FORMULA_STARTER = '#';
-    private String content;
 
     /**
      * Creates the Excel expression compiler.
@@ -64,7 +63,6 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
 
     public Expression compile(Cell cell, String source) throws FormulaCompilationException {
         // Creates the lexer and parser
-        content = source;
         FormulaParser parser = new FormulaParser(
                 new FormulaLexer_PT(new StringReader(source)));
 
@@ -100,7 +98,6 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
                 e = convert(alvo, nodeFunc);
                 alvo.setContent(e.evaluate().toString());
                 return e;
-                //return new Literal(Value.parseValue(content, Value.Type.BOOLEAN, Value.Type.DATE));
             } else if (node.getText().equalsIgnoreCase("{")) {   //Formato alinea b)
                 nodeP = node; //P = proximo                
                 do {
@@ -113,7 +110,6 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
                     alvo.setContent(e.evaluate().toString());
                 } while (nodeP.getText().equalsIgnoreCase(";"));
                 return e;
-                //return new Literal(Value.parseValue(content, Value.Type.BOOLEAN, Value.Type.DATE));
             }
 
 
