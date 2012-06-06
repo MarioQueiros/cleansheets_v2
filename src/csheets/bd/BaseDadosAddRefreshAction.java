@@ -315,7 +315,7 @@ public class BaseDadosAddRefreshAction extends BaseAction {
                 a.addNewInf(nome_tabela,infor[0], vector,  tipo_bd, infor[1], infor[2], infor[3], infor[4]);
                 aux++;
             }
-
+            
             JOptionPane.showMessageDialog(null, "Informação exportada com sucesso!");
         }
 
