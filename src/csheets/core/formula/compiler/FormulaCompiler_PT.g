@@ -37,10 +37,15 @@ options {
 	: ( expression | literal ) EOF
 	; */
 expression
-	: EQ! (comparison | anothercell) EOF!
+	: EQ! (key | ref_cell |comparison) EOF!
+	;	
+	
+ref_cell
+	: CELL_REF (EQF comparison)?
 	;
-anothercell
-	: CELL_REF EQF comparison
+
+key
+	: LKey CELL_REF (EQF comparison)? ((SEMI CELL_REF (EQF comparison)?))* RKey
 	;
 	
 comparison
@@ -82,13 +87,17 @@ atom
 	|	literal
 	|	LPAR! comparison RPAR!
 	;
-
+	
 function_call
 	:	FUNCTION^ 
 		( comparison ( SEMI! comparison )* )?
 		RPAR!
 	;
-
+	
+another_cell:
+	EQF function_call
+	;
+	
 reference
 	:	CELL_REF
 		( ( COLON^ ) CELL_REF )?
@@ -176,7 +185,8 @@ COMMA	: ',' ;
 SEMI	: ';' ;
 LPAR	: '(' ;
 RPAR	: ')' ;
-
+RKey	: '}' ;
+LKey	: '{' ;
 
 /* White-space (ignored) */
 WS: ( ' '

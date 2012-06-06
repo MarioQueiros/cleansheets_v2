@@ -19,5 +19,7 @@ public interface IBaseDados {
   public String criarColunas(String [][] matriz); 
   public boolean carregarInformacao(String nome_tab, UIController ui, String nome_bd,String tipobd, String end,String porta, String user, String pass);
   public boolean validarPK(String [] v, String [][] matriz_sele);
-
+  public int getNrColunas(String nome_tab, String nome_bd, String tipobd, String end, String porta, String user, String pass);
+  public boolean addNewInf(String nome_tab, String nome_bd, String[] v, String tipobd, String end, String porta, String user, String pass);
+  
 }
