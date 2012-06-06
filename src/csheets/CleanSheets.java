@@ -222,7 +222,7 @@ public class CleanSheets {
 			try {
 				// Reads workbook data
 				stream = new FileOutputStream(file);
-				codec.write(workbook, stream);
+				codec.write(workbook, stream, file);
 			} finally {
 				try {
 					if (stream != null)

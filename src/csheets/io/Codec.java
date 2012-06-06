@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import csheets.core.Workbook;
+import java.io.File;
 
 /**
  * An interface for classes capable of reading and writing workbooks.
@@ -45,5 +46,5 @@ public interface Codec {
 	 * @param stream the output stream to which the workbook should be written
 	 * @throws IOException if the workbook could not be written correctly
 	 */
-	public void write(Workbook workbook, OutputStream stream) throws IOException;
+	public void write(Workbook workbook, OutputStream stream, File file) throws IOException;
 }

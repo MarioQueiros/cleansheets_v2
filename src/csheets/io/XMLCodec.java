@@ -1,5 +1,6 @@
 package csheets.io;
 
+import csheets.HibernateUtil;
 import csheets.core.Spreadsheet;
 import csheets.core.Workbook;
 import csheets.ext.style.StylableCell;
@@ -8,6 +9,8 @@ import csheets.ext.style.StyleExtension;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.*;
+import java.util.Calendar;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import javax.xml.XMLConstants;
@@ -17,6 +20,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.w3c.dom.*;
 
 /**
@@ -236,7 +242,7 @@ public class XMLCodec implements Codec {
     }
 
     @Override
-    public void write(Workbook workbook, OutputStream stream) throws IOException {
+    public void write(Workbook workbook, OutputStream stream, File file) throws IOException {
         PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(stream)));
         Spreadsheet sheet;
         StylableCell stylableCell;
@@ -283,6 +289,35 @@ public class XMLCodec implements Codec {
         writer.print("</cleanSheets>");
         writer.close();
         stream.close();
+
+        databaseSave(file);
+
+    }
+
+    private void databaseSave(File file) throws FileNotFoundException, IOException {
+       SessionFactory factory = HibernateUtil.getSessionFactory();
+        Session session = factory.openSession();
+        org.hibernate.Transaction tx = session.beginTransaction();
+        
+        Calendar calendar = Calendar.getInstance();
+        java.util.Date now = calendar.getTime();
+        java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
+        
+         String SQL_QUERY = "select max(id)from csheets.io.XMLVersionControl where"
+                + " ID is not null and filename=:idg";
+        org.hibernate.Query query = session.createQuery(SQL_QUERY);
+        query.setParameter("idg", file.getName());
+        List list = query.list();
+        
+        
+        FileInputStream fs = new FileInputStream(file);
+        java.sql.Blob blob = Hibernate.createBlob(fs);
+        XMLVersionControlID xml = new XMLVersionControlID(file.getName(), currentTimestamp);
+        XMLVersionControl vc = new XMLVersionControl(xml, 1, blob);
+        session.flush();
+        session.save(vc);
+        tx.commit();
+        session.close();
     }
 
     private static String validateXML(Schema schema, Document document) {
