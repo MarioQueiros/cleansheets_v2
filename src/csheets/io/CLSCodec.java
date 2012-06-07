@@ -41,7 +41,7 @@ public class CLSCodec implements Codec {
 	 */
 	public CLSCodec() {}
 
-	public Workbook read(InputStream stream) throws IOException, ClassNotFoundException {
+	public Workbook read(InputStream stream, File file) throws IOException, ClassNotFoundException {
 		ObjectInputStream ois = new DynamicObjectInputStream(stream,
 			ExtensionManager.getInstance().getLoader());
 		return (Workbook)ois.readObject();

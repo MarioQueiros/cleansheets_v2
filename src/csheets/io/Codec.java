@@ -39,7 +39,7 @@ public interface Codec {
 	 * @throws IOException if the workbook could not be read correctly
 	 * @throws ClassNotFoundException If the class of a serialized object could not be found
 	 */
-	public Workbook read(InputStream stream) throws IOException, ClassNotFoundException;
+	public Workbook read(InputStream stream, File file) throws IOException, ClassNotFoundException;
 
 	/**
 	 * Writes a workbook to the given output stream.
