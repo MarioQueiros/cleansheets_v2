@@ -171,7 +171,7 @@ public class CleanSheets {
 			try {
 				// Reads workbook data
 				stream = new FileInputStream(file);
-				workbook = codec.read(stream);
+				workbook = codec.read(stream, file);
 			} finally {
 				try {
 					if (stream != null)

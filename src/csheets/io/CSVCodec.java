@@ -50,7 +50,7 @@ public class CSVCodec implements Codec {
 	 */
 	public CSVCodec() {}
 
-	public Workbook read(InputStream stream) throws IOException {
+	public Workbook read(InputStream stream, File file) throws IOException {
 		// Wraps stream
 		Reader streamReader = new InputStreamReader(stream);
 		BufferedReader reader = new BufferedReader(streamReader);
