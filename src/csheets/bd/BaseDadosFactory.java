@@ -12,11 +12,11 @@ public class BaseDadosFactory {
     
     public static IBaseDados getBD(String tipo){
         if(tipo.equalsIgnoreCase("mysql"))
-            return (IBaseDados) new MySQL();
+            return  new MySQL();
         else if(tipo.equalsIgnoreCase("postgres"))
-            return  (IBaseDados) new Postgres();
+            return   new Postgres();
         else if(tipo.equalsIgnoreCase("sqlserver"))
-            return (IBaseDados) new SQLserver();
+            return  new SQLserver();
         
         return null;
         

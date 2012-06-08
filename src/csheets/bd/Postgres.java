@@ -408,7 +408,7 @@ public class Postgres implements IBaseDados {
 
            Statement ft;
             try {
-                System.out.println(update);
+         
               String url = "";
 
             DriverManager.registerDriver(new org.postgresql.Driver());
@@ -430,7 +430,7 @@ public class Postgres implements IBaseDados {
 
             
 
-            //e.printStackTrace();
+            
             return false;
         }
 

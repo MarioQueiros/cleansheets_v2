@@ -316,7 +316,9 @@ public class BaseDadosAddRefreshAction extends BaseAction {
                 aux++;
             }
             
-            JOptionPane.showMessageDialog(null, "Informação exportada com sucesso!");
+            
+            
+            JOptionPane.showMessageDialog(null, "Informação actualizada!");
         }
 
     }
