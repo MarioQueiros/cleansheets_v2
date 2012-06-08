@@ -1,5 +1,6 @@
 package csheets.io;
 
+import csheets.HibernateUtil;
 import csheets.core.Spreadsheet;
 import csheets.core.Workbook;
 import csheets.ext.style.StylableCell;
@@ -8,7 +9,12 @@ import csheets.ext.style.StyleExtension;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.*;
-import javax.swing.BorderFactory;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -17,6 +23,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.w3c.dom.*;
 
 /**
@@ -30,12 +39,83 @@ public class XMLCodec implements Codec {
         "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ"};
     int MATRIX_WIDTH = columns.length;
     int MATRIX_HEIGHT = 128;
+    boolean mainFlag;
 
     public XMLCodec() {
     }
 
+    private int versionControlWindow(List list) {
+        DefaultListModel dlm = new DefaultListModel();
+
+        int index = 1;
+        String strAux = null;
+        XMLVersionControl xml = null;
+        dlm.add(0, "Load the version from hard-drive");
+        for (Iterator<XMLVersionControl> i = list.iterator(); i.hasNext();) {
+            xml = i.next();
+            dlm.add(index, "Version: " + xml.getM_id() + " - Timestamp: " + xml.getM_key().getM_timestamp());
+            index++;
+        }
+
+        JList jlist = new JList(dlm);
+        JScrollPane scrollPane = new JScrollPane(jlist);
+        JOptionPane.showMessageDialog(null, scrollPane, "Choose a version", JOptionPane.INFORMATION_MESSAGE);
+
+        return jlist.getSelectedIndex();
+    }
+
     @Override
-    public Workbook read(InputStream stream) throws IOException, ClassNotFoundException {
+    public Workbook read(InputStream stream, File file) throws IOException, ClassNotFoundException {
+        SessionFactory factory = HibernateUtil.getSessionFactory();
+        Session session = factory.openSession();
+        org.hibernate.Transaction tx = session.beginTransaction();
+
+        org.hibernate.Query query = session.createQuery("from csheets.io.XMLVersionControl where filename=:fn order by timestampfile DESC");
+        query.setParameter("fn", file.getName());
+
+        List list = query.list();
+
+        int position = versionControlWindow(list);
+        while (position == -1) {
+            position = versionControlWindow(list);
+        }
+        XMLVersionControl xml = null;
+        if (position != 0) {
+            xml = (XMLVersionControl) list.get(position - 1);
+
+            String value = null;
+            java.sql.Blob blob = null;
+            try {
+                blob = xml.getM_blob();
+                int offset = -1;
+                int chunkSize = 1024;
+                long blobLength = 0;
+
+                blobLength = blob.length();
+
+                if (chunkSize > blobLength) {
+                    chunkSize = (int) blobLength;
+                }
+                char buffer[] = new char[chunkSize];
+                StringBuilder stringBuffer = new StringBuilder();
+                Reader reader = null;
+
+                reader = new InputStreamReader(blob.getBinaryStream());
+
+
+                while ((offset = reader.read(buffer)) != -1) {
+                    stringBuffer.append(buffer, 0, offset);
+                }
+                value = stringBuffer.toString();
+            } catch (Exception ex) {
+                Logger.getLogger(XMLCodec.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            stream = new ByteArrayInputStream(value.getBytes("UTF-8"));
+        }
+        tx.commit();
+        session.close();
+
         String[][] content = null;
         Font font = null;
         Font fontnew = null;
@@ -236,7 +316,7 @@ public class XMLCodec implements Codec {
     }
 
     @Override
-    public void write(Workbook workbook, OutputStream stream) throws IOException {
+    public void write(Workbook workbook, OutputStream stream, File file) throws IOException {
         PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(stream)));
         Spreadsheet sheet;
         StylableCell stylableCell;
@@ -283,6 +363,48 @@ public class XMLCodec implements Codec {
         writer.print("</cleanSheets>");
         writer.close();
         stream.close();
+
+        databaseSave(file);
+
+    }
+
+    private void databaseSave(File file) throws FileNotFoundException, IOException {
+        SessionFactory factory = HibernateUtil.getSessionFactory();
+        Session session = factory.openSession();
+        org.hibernate.Transaction tx = session.beginTransaction();
+
+        Calendar calendar = Calendar.getInstance();
+        java.util.Date now = calendar.getTime();
+        java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
+
+        org.hibernate.Query query = session.createQuery("from csheets.io.XMLVersionControl where filename=:idg");
+        query.setParameter("idg", file.getName());
+
+        List list = query.list();
+
+        int maior = -1;
+        for (Iterator<XMLVersionControl> i = list.iterator(); i.hasNext();) {
+            XMLVersionControl xml = i.next();
+            if (xml.getM_id() > maior) {
+                maior = xml.getM_id();
+            }
+        }
+
+        FileInputStream fs = new FileInputStream(file);
+        java.sql.Blob blob = Hibernate.createBlob(fs);
+        XMLVersionControlID xml = new XMLVersionControlID(file.getName(), currentTimestamp);
+        XMLVersionControl vc = null;
+        if (maior == -1) {
+            vc = new XMLVersionControl(xml, 1, blob);
+        } else {
+            vc = new XMLVersionControl(xml, ++maior, blob);
+        }
+
+
+        session.flush();
+        session.save(vc);
+        tx.commit();
+        session.close();
     }
 
     private static String validateXML(Schema schema, Document document) {

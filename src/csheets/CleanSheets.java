@@ -44,7 +44,6 @@ import csheets.ext.ExtensionManager;
 import csheets.io.Codec;
 import csheets.io.CodecFactory;
 import csheets.io.NamedProperties;
-import csheets.ui.Frame;
 
 /**
  * CleanSheets - the main class of the application.
@@ -119,7 +118,7 @@ public class CleanSheets {
 
 		// Creates user interface
 		
-                new csheets.ui.Frame.Creator(app,new csheets.sp.ConnectionController.Creator(app).createAndWait()).createAndWait();
+                new csheets.ui.Frame.Creator(app).createAndWait();
                 
 		app.create();
 	}
@@ -171,7 +170,7 @@ public class CleanSheets {
 			try {
 				// Reads workbook data
 				stream = new FileInputStream(file);
-				workbook = codec.read(stream);
+				workbook = codec.read(stream, file);
 			} finally {
 				try {
 					if (stream != null)
@@ -222,7 +221,7 @@ public class CleanSheets {
 			try {
 				// Reads workbook data
 				stream = new FileOutputStream(file);
-				codec.write(workbook, stream);
+				codec.write(workbook, stream, file);
 			} finally {
 				try {
 					if (stream != null)
