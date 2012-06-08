@@ -327,6 +327,7 @@ public class MySQL implements IBaseDados {
     
     }
     
+  
       public int getPosCol(String col,String nome_tab,String nome_bd, String tipobd, String end, String porta, String user, String pass) throws SQLException{
         String[] vec=  getNomeColunas(nome_tab, nome_bd, tipobd, end, porta, user, pass);
          for(int i=0;i<vec.length;i++){
@@ -448,7 +449,7 @@ public class MySQL implements IBaseDados {
 
             
 
-            //e.printStackTrace();
+          
             return false;
         }
 
