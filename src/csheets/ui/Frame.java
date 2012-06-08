@@ -37,11 +37,7 @@ import javax.swing.JToolBar;
 
 import csheets.CleanSheets;
 import csheets.core.Workbook;
-import csheets.sp.ConnectionController;
 import csheets.ui.ctrl.*;
-import csheets.ui.share.ClientAction;
-import csheets.ui.share.DisconnectAction;
-import csheets.ui.share.HostAction;
 import csheets.ui.ext.UIExtension;
 import csheets.ui.sheet.AddressBox;
 import csheets.ui.sheet.CellEditor;
@@ -59,23 +55,15 @@ public class Frame extends JFrame implements SelectionListener {
 
 	/** The CleanSheets application */
 	private CleanSheets app;
-
-        /** The Connections Controller */
-        private ConnectionController connectController;
         
 	/**
 	 * Creates a new frame.
 	 * @param app the CleanSheets application
 	 */
-	public Frame(CleanSheets app, ConnectionController connectController) {
+	public Frame(CleanSheets app) {
 		// Stores members and creates controllers
 		this.app = app;
-                
 		UIController uiController = new UIController(app);
-                
-                connectController.addUIListeners(uiController);
-                this.connectController = connectController;
-                
                 
 		// Creates action manager
 		FileChooser chooser = null;
@@ -122,13 +110,7 @@ public class Frame extends JFrame implements SelectionListener {
                 
                 // Registers macros actions
 		actionManager.registerAction("Criacao de Novas Macros", new MacroAction(uiController));
-
-                // Registers page share actions
                 
-		actionManager.registerAction("host", new HostAction(app,uiController,connectController));
-		actionManager.registerAction("client", new ClientAction(app,uiController,connectController));
-		actionManager.registerAction("disconnect", new DisconnectAction(app,uiController,connectController));
-
 		// Creates spreadsheet components
 		WorkbookPane workbookPane = new WorkbookPane(uiController, actionManager);
 		CellEditor cellEditor = new CellEditor(uiController);
@@ -224,17 +206,13 @@ public class Frame extends JFrame implements SelectionListener {
 
 		/** The CleanSheets application */
 		private CleanSheets app;
-                
-                /** The Connections Controller */
-                ConnectionController connectController;
 
 		/**
 		 * Creates a new frame creator.
 		 * @param app the CleanSheets application
 		 */
-		public Creator(CleanSheets app, ConnectionController connectController) {
+		public Creator(CleanSheets app) {
 			this.app = app;
-                        this.connectController = connectController;
 		}
 
 		/**
@@ -262,7 +240,7 @@ public class Frame extends JFrame implements SelectionListener {
 		}
 
 		public void run() {
-			frame = new Frame(app,connectController);
+			frame = new Frame(app);
 		}
 	}
 }
