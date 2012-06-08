@@ -419,7 +419,7 @@ public class SQLserver implements IBaseDados {
             Statement ft;
             try {
                 
-                System.out.println(update);
+               
 
                 String url = "";
 
@@ -442,7 +442,7 @@ public class SQLserver implements IBaseDados {
 
 
 
-            //e.printStackTrace();
+          
             return false;
         }
 
