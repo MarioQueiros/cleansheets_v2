@@ -9,7 +9,12 @@ import csheets.core.Spreadsheet;
 import csheets.ext.share.PageSharingController;
 import csheets.ui.ctrl.UIController;
 import csheets.ui.sheet.SpreadsheetTableModel;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +44,8 @@ public class ClientFrame extends JFrame {
     private UIController uiController;
     private PageSharingController pageSharingController;
     private List<ClientListener> clientListeners;
-
+    private final int PORT=53531;
+    
     /* A Frame for the ClientAction */
     /* Lacks limit of chars in Text Fields and Listeners*/
     public ClientFrame(UIController uiController, PageSharingController pageSharingController) {
@@ -148,8 +154,9 @@ public class ClientFrame extends JFrame {
                 ip = ip1 + "." + ip2 + "." + ip3 + "." + ip4;
 
                 ad = InetAddress.getByName(ip);
-
-                fireConnectionAdded(ad, firstCell, uiController.getActiveSpreadsheet());
+                
+                chooseHostToConnect(ad,firstCell);
+                
                 setVisible(false);
             } else {
                 JOptionPane.showMessageDialog(null, "Error in data insered!");
@@ -221,8 +228,8 @@ public class ClientFrame extends JFrame {
      * list was modified.
      * @param workbook the workbook that was modified
      */
-    private void fireConnectionAdded(InetAddress ip, Cell firstCell, Spreadsheet spreadsheet) {
-        ClientEvent clientEvent = new ClientEvent(this, ip, firstCell, spreadsheet,uiController);
+    private void fireConnectionAdded(InetAddress ip, Cell firstCell, Spreadsheet spreadsheet, Socket connectedSocket,String connectName) {
+        ClientEvent clientEvent = new ClientEvent(this, ip, firstCell, spreadsheet,uiController,connectedSocket,connectName);
 
         for (ClientListener listener : clientListeners.toArray(
                 new ClientListener[clientListeners.size()])) {
@@ -230,5 +237,47 @@ public class ClientFrame extends JFrame {
         }
 
 
+    }
+
+    private void chooseHostToConnect(InetAddress ad, Cell firstCell) {
+        try {
+            String stream;
+            int hostsAvailable;
+            String [] split;
+            Socket socket = new Socket(ad, PORT);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            
+            stream = in.readLine();
+            if(stream.contains("No hosts available!")){
+                JOptionPane.showMessageDialog(this, "No hosts available to connect in that IP!");
+            }
+            else{
+                int response = -1;
+                hostsAvailable = Integer.parseInt(stream);
+                split = new String[hostsAvailable];
+                stream = in.readLine();
+                split = stream.split("-");
+                
+                response = JOptionPane.showOptionDialog(this,"What hosting connection you want ?","Choosing the Shared Connection in the IP", JOptionPane.OK_OPTION ,1, null,split, split[0]);
+                out.write((response+1)+"\n");
+                out.flush();
+                stream = in.readLine();
+                if(stream.equals("Connection started!")){
+                    stream = split[response];
+                    split = stream.split(" :");
+                    
+                    fireConnectionAdded(ad, firstCell, uiController.getActiveSpreadsheet(),socket,split[0]);
+                    JOptionPane.showMessageDialog(this, "Connection started!");
+                }else{
+                    JOptionPane.showMessageDialog(this, "No hosts available to connect in that IP!");
+                }
+            }
+            
+        
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "No hosts available to connect in that IP!");
+        }
+        
     }
 }

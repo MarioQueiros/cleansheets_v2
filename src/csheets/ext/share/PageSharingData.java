@@ -8,7 +8,7 @@ import csheets.core.Cell;
 import csheets.core.Spreadsheet;
 import csheets.ui.ctrl.UIController;
 import java.net.InetAddress;
-import java.util.ArrayList;
+import java.net.Socket;
 import java.util.List;
 
 /**
@@ -16,7 +16,7 @@ import java.util.List;
  * @author Tiago
  */
 public class PageSharingData {
-
+    private Socket connectedSocket;
     private List<Cell> cellConnected;
     private int rowNumber;
     private int colNumber;
@@ -25,13 +25,16 @@ public class PageSharingData {
     private UIController uiController;
     private InetAddress ip;
     private Cell cell;
+    private String connectName;
 
-    public PageSharingData(InetAddress ip, Cell cell, Spreadsheet spreadsheet, PageSharingController aThis, UIController uiController) {
+    public PageSharingData(Socket connectedSocket, InetAddress ip, Cell cell, Spreadsheet spreadsheet, PageSharingController aThis, UIController uiController,String connectName) {
+        this.connectedSocket = connectedSocket;
         this.spreadsheet = spreadsheet;
         this.ip = ip;
         this.cell = cell;
         this.connectController = aThis;
         this.uiController = uiController;
+        this.connectName = connectName;
     }
 
     public PageSharingData(List<Cell> cellConnected, int rowNumber, int colNumber, Spreadsheet spreadsheet, PageSharingController aThis, UIController uiController) {
@@ -94,5 +97,16 @@ public class PageSharingData {
      */
     public Cell getCell() {
         return cell;
+    }
+
+    public Socket getConnectedSocket() {
+        return connectedSocket;
+    }
+
+    /**
+     * @return the connectName
+     */
+    public String getConnectName() {
+        return connectName;
     }
 }
