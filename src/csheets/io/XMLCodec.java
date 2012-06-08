@@ -49,9 +49,9 @@ public class XMLCodec implements Codec {
 
         int index = 1;
         String strAux = null;
-        XMLVersionControl xml = null;
+        VersionControl xml = null;
         dlm.add(0, "Load the version from hard-drive");
-        for (Iterator<XMLVersionControl> i = list.iterator(); i.hasNext();) {
+        for (Iterator<VersionControl> i = list.iterator(); i.hasNext();) {
             xml = i.next();
             dlm.add(index, "Version: " + xml.getM_id() + " - Timestamp: " + xml.getM_key().getM_timestamp());
             index++;
@@ -79,9 +79,9 @@ public class XMLCodec implements Codec {
         while (position == -1) {
             position = versionControlWindow(list);
         }
-        XMLVersionControl xml = null;
+        VersionControl xml = null;
         if (position != 0) {
-            xml = (XMLVersionControl) list.get(position - 1);
+            xml = (VersionControl) list.get(position - 1);
 
             String value = null;
             java.sql.Blob blob = null;
@@ -377,30 +377,25 @@ public class XMLCodec implements Codec {
         java.util.Date now = calendar.getTime();
         java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
 
-        org.hibernate.Query query = session.createQuery("from csheets.io.XMLVersionControl where filename=:idg");
+        org.hibernate.Query query = session.createQuery("from csheets.io.XMLVersionControl where filename=:idg order by id DESC");
         query.setParameter("idg", file.getName());
 
         List list = query.list();
-
-        int maior = -1;
-        for (Iterator<XMLVersionControl> i = list.iterator(); i.hasNext();) {
-            XMLVersionControl xml = i.next();
-            if (xml.getM_id() > maior) {
-                maior = xml.getM_id();
-            }
-        }
-
+        
         FileInputStream fs = new FileInputStream(file);
         java.sql.Blob blob = Hibernate.createBlob(fs);
-        XMLVersionControlID xml = new XMLVersionControlID(file.getName(), currentTimestamp);
-        XMLVersionControl vc = null;
-        if (maior == -1) {
-            vc = new XMLVersionControl(xml, 1, blob);
-        } else {
-            vc = new XMLVersionControl(xml, ++maior, blob);
+        VersionControlID xml = new VersionControlID(file.getName(), currentTimestamp);
+        VersionControl xmlvc = null;
+        VersionControl vc = null;
+        
+        if(list.isEmpty())
+        {
+            vc = new VersionControl(xml, 1, blob);
+        }else{
+           xmlvc = (VersionControl) list.get(0);
+           int id = xmlvc.getM_id();
         }
-
-
+        
         session.flush();
         session.save(vc);
         tx.commit();
