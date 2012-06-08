@@ -172,14 +172,6 @@ public class MenuBar extends JMenuBar {
 		JMenu macrosMenu = addMenu("Macros", KeyEvent.VK_M);
 		macrosMenu.add(actionManager.getAction("Criacao de Novas Macros"));
                 
-                //Creates the page share menu (Partilha de Folha)                
-                JMenu shareMenu = addMenu("Share",KeyEvent.VK_P);
-                shareMenu.add(actionManager.getAction("host"));
-                shareMenu.add(actionManager.getAction("client"));
-                shareMenu.addSeparator();
-                shareMenu.add(actionManager.getAction("disconnect"));
-
-                
         }             
 
 	/**

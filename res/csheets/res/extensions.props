@@ -3,4 +3,4 @@ csheets.ext.deptree.DependencyTreeExtension
 csheets.ext.assertion.AssertionExtension
 csheets.ext.test.TestExtension
 csheets.bd.ExtensionBaseDados
-csheets.isep.ExtensionExample
+csheets.ext.share.PageSharingExtension
