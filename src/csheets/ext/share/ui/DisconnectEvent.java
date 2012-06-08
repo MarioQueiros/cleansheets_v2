@@ -12,18 +12,18 @@ import java.util.EventObject;
  */
 public class DisconnectEvent extends EventObject{
     
-    private String connection;
+    private int connectioIndex;
     
-    public DisconnectEvent(Object source,String connection){
+    public DisconnectEvent(Object source,int connectioIndex){
         super(source);
-        this.connection = connection;
+        this.connectioIndex = connectioIndex;
     }
 
     /**
      * @return the connection
      */
-    public String getConnection() {
-        return connection;
+    public int getConnectionIndex() {
+        return connectioIndex;
     }
     
 }

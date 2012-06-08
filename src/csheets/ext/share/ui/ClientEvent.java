@@ -8,6 +8,7 @@ import csheets.core.Cell;
 import csheets.core.Spreadsheet;
 import csheets.ui.ctrl.UIController;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.EventObject;
 
 /**
@@ -20,9 +21,13 @@ public class ClientEvent extends EventObject{
     private Cell firstCell;
     private Spreadsheet spreadsheet;
     private UIController uiController;
-
-    public ClientEvent(Object source, InetAddress ip, Cell firstCell, Spreadsheet spreadsheet, UIController uiController) {
+    private Socket connectedSocket;
+    private String connectName;
+    
+    public ClientEvent(Object source, InetAddress ip, Cell firstCell, Spreadsheet spreadsheet, UIController uiController,Socket connectedSocket,String connectName) {
         super(source);
+        this.connectName = connectName;
+        this.connectedSocket = connectedSocket;
         this.ip = ip;
         this.firstCell = firstCell;
         this.spreadsheet = spreadsheet;
@@ -55,6 +60,20 @@ public class ClientEvent extends EventObject{
      */
     public UIController getUiController() {
         return uiController;
+    }
+
+    /**
+     * @return the connectedSocket
+     */
+    public Socket getConnectedSocket() {
+        return connectedSocket;
+    }
+
+    /**
+     * @return the connectName
+     */
+    public String getConnectName() {
+        return connectName;
     }
     
 }
