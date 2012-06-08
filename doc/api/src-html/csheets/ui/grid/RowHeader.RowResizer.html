@@ -1,0 +1,305 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    /*<a name="line.1"></a>
+<FONT color="green">002</FONT>     * Copyright (c) 2005 Einar Pehrson &lt;einar@pehrson.nu&gt;.<a name="line.2"></a>
+<FONT color="green">003</FONT>     *<a name="line.3"></a>
+<FONT color="green">004</FONT>     * This file is part of<a name="line.4"></a>
+<FONT color="green">005</FONT>     * CleanSheets - a spreadsheet application for the Java platform.<a name="line.5"></a>
+<FONT color="green">006</FONT>     *<a name="line.6"></a>
+<FONT color="green">007</FONT>     * CleanSheets is free software; you can redistribute it and/or modify<a name="line.7"></a>
+<FONT color="green">008</FONT>     * it under the terms of the GNU General Public License as published by<a name="line.8"></a>
+<FONT color="green">009</FONT>     * the Free Software Foundation; either version 2 of the License, or<a name="line.9"></a>
+<FONT color="green">010</FONT>     * (at your option) any later version.<a name="line.10"></a>
+<FONT color="green">011</FONT>     *<a name="line.11"></a>
+<FONT color="green">012</FONT>     * CleanSheets is distributed in the hope that it will be useful,<a name="line.12"></a>
+<FONT color="green">013</FONT>     * but WITHOUT ANY WARRANTY; without even the implied warranty of<a name="line.13"></a>
+<FONT color="green">014</FONT>     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the<a name="line.14"></a>
+<FONT color="green">015</FONT>     * GNU General Public License for more details.<a name="line.15"></a>
+<FONT color="green">016</FONT>     *<a name="line.16"></a>
+<FONT color="green">017</FONT>     * You should have received a copy of the GNU General Public License<a name="line.17"></a>
+<FONT color="green">018</FONT>     * along with CleanSheets; if not, write to the Free Software<a name="line.18"></a>
+<FONT color="green">019</FONT>     * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA<a name="line.19"></a>
+<FONT color="green">020</FONT>     */<a name="line.20"></a>
+<FONT color="green">021</FONT>    package csheets.ui.grid;<a name="line.21"></a>
+<FONT color="green">022</FONT>    <a name="line.22"></a>
+<FONT color="green">023</FONT>    import java.awt.Component;<a name="line.23"></a>
+<FONT color="green">024</FONT>    import java.awt.Cursor;<a name="line.24"></a>
+<FONT color="green">025</FONT>    import java.awt.Dimension;<a name="line.25"></a>
+<FONT color="green">026</FONT>    import java.awt.Graphics;<a name="line.26"></a>
+<FONT color="green">027</FONT>    import java.awt.Point;<a name="line.27"></a>
+<FONT color="green">028</FONT>    import java.awt.Rectangle;<a name="line.28"></a>
+<FONT color="green">029</FONT>    import java.awt.event.MouseEvent;<a name="line.29"></a>
+<FONT color="green">030</FONT>    import java.util.Arrays;<a name="line.30"></a>
+<FONT color="green">031</FONT>    <a name="line.31"></a>
+<FONT color="green">032</FONT>    import javax.swing.CellRendererPane;<a name="line.32"></a>
+<FONT color="green">033</FONT>    import javax.swing.JComponent;<a name="line.33"></a>
+<FONT color="green">034</FONT>    import javax.swing.JTable;<a name="line.34"></a>
+<FONT color="green">035</FONT>    import javax.swing.SwingConstants;<a name="line.35"></a>
+<FONT color="green">036</FONT>    import javax.swing.event.MouseInputAdapter;<a name="line.36"></a>
+<FONT color="green">037</FONT>    import javax.swing.event.MouseInputListener;<a name="line.37"></a>
+<FONT color="green">038</FONT>    import javax.swing.table.TableCellRenderer;<a name="line.38"></a>
+<FONT color="green">039</FONT>    <a name="line.39"></a>
+<FONT color="green">040</FONT>    <a name="line.40"></a>
+<FONT color="green">041</FONT>    /**<a name="line.41"></a>
+<FONT color="green">042</FONT>     * The row header for spreadsheet tables. This component emulates the<a name="line.42"></a>
+<FONT color="green">043</FONT>     * behaviour of &lt;code&gt;javax.swing.plaf.basic.BasicTableHeaderUI&lt;/code&gt;, but<a name="line.43"></a>
+<FONT color="green">044</FONT>     * paints the header vertically in stead of horizontally.<a name="line.44"></a>
+<FONT color="green">045</FONT>     * @author Einar Pehrson<a name="line.45"></a>
+<FONT color="green">046</FONT>     */<a name="line.46"></a>
+<FONT color="green">047</FONT>    @SuppressWarnings("serial")<a name="line.47"></a>
+<FONT color="green">048</FONT>    public class RowHeader extends JComponent {<a name="line.48"></a>
+<FONT color="green">049</FONT>    <a name="line.49"></a>
+<FONT color="green">050</FONT>            /** The table to which the row header belongs */<a name="line.50"></a>
+<FONT color="green">051</FONT>            private JTable table;<a name="line.51"></a>
+<FONT color="green">052</FONT>    <a name="line.52"></a>
+<FONT color="green">053</FONT>            /** The header's renderer pane */<a name="line.53"></a>
+<FONT color="green">054</FONT>            private CellRendererPane rendererPane = new CellRendererPane();<a name="line.54"></a>
+<FONT color="green">055</FONT>    <a name="line.55"></a>
+<FONT color="green">056</FONT>            /** The row header renderer*/<a name="line.56"></a>
+<FONT color="green">057</FONT>            private TableCellRenderer renderer<a name="line.57"></a>
+<FONT color="green">058</FONT>                    = new HeaderRenderer(SwingConstants.VERTICAL);<a name="line.58"></a>
+<FONT color="green">059</FONT>    <a name="line.59"></a>
+<FONT color="green">060</FONT>            /** The width of the row header */<a name="line.60"></a>
+<FONT color="green">061</FONT>            private int width = 30;<a name="line.61"></a>
+<FONT color="green">062</FONT>    <a name="line.62"></a>
+<FONT color="green">063</FONT>            /** The minimum height of rows */<a name="line.63"></a>
+<FONT color="green">064</FONT>            private int minRowHeight = 5;<a name="line.64"></a>
+<FONT color="green">065</FONT>    <a name="line.65"></a>
+<FONT color="green">066</FONT>            /** The margin around the packed rows of the header. */<a name="line.66"></a>
+<FONT color="green">067</FONT>        private int rowMargin = 1;<a name="line.67"></a>
+<FONT color="green">068</FONT>    <a name="line.68"></a>
+<FONT color="green">069</FONT>            /** The index of the row being resized, or -1 */<a name="line.69"></a>
+<FONT color="green">070</FONT>            private int resizingRow = -1;<a name="line.70"></a>
+<FONT color="green">071</FONT>    <a name="line.71"></a>
+<FONT color="green">072</FONT>            /**<a name="line.72"></a>
+<FONT color="green">073</FONT>             * Creates a new row header for the given table.<a name="line.73"></a>
+<FONT color="green">074</FONT>             * @param table the table to which the row header belongs<a name="line.74"></a>
+<FONT color="green">075</FONT>             */<a name="line.75"></a>
+<FONT color="green">076</FONT>            public RowHeader(JTable table) {<a name="line.76"></a>
+<FONT color="green">077</FONT>                    this.table = table;<a name="line.77"></a>
+<FONT color="green">078</FONT>                    add(rendererPane);<a name="line.78"></a>
+<FONT color="green">079</FONT>                    setPreferredSize(new Dimension(width, table.getRowCount() * table.getRowHeight()));<a name="line.79"></a>
+<FONT color="green">080</FONT>                    MouseInputListener rowResizer = new RowResizer();<a name="line.80"></a>
+<FONT color="green">081</FONT>                    addMouseListener(rowResizer);<a name="line.81"></a>
+<FONT color="green">082</FONT>                    addMouseMotionListener(rowResizer);<a name="line.82"></a>
+<FONT color="green">083</FONT>            }<a name="line.83"></a>
+<FONT color="green">084</FONT>    <a name="line.84"></a>
+<FONT color="green">085</FONT>            public void paint(Graphics g) {<a name="line.85"></a>
+<FONT color="green">086</FONT>                    // Calculates visible area<a name="line.86"></a>
+<FONT color="green">087</FONT>                    Rectangle bounds = g.getClipBounds(); <a name="line.87"></a>
+<FONT color="green">088</FONT>                    Point top = bounds.getLocation();<a name="line.88"></a>
+<FONT color="green">089</FONT>                    Point bottom = new Point(bounds.x, bounds.y + bounds.height - 1);<a name="line.89"></a>
+<FONT color="green">090</FONT>    <a name="line.90"></a>
+<FONT color="green">091</FONT>                    // Finds rows to paint<a name="line.91"></a>
+<FONT color="green">092</FONT>                    int minRow = table.rowAtPoint(top);<a name="line.92"></a>
+<FONT color="green">093</FONT>                    int maxRow = table.rowAtPoint(bottom);<a name="line.93"></a>
+<FONT color="green">094</FONT>                    if (minRow == -1)<a name="line.94"></a>
+<FONT color="green">095</FONT>                            minRow =  0;<a name="line.95"></a>
+<FONT color="green">096</FONT>                    if (maxRow == -1)<a name="line.96"></a>
+<FONT color="green">097</FONT>                            maxRow = table.getRowCount()-1;  <a name="line.97"></a>
+<FONT color="green">098</FONT>    <a name="line.98"></a>
+<FONT color="green">099</FONT>                    // Paints rows<a name="line.99"></a>
+<FONT color="green">100</FONT>                    int y = table.getCellRect(minRow, 0, true).y;<a name="line.100"></a>
+<FONT color="green">101</FONT>                    int[] selectedRows = table.getSelectedRows();<a name="line.101"></a>
+<FONT color="green">102</FONT>                    for (int row = minRow; row &lt;= maxRow; row++) {<a name="line.102"></a>
+<FONT color="green">103</FONT>                            // Fetches component from renderer<a name="line.103"></a>
+<FONT color="green">104</FONT>                            boolean selected = Arrays.binarySearch(selectedRows, row) &gt;= 0;<a name="line.104"></a>
+<FONT color="green">105</FONT>                            Component c = renderer.getTableCellRendererComponent(<a name="line.105"></a>
+<FONT color="green">106</FONT>                                    table, null, selected, false, row, -1);<a name="line.106"></a>
+<FONT color="green">107</FONT>    <a name="line.107"></a>
+<FONT color="green">108</FONT>                            // Calculates coordinates and paints component<a name="line.108"></a>
+<FONT color="green">109</FONT>                            int rowHeight = table.getRowHeight(row);<a name="line.109"></a>
+<FONT color="green">110</FONT>                            rendererPane.paintComponent(g, c, this,<a name="line.110"></a>
+<FONT color="green">111</FONT>                                    0, y, width, rowHeight, true);<a name="line.111"></a>
+<FONT color="green">112</FONT>                            y += rowHeight;<a name="line.112"></a>
+<FONT color="green">113</FONT>                    }<a name="line.113"></a>
+<FONT color="green">114</FONT>            }<a name="line.114"></a>
+<FONT color="green">115</FONT>    <a name="line.115"></a>
+<FONT color="green">116</FONT>            /**<a name="line.116"></a>
+<FONT color="green">117</FONT>             * Adjusts the height of the row at the given index to precisely fit all<a name="line.117"></a>
+<FONT color="green">118</FONT>             * data being rendered.<a name="line.118"></a>
+<FONT color="green">119</FONT>             * @param row the index of the row to auto-resize<a name="line.119"></a>
+<FONT color="green">120</FONT>             */<a name="line.120"></a>
+<FONT color="green">121</FONT>            public void autoResize(int row) {<a name="line.121"></a>
+<FONT color="green">122</FONT>                    // Gets width of row header<a name="line.122"></a>
+<FONT color="green">123</FONT>                    int height = renderer.getTableCellRendererComponent(table, null,<a name="line.123"></a>
+<FONT color="green">124</FONT>                                    false, false, row, 0).getPreferredSize().height;<a name="line.124"></a>
+<FONT color="green">125</FONT>                    <a name="line.125"></a>
+<FONT color="green">126</FONT>                    // Gets maximum width of column data<a name="line.126"></a>
+<FONT color="green">127</FONT>                    for (int column = 0; column &lt; table.getColumnCount(); column++) {<a name="line.127"></a>
+<FONT color="green">128</FONT>                            Component c = table.getCellRenderer(row, column)<a name="line.128"></a>
+<FONT color="green">129</FONT>                                    .getTableCellRendererComponent(table, table.getValueAt<a name="line.129"></a>
+<FONT color="green">130</FONT>                                            (row, column), false, false, row, column);<a name="line.130"></a>
+<FONT color="green">131</FONT>                            height = Math.max(height, c.getPreferredSize().height);<a name="line.131"></a>
+<FONT color="green">132</FONT>                    }<a name="line.132"></a>
+<FONT color="green">133</FONT>    <a name="line.133"></a>
+<FONT color="green">134</FONT>                    // Adds margin<a name="line.134"></a>
+<FONT color="green">135</FONT>                    height += 2 * rowMargin;<a name="line.135"></a>
+<FONT color="green">136</FONT>                    if (height &gt; minRowHeight) {<a name="line.136"></a>
+<FONT color="green">137</FONT>                            table.setRowHeight(resizingRow, height);<a name="line.137"></a>
+<FONT color="green">138</FONT>                    } else<a name="line.138"></a>
+<FONT color="green">139</FONT>                            table.setRowHeight(minRowHeight);<a name="line.139"></a>
+<FONT color="green">140</FONT>                    repaint();<a name="line.140"></a>
+<FONT color="green">141</FONT>            }<a name="line.141"></a>
+<FONT color="green">142</FONT>    <a name="line.142"></a>
+<FONT color="green">143</FONT>            /**<a name="line.143"></a>
+<FONT color="green">144</FONT>             * A mouse input listener that enables resizing of rows<a name="line.144"></a>
+<FONT color="green">145</FONT>             */<a name="line.145"></a>
+<FONT color="green">146</FONT>            protected class RowResizer extends MouseInputAdapter {<a name="line.146"></a>
+<FONT color="green">147</FONT>    <a name="line.147"></a>
+<FONT color="green">148</FONT>                    /** The normal cursor */<a name="line.148"></a>
+<FONT color="green">149</FONT>                    private final Cursor NORMAL_CURSOR = getCursor();<a name="line.149"></a>
+<FONT color="green">150</FONT>    <a name="line.150"></a>
+<FONT color="green">151</FONT>                    /** The cursor to display when resizing a row */<a name="line.151"></a>
+<FONT color="green">152</FONT>                    private final Cursor RESIZE_CURSOR<a name="line.152"></a>
+<FONT color="green">153</FONT>                            = Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR);<a name="line.153"></a>
+<FONT color="green">154</FONT>    <a name="line.154"></a>
+<FONT color="green">155</FONT>                    /**<a name="line.155"></a>
+<FONT color="green">156</FONT>                     * Selects the clicked row, unless resizing is intended.<a name="line.156"></a>
+<FONT color="green">157</FONT>                     * @param e the event that was fired<a name="line.157"></a>
+<FONT color="green">158</FONT>                     */<a name="line.158"></a>
+<FONT color="green">159</FONT>                    public void mousePressed(MouseEvent e) {<a name="line.159"></a>
+<FONT color="green">160</FONT>                            // Checks what was done<a name="line.160"></a>
+<FONT color="green">161</FONT>                            resizingRow = getResizingRow(e.getPoint());<a name="line.161"></a>
+<FONT color="green">162</FONT>                            if (resizingRow == -1) {<a name="line.162"></a>
+<FONT color="green">163</FONT>                                    int pressedRow = table.rowAtPoint(e.getPoint());<a name="line.163"></a>
+<FONT color="green">164</FONT>                                    int columns = table.getColumnCount();<a name="line.164"></a>
+<FONT color="green">165</FONT>            <a name="line.165"></a>
+<FONT color="green">166</FONT>                                    // Configures new selection<a name="line.166"></a>
+<FONT color="green">167</FONT>                                    if (e.isShiftDown())<a name="line.167"></a>
+<FONT color="green">168</FONT>                                            table.changeSelection(pressedRow, 0, false, true);<a name="line.168"></a>
+<FONT color="green">169</FONT>                                    else if (e.isControlDown())<a name="line.169"></a>
+<FONT color="green">170</FONT>                                            table.changeSelection(pressedRow, 0, true, false);<a name="line.170"></a>
+<FONT color="green">171</FONT>                                    else {<a name="line.171"></a>
+<FONT color="green">172</FONT>                                            table.changeSelection(pressedRow, columns, false, false);<a name="line.172"></a>
+<FONT color="green">173</FONT>                                            table.changeSelection(pressedRow, 0, false, true);<a name="line.173"></a>
+<FONT color="green">174</FONT>                                    }<a name="line.174"></a>
+<FONT color="green">175</FONT>                                    repaint();<a name="line.175"></a>
+<FONT color="green">176</FONT>                            }<a name="line.176"></a>
+<FONT color="green">177</FONT>                    }<a name="line.177"></a>
+<FONT color="green">178</FONT>    <a name="line.178"></a>
+<FONT color="green">179</FONT>                    /**<a name="line.179"></a>
+<FONT color="green">180</FONT>                     * Auto-resizes a column whose border was double-clicked.<a name="line.180"></a>
+<FONT color="green">181</FONT>                     * @param e the event that was fired<a name="line.181"></a>
+<FONT color="green">182</FONT>                     */<a name="line.182"></a>
+<FONT color="green">183</FONT>                    public void mouseClicked(MouseEvent e) {<a name="line.183"></a>
+<FONT color="green">184</FONT>                            if (e.getClickCount() == 2 &amp;&amp; resizingRow != -1)<a name="line.184"></a>
+<FONT color="green">185</FONT>                                    autoResize(resizingRow);<a name="line.185"></a>
+<FONT color="green">186</FONT>                    }<a name="line.186"></a>
+<FONT color="green">187</FONT>    <a name="line.187"></a>
+<FONT color="green">188</FONT>                    /**<a name="line.188"></a>
+<FONT color="green">189</FONT>                     * Sets the appropriate cursor depending on whether the mouse is on<a name="line.189"></a>
+<FONT color="green">190</FONT>                     * a row that can be resized.<a name="line.190"></a>
+<FONT color="green">191</FONT>                     * @param e the event that was fired<a name="line.191"></a>
+<FONT color="green">192</FONT>                     */<a name="line.192"></a>
+<FONT color="green">193</FONT>                    public void mouseMoved(MouseEvent e) { <a name="line.193"></a>
+<FONT color="green">194</FONT>                            setCursor(getResizingRow(e.getPoint()) == -1<a name="line.194"></a>
+<FONT color="green">195</FONT>                                    ? NORMAL_CURSOR : RESIZE_CURSOR);<a name="line.195"></a>
+<FONT color="green">196</FONT>                    }<a name="line.196"></a>
+<FONT color="green">197</FONT>    <a name="line.197"></a>
+<FONT color="green">198</FONT>                    /**<a name="line.198"></a>
+<FONT color="green">199</FONT>                     * Resizes the row that is dragged<a name="line.199"></a>
+<FONT color="green">200</FONT>                     * @param e the event that was fired<a name="line.200"></a>
+<FONT color="green">201</FONT>                     */<a name="line.201"></a>
+<FONT color="green">202</FONT>                    public void mouseDragged(MouseEvent e) {<a name="line.202"></a>
+<FONT color="green">203</FONT>                            if (resizingRow != -1) {<a name="line.203"></a>
+<FONT color="green">204</FONT>                                    int rowHeight = e.getPoint().y<a name="line.204"></a>
+<FONT color="green">205</FONT>                                            - table.getCellRect(resizingRow, 0, true).y;<a name="line.205"></a>
+<FONT color="green">206</FONT>                                    if (rowHeight &gt;= minRowHeight)<a name="line.206"></a>
+<FONT color="green">207</FONT>                                            table.setRowHeight(resizingRow, rowHeight);<a name="line.207"></a>
+<FONT color="green">208</FONT>                                    repaint();<a name="line.208"></a>
+<FONT color="green">209</FONT>                            }<a name="line.209"></a>
+<FONT color="green">210</FONT>                    }<a name="line.210"></a>
+<FONT color="green">211</FONT>    <a name="line.211"></a>
+<FONT color="green">212</FONT>                    /**<a name="line.212"></a>
+<FONT color="green">213</FONT>                     * Retrieves the index of the row at the given point, if it can be<a name="line.213"></a>
+<FONT color="green">214</FONT>                     * resized.<a name="line.214"></a>
+<FONT color="green">215</FONT>                     * @param p the point to look at<a name="line.215"></a>
+<FONT color="green">216</FONT>                     * @return the index of the row, or -1 if it can not be resized<a name="line.216"></a>
+<FONT color="green">217</FONT>                     */<a name="line.217"></a>
+<FONT color="green">218</FONT>                    private int getResizingRow(Point p) {<a name="line.218"></a>
+<FONT color="green">219</FONT>                            // Fetches the row index, and stops if it is invalid<a name="line.219"></a>
+<FONT color="green">220</FONT>                            int row = table.rowAtPoint(p);<a name="line.220"></a>
+<FONT color="green">221</FONT>                            if (row == -1)<a name="line.221"></a>
+<FONT color="green">222</FONT>                                    return row;<a name="line.222"></a>
+<FONT color="green">223</FONT>    <a name="line.223"></a>
+<FONT color="green">224</FONT>                            // Fetches the bounding rectangle of the header row<a name="line.224"></a>
+<FONT color="green">225</FONT>                            Rectangle r = table.getCellRect(row, 0, true);<a name="line.225"></a>
+<FONT color="green">226</FONT>                            r = new Rectangle(0, r.y, width, table.getRowHeight(row));<a name="line.226"></a>
+<FONT color="green">227</FONT>                            r.grow(0, -2);<a name="line.227"></a>
+<FONT color="green">228</FONT>    <a name="line.228"></a>
+<FONT color="green">229</FONT>                            // Stops if the point is inside the header row<a name="line.229"></a>
+<FONT color="green">230</FONT>                            if (r.contains(p))<a name="line.230"></a>
+<FONT color="green">231</FONT>                                    return -1;<a name="line.231"></a>
+<FONT color="green">232</FONT>    <a name="line.232"></a>
+<FONT color="green">233</FONT>                            // If above the middle of the row, resize previous row<a name="line.233"></a>
+<FONT color="green">234</FONT>                            if (p.y &lt; (r.y + (r.height / 2)))<a name="line.234"></a>
+<FONT color="green">235</FONT>                                    row--;<a name="line.235"></a>
+<FONT color="green">236</FONT>                            return row;<a name="line.236"></a>
+<FONT color="green">237</FONT>                    }<a name="line.237"></a>
+<FONT color="green">238</FONT>            }<a name="line.238"></a>
+<FONT color="green">239</FONT>    }<a name="line.239"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>
