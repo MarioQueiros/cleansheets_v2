@@ -6,10 +6,8 @@ package csheets.ext.share.connect;
 
 import csheets.ext.share.PageSharingController;
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -19,27 +17,41 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Esta classe é a classe servidor da instância da aplicação, e só pode existir
+ * uma numa instância por computador
  * @author Tiago
  */
 public class Server extends Thread {
 
-    private PageSharingController psc;
+    /** A Socket do servidor que vai receber clientes */
     private ServerSocket servSocket;
+    
+    /** A socket criada quando o cliente se liga */
     private Socket clntSocket;
+    
+    /** A porta da aplicação */
     private final int PORT = 53531;
 
-    public Server(PageSharingController psc) throws IOException {
+    public Server() throws IOException {
 
         servSocket = new ServerSocket(PORT, 0, InetAddress.getLocalHost());
-        this.psc = psc;
 
     }
 
+    
+/** O RUN DO SERVER */
+    
+    /**
+     * Neste run existe uma lógica de envio e recepção de informação trocada com
+     * o cliente que se quer ligar.
+     * Para garantir consistência de informação, um e só um cliente se pode 
+     * ligar de cada vez.
+     */
+    
     public @Override
     void run() {
-        BufferedReader in;
-        PrintWriter out;
+        BufferedReader in = null;
+        PrintWriter out = null;
         List<Connection> connections;
         String hostsAvailable;
         int hostNum;
@@ -71,6 +83,7 @@ public class Server extends Thread {
 
                 if (hostNum == 0) {
                     out.write("No hosts available!\n");
+                    out.flush();
                 } else {
                     hostsAvailable += "\n";
 
@@ -98,7 +111,7 @@ public class Server extends Thread {
                                         + " connected to "
                                         + connections.get(Integer.parseInt(split[1])).getShareName());
                                 active = true;
-                                psc.connectionOn();
+                                PageSharingController.getInstance().connectionOn();
                             }
                         }
                         if (!active) {
@@ -111,8 +124,13 @@ public class Server extends Thread {
                     }
 
                 }
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                try{
+                    out.write("Connection Error!\n");
+                    out.flush();
+                }catch(Exception e){
+                    
+                }
             }
         }
     }

@@ -4,10 +4,13 @@ import javax.swing.Icon;
 import javax.swing.JMenu;
 
 import csheets.ext.Extension;
-import csheets.ext.share.PageSharingController;
 import csheets.ui.ctrl.UIController;
 import csheets.ui.ext.UIExtension;
 
+
+/**
+ * A extensão da Interface dedicada à Partilha de Folha
+ */
 public class PageSharingUIExtension extends UIExtension {
 
 	/** The icon to display with the extension's name */

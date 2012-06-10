@@ -12,7 +12,9 @@ import java.net.Socket;
 import java.util.List;
 
 /**
- *
+ * A classe que contém a informação de uma conecção passada pela interface ao
+ * modelo de negócio (core) da Partilha de Folha
+ * 
  * @author Tiago
  */
 public class PageSharingData {
@@ -21,29 +23,29 @@ public class PageSharingData {
     private int rowNumber;
     private int colNumber;
     private Spreadsheet spreadsheet;
-    private PageSharingController connectController;
     private UIController uiController;
     private InetAddress ip;
     private Cell cell;
-    private String connectName;
+    private int numberOfShares;
+    private String shareName;
 
-    public PageSharingData(Socket connectedSocket, InetAddress ip, Cell cell, Spreadsheet spreadsheet, PageSharingController aThis, UIController uiController,String connectName) {
+    public PageSharingData(Socket connectedSocket, InetAddress ip, Cell cell, Spreadsheet spreadsheet, UIController uiController,String shareName) {
         this.connectedSocket = connectedSocket;
         this.spreadsheet = spreadsheet;
         this.ip = ip;
         this.cell = cell;
-        this.connectController = aThis;
         this.uiController = uiController;
-        this.connectName = connectName;
+        this.shareName = shareName;
     }
 
-    public PageSharingData(List<Cell> cellConnected, int rowNumber, int colNumber, Spreadsheet spreadsheet, PageSharingController aThis, UIController uiController) {
+    public PageSharingData(String shareName, int numShares, List<Cell> cellConnected, int rowNumber, int colNumber, Spreadsheet spreadsheet, UIController uiController) {
         this.cellConnected = cellConnected;
         this.rowNumber = rowNumber;
         this.colNumber = colNumber;
         this.spreadsheet = spreadsheet;
-        this.connectController = aThis;
         this.uiController = uiController;
+        this.numberOfShares = numShares;
+        this.shareName = shareName;
     }
 
     public UIController getUiController() {
@@ -79,13 +81,6 @@ public class PageSharingData {
     }
 
     /**
-     * @return the aThis
-     */
-    public PageSharingController getConnectController() {
-        return connectController;
-    }
-
-    /**
      * @return the ip
      */
     public InetAddress getIp() {
@@ -104,9 +99,16 @@ public class PageSharingData {
     }
 
     /**
-     * @return the connectName
+     * @return the numberOfShares
      */
-    public String getConnectName() {
-        return connectName;
+    public int getNumberOfShares() {
+        return numberOfShares;
+    }
+
+    /**
+     * @return the shareName
+     */
+    public String getShareName() {
+        return shareName;
     }
 }

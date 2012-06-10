@@ -10,32 +10,40 @@ import csheets.core.CellListener;
 import csheets.core.Spreadsheet;
 import csheets.core.Workbook;
 import csheets.ext.share.PageSharingController;
-import csheets.ext.share.ui.ClientListener;
-import csheets.ext.share.ui.DisconnectListener;
-import csheets.ext.share.ui.HostListener;
 import csheets.ui.ctrl.UIController;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.List;
 
 /**
- *
+ * A classe pai, têm os atributos gerais das conecções
  * @author Tiago
  */
-public abstract class Connection extends Thread implements Serializable, CellListener{
+public abstract class Connection extends Thread implements CellListener{
     
-    
+    /** O nome da conecção */
     protected String shareName;
+    
+    /** O tipo da conecção */
     protected String type;
+    
+    /** O endereço da conecção, para "Client" é o próprio, para "Host" é
+     * aquele ao qual está ligado
+     */
     protected InetAddress address;
+    
+    /** O painel conectado */
     protected Spreadsheet connectedSpreadsheet;
+    
+    /** As células conectadas */
     protected List<Cell> connectedCells;
+    
+    /** O livro conectado */
     protected Workbook connectedWorkbook;
+    
+    /** Os endereços das células conectadas do outro lado da partilha */
     protected List<Address> connectedFrom;
-    protected PageSharingController pageSharingController;
+    
+    /** O controlador da interface da aplicação */
     protected UIController uiController;
     
     public Workbook getWorkbook() {
@@ -76,13 +84,4 @@ public abstract class Connection extends Thread implements Serializable, CellLis
         return shareName;
     }
     
-    class AppendableObjectOutputStream extends ObjectOutputStream {
-
-        public AppendableObjectOutputStream(OutputStream os) throws IOException {
-            super(os);
-        }
-
-        protected void writeStreamHeader() {
-        }
-    }
 }

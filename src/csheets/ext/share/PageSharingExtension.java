@@ -1,10 +1,15 @@
 package csheets.ext.share;
 
-import csheets.CleanSheets;
 import csheets.ext.share.ui.PageSharingUIExtension;
 import csheets.ext.Extension;
 import csheets.ui.ctrl.UIController;
 import csheets.ui.ext.UIExtension;
+
+/**
+ * Classe que interliga o Modelo de negócio do programa da extensão de
+ * Partilha de Folha
+ * @author Tiago
+ */
 
 public class PageSharingExtension extends Extension {
 
@@ -14,7 +19,7 @@ public class PageSharingExtension extends Extension {
         /** The Page Sharing Controller */
         
 	/**
-	 * Creates a new Example extension.
+	 * Creates a new Page Sharing extension.
 	 */
 	public PageSharingExtension() {
 		super(NAME);
