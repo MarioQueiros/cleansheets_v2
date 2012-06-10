@@ -17,8 +17,8 @@ public class ClientAction extends BaseAction{
     
     ClientFrame cFrame;
     
-    public ClientAction(UIController uiController, PageSharingController pageSharingController) {
-        cFrame = new ClientFrame(uiController, pageSharingController);
+    public ClientAction(UIController uiController) {
+        cFrame = new ClientFrame(uiController);
         cFrame.setVisible(false);
         
     }

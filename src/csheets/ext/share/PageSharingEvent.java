@@ -9,7 +9,7 @@ import java.util.EventObject;
 import java.util.List;
 
 /**
- *
+ * Evento da mudança na lista de conecções
  * @author Tiago
  */
 public class PageSharingEvent extends EventObject {

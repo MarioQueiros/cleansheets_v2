@@ -11,26 +11,32 @@ import javax.swing.JMenu;
 
 import csheets.ui.ctrl.UIController;
 
+/**
+ * O menu da extensão
+ * @author Tiago
+ */
 public class PageSharingMenu extends JMenu {
 
     
         private PageSharingController pageSharingController;
         
 	/**
-	 * Creates a new example menu.
+	 * Creates a new Page Sharing menu.
 	 * @param uiController the user interface controller
 	 */
 	public PageSharingMenu(UIController uiController) {
 		super("Share");
                 
-                pageSharingController = PageSharingController.getInstance();
-                
 		setMnemonic(KeyEvent.VK_Z);
 
 		// Adds font actions
-                add(new HostAction(uiController, pageSharingController));
-		add(new ClientAction(uiController, pageSharingController));
-		add(new DisconnectAction(uiController, pageSharingController));
+                add(new HostAction(uiController));
+		add(new ClientAction(uiController));
+                addSeparator();
+		add(new DisconnectAction(uiController));
+                addSeparator();
+                add(new InterruptOneAction(uiController,false));
+                add(new InterruptAllAction(uiController,true));
 	}	
         
         
