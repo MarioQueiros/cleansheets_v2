@@ -30,7 +30,7 @@ public class FormulaParserTest {
 
     @Test
     public void testExpression() throws Exception {
-        System.out.println("expression");
+        System.out.println("teste formula Parser");
         String source = "#A2:=Soma(4;5)";
         FormulaParser parser = new FormulaParser(
                 new FormulaLexer_PT(new StringReader(source)));
