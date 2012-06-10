@@ -7,9 +7,9 @@ package csheets.ext.share.connect;
 import csheets.core.Address;
 import csheets.core.Cell;
 import csheets.core.formula.compiler.FormulaCompilationException;
+import csheets.ext.share.PageSharingController;
 import csheets.ext.share.PageSharingData;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -17,22 +17,27 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Subclasse de "Connection", trata-se de um cliente, que se liga a uma
+ * partilha
  * @author Tiago
  */
 public class Client extends Connection {
 
+    /** A socket que o liga ao servidor */
     private Socket socket;
+    
+    /** A primeira célula da partilha */
     private Cell firstCell;
+    
+    /** O objecto que se encarrega de manter a sincronização de Threads */
     private Object syncSockets = new Object();
 
     public Client(PageSharingData connectData) {
 
         try {
-            this.shareName = connectData.getConnectName();
+            this.shareName = connectData.getShareName();
             address = connectData.getIp();
             this.socket = connectData.getConnectedSocket();
-            this.pageSharingController = connectData.getConnectController();
             connectedWorkbook = connectData.getSpreadsheet().getWorkbook();
             this.connectedSpreadsheet = connectData.getSpreadsheet();
             this.firstCell = connectData.getCell();
@@ -48,21 +53,27 @@ public class Client extends Connection {
 
     }
 
+    /** Quando do outro lado a conecção é fechada é recolhida na Thread Receive
+     * que por sua vez chama este método para fechar também esta conecção
+     */
+    
     @Override
     public void closeSockets() {
         PrintWriter out;
         try {
-            out = new PrintWriter(getSocket().getOutputStream(), true);
+            out = new PrintWriter(socket.getOutputStream(), true);
             out.println("closeSocket\n");
             out.flush();
-            getSocket().close();
+            socket.close();
+
         } catch (Exception ex) {
         }
     }
 
+/** ESCUTA DO EVENTO DE MUDANÇA NAS CÉLULAS */
+    
     @Override
     public void valueChanged(Cell cell) {
-        //
     }
 
     @Override
@@ -72,7 +83,7 @@ public class Client extends Connection {
             if (cell.equals(connectedCells.get(i))) {
                 synchronized (syncSockets) {
                     try {
-                        out = new PrintWriter(getSocket().getOutputStream(), true);
+                        out = new PrintWriter(socket.getOutputStream(), true);
                         out.println(cell.getAddress() + "," + cell.getContent() + "\n");
                         out.flush();
                     } catch (Exception e) {
@@ -85,17 +96,43 @@ public class Client extends Connection {
 
     @Override
     public void dependentsChanged(Cell cell) {
-        //
     }
 
     @Override
     public void cellCleared(Cell cell) {
-        //
+        PrintWriter out;
+        for (int i = 0; i < connectedCells.size(); i++) {
+            if (cell.equals(connectedCells.get(i))) {
+                synchronized (syncSockets) {
+                    try {
+                        out = new PrintWriter(socket.getOutputStream(), true);
+                        out.println(cell.getAddress() + "," + cell.getContent() + "\n");
+                        out.flush();
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, e.getMessage());
+                    }
+                }
+            }
+        }
     }
 
     @Override
     public void cellCopied(Cell cell, Cell source) {
-        //
+        PrintWriter out;
+        for (int i = 0; i < connectedCells.size(); i++) {
+            if (cell.equals(connectedCells.get(i))) {
+                synchronized (syncSockets) {
+                    try {
+                        cell.setContent(source.getContent());
+                        out = new PrintWriter(socket.getOutputStream(), true);
+                        out.println(cell.getAddress() + "," + cell.getContent() + "\n");
+                        out.flush();
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, e.getMessage());
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -103,53 +140,8 @@ public class Client extends Connection {
         connectedSpreadsheet.removeCellListener(this);
     }
 
-    /**
-     * @return the socket
-     */
-    public Socket getSocket() {
-        return socket;
-    }
-
-    class Receive implements Runnable {
-
-        public void run() {
-            BufferedReader in;
-            String stream;
-            String cellInfo[] = new String[2];
-            try {
-
-                while (true) {
-                    in = new BufferedReader(new InputStreamReader(getSocket().getInputStream()));
-                    stream = in.readLine();
-                    try {
-                        if (stream.contains("closeSocket")) {
-                            break;
-                        }
-                        cellInfo = stream.split(",");
-
-                        for (int i = 0; i < connectedCells.size(); i++) {
-                            for (int j = 0; j < connectedCells.size(); j++) {
-                                if (connectedFrom.get(i).toString().contains(cellInfo[0])) {
-                                    try {
-                                        connectedCells.get(i).setContent(cellInfo[1]);
-                                    } catch (FormulaCompilationException ex) {
-                                        JOptionPane.showMessageDialog(null, "Error on receiving connected content!");
-
-                                    }
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                    }
-                }
-
-            } catch (Exception ex) {
-            }
-
-
-        }
-    }
-
+/** RUN DO CLIENT */
+    
     @Override
     public void run() {
         String stream;
@@ -162,8 +154,8 @@ public class Client extends Connection {
 
         try {
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(getSocket().getInputStream()));
-            PrintWriter out = new PrintWriter(getSocket().getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
             stream = in.readLine();
             out.println(firstCellAddress.getColumn() + "," + firstCellAddress.getRow() + "\n");
@@ -185,30 +177,79 @@ public class Client extends Connection {
             }
 
             setType("Client");
-            if (!pageSharingController.isConnectedTo(getType(), getConnectedCells().get(0),
+            if (!PageSharingController.getInstance().isConnectedTo(getType(), getConnectedCells().get(0),
                     getConnectedCells().get(getConnectedCells().size() - 1),
                     getSpreadsheet(), getWorkbook())) {
-                
-                pageSharingController.clientConfigured(this);
+
+                PageSharingController.getInstance().clientConfigured(this);
                 Thread receiver = new Thread(this.new Receive());
                 receiver.start();
                 receiver.join();
-                getSocket().close();
-                pageSharingController.connectionRemoved(this);
+                socket.close();
+                PageSharingController.getInstance().connectionRemoved(this);
 
             } else {
                 JOptionPane.showMessageDialog(null, "Unable to create connection, already connected to that server!");
-                pageSharingController.connectionRemoved(this);
+                PageSharingController.getInstance().connectionRemoved(this);
             }
 
         } catch (Exception ex) {
-            if (ex.getMessage().contains("socket closed")) {
-                JOptionPane.showMessageDialog(null, "Connection Closed!");
-            } else if (ex.getMessage().contains("Connection reset")) {
-                pageSharingController.connectionRemoved(this);
-                JOptionPane.showMessageDialog(null, "Connection Closed!");
-            } else {
-                JOptionPane.showMessageDialog(null, ex.getMessage());
+        }
+        PageSharingController.getInstance().connectionRemoved(this);
+    }
+    
+ /** GETS E SETS */
+    
+    /**
+     * @return the socket
+     */
+    public Socket getSocket() {
+        return socket;
+    }
+    
+    
+    
+ /** Thread RECEIVE */
+    
+    /**
+     * Esta classe encarrega-se de receber informação pela socket e
+     * a colocar no seu devido lugar. Também se encarrega de verificar
+     * se a socket se mantém activa e fechar o Client se for o caso
+     */
+    
+    class Receive implements Runnable {
+
+        public void run() {
+            BufferedReader in;
+            String stream;
+            String cellInfo[] = new String[2];
+            try {
+                while (true) {
+
+                    in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    stream = in.readLine();
+
+                    if (stream.contains("closeSocket")) {
+                        break;
+                    }
+                    cellInfo = stream.split(",");
+
+                    for (int i = 0; i < connectedCells.size(); i++) {
+                        for (int j = 0; j < connectedCells.size(); j++) {
+                            if (connectedFrom.get(i).toString().contains(cellInfo[0])) {
+                                try {
+                                    connectedCells.get(i).setContent(cellInfo[1]);
+                                } catch (FormulaCompilationException ex) {
+                                    JOptionPane.showMessageDialog(null, "Error on receiving connected content!");
+
+                                }
+                            }
+                        }
+                    }
+
+
+                }
+            } catch (Exception ex) {
             }
         }
     }
