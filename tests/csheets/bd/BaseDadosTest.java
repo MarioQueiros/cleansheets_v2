@@ -98,14 +98,53 @@ public class BaseDadosTest {
         matriz[1][1]="B";
         matriz[1][2]="C";
         IBaseDados instance = BaseDadosFactory.getBD("mysql");;
-        String expResult ="A varchar(120), B varchar(120), C varchar(120)";
+        String expResult ="A varchar(120), B varchar(120), C varchar(120), )";
+     
         String result = instance.criarColunas(matriz);
+        assertEquals(expResult, result);
+       
+        // TODO review the generated test code and remove the default call to fail.
+        
+    }
+    
+       /**
+     * Verificar se a coluna 1 pode ser chave primária da tabela
+      */
+    @Test
+    public void validarPk() throws SQLException, ClassNotFoundException {
+        System.out.println("verificarErro");
+        matriz[0][0]="Nome";
+        matriz[0][1]="Nif";
+        matriz[0][2]="Morada";
+        String [] vec = new String [1];
+        vec[0]="2";
+        IBaseDados instance = BaseDadosFactory.getBD("mysql");
+        boolean result = instance.validarPK(vec,matriz);
+        boolean expResult = true;
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         
     }
     
-    
+        /**
+     * Verificar se a coluna 1 pode ser  2x chave primária da tabela
+      */
+    @Test
+    public void validarPk_false() throws SQLException, ClassNotFoundException {
+        System.out.println("verificarErro");
+        matriz[0][0]="Nome";
+        matriz[0][1]="Nif";
+        matriz[0][2]="Morada";
+        String [] vec = new String [2];
+        vec[0]="2";
+        vec[0]="2";
+        IBaseDados instance = BaseDadosFactory.getBD("mysql");
+        boolean result = instance.validarPK(vec,matriz);
+        boolean expResult = false;
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        
+    }
     
     
     
