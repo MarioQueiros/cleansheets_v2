@@ -9,7 +9,6 @@ import csheets.core.formula.FunctionParameter;
 import csheets.core.formula.compiler.ExcelExpressionCompilerPT;
 import csheets.core.formula.compiler.FormulaCompilationException;
 import csheets.core.formula.compiler.FormulaCompiler;
-import csheets.ui.ctrl.UIController;
 
 /**
  * @author Bruno Cunha
@@ -27,15 +26,14 @@ public class Eval implements Function {
     public String getIdentifier() {
         return "Eval";
     }
-
- 
+    
     public Value applyTo(Expression[] arguments) throws IllegalValueTypeException {
-
-        Expression e = null;
-        Cell a = ExcelExpressionCompilerPT.getLastActiveCell();
+   
+        Cell a = ExcelExpressionCompilerPT.getLastActiveCell(this);
+        //a = UIController.getActiveCell();
         try {
             String str = arguments[0].evaluate().toString();
-            e = FormulaCompiler.getInstance().compile(a, ExcelExpressionCompilerPT.FORMULA_STARTER + str);
+            Expression e = FormulaCompiler.getInstance().compile(a, ExcelExpressionCompilerPT.FORMULA_STARTER + str);
             return e.evaluate();
         } catch (FormulaCompilationException ex) {
             return new Value(ex);

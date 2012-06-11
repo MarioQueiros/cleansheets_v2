@@ -49,6 +49,9 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
     public static final char FORMULA_STARTER = '#';
     private static Cell lastActiveCell = null;
 
+
+
+
     /**
      * Creates the Excel expression compiler.
      */
@@ -184,8 +187,11 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
     /**    
      * @return a ultima cell que foi chamada para compilar.
      * nao deve ser chamado directamente, para uso exclusivo da formula "Eval"
+     * Tentativas de chamadas por outras funcs retornam "null"
      */
-    public static Cell getLastActiveCell() {
+    public static Cell getLastActiveCell(Function function) {
+        if(function.getIdentifier().equalsIgnoreCase("Eval")) 
         return lastActiveCell;
+        return null;
     }
 }
