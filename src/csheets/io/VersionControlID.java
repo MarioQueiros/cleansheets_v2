@@ -7,15 +7,15 @@ import java.sql.Timestamp;
  *
  * @author MpApQ
  */
-public class XMLVersionControlID implements Serializable{
+public class VersionControlID implements Serializable{
 
     private String m_filename;
     private java.sql.Timestamp m_timestamp;
 
-    public XMLVersionControlID() {
+    public VersionControlID() {
     }
 
-    public XMLVersionControlID(String fn, java.sql.Timestamp ts) {
+    public VersionControlID(String fn, java.sql.Timestamp ts) {
         m_filename = fn;
         m_timestamp = ts;
     }

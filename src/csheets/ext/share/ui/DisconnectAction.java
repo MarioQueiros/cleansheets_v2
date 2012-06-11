@@ -17,8 +17,8 @@ public class DisconnectAction extends BaseAction{
     
             DisconnectFrame dscFrame;
 
-    public DisconnectAction(UIController uiController, PageSharingController pageSharingController){
-           dscFrame = new DisconnectFrame(uiController, pageSharingController);
+    public DisconnectAction(UIController uiController){
+           dscFrame = new DisconnectFrame(uiController);
            dscFrame.setVisible(false);
     }
     

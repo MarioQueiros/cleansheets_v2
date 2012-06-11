@@ -39,12 +39,11 @@ public class DisconnectFrame extends JFrame implements PageSharingListener {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private PageSharingController pageSharingController;
     private UIController uiController;
     private List<DisconnectListener> disconnectListeners;
     private List<String> connectionsText;
 
-    public DisconnectFrame(UIController uiController, PageSharingController pageSharingController) {
+    public DisconnectFrame(UIController uiController) {
         this.uiController = uiController;
         disconnectListeners = new ArrayList<DisconnectListener>();
 
@@ -66,7 +65,7 @@ public class DisconnectFrame extends JFrame implements PageSharingListener {
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setIconImage(Toolkit.getDefaultToolkit().getImage(
                 CleanSheets.class.getResource("res/img/sheet.gif")));
 
@@ -83,10 +82,11 @@ public class DisconnectFrame extends JFrame implements PageSharingListener {
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel());
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
             }
-        });   
+        });
 
         jLabel2.setText("Type :");
 
@@ -117,31 +117,42 @@ public class DisconnectFrame extends JFrame implements PageSharingListener {
 
         pack();
         setLocationRelativeTo(null);
-    }// </editor-fold>
+        setResizable(false);
+    }
 
     private void jComboBox1ActionPerformed(ActionEvent evt) {
 
         String[] split = new String[6];
-        if (!jComboBox1.getSelectedItem().equals(null)) {
-            split = connectionsText.get(jComboBox1.getSelectedIndex()).split(" - ");
-            
-            jLabel7.setText(split[1]);
-            
-            jLabel8.setText(split[2].split(": ")[1]);
+        try{
+            if(!jComboBox1.getSelectedItem().equals(null)){
+                split = connectionsText.get(jComboBox1.getSelectedIndex()).split(" - ");
+                jLabel7.setText(split[1]);
 
-            jLabel9.setText(split[3].split(": ")[1]);
+                jLabel8.setText(split[2].split(": ")[1]);
 
-            jLabel10.setText(split[4]);
+                jLabel9.setText(split[3].split(": ")[1]);
 
-            jLabel11.setText(split[5].substring(12));
+                jLabel10.setText(split[4]);
+
+                jLabel11.setText(split[5].substring(12));
+            }
+        }catch(NullPointerException e){
+            jLabel7.setText("");
+
+            jLabel8.setText("");
+
+            jLabel9.setText("");
+
+            jLabel10.setText("");
+
+            jLabel11.setText("");
         }
+            
     }
 
     private void jButton1ActionPerformed(ActionEvent evt) {
         if (jComboBox1.getSelectedItem() != null) {
-
             fireConnectionRemoved(jComboBox1.getSelectedIndex());
-            jComboBox1.removeItem(jComboBox1.getSelectedItem());
         } else {
             JOptionPane.showMessageDialog(null, "Error in removing connection!");
         }
@@ -149,6 +160,7 @@ public class DisconnectFrame extends JFrame implements PageSharingListener {
 
     @Override
     public void connectionsChanged(PageSharingEvent event) {
+        
         connectionsText = new ArrayList<String>();
         List<Connection> connections = event.getConnectionList();
         String[] comboBoxSelections = new String[connections.size()];
@@ -184,7 +196,7 @@ public class DisconnectFrame extends JFrame implements PageSharingListener {
                     comboBoxSelections[i] += " - ";
                     comboBoxSelections[i] += "Spreadsheet " + connections.get(i).getSpreadsheet().getTitle();
                     connectionsText.add(comboBoxSelections[i]);
-                    comboBoxSelections[i] = (i+1)+". ";
+                    comboBoxSelections[i] = (i + 1) + ". ";
                     comboBoxSelections[i] += connections.get(i).getShareName();
                     comboBoxSelections[i] += " - ";
                     comboBoxSelections[i] += connections.get(i).getType();
@@ -192,11 +204,11 @@ public class DisconnectFrame extends JFrame implements PageSharingListener {
                     comboBoxSelections[i] = "Connection with Errors!";
                 }
             }
-            
+
         }
+        
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(comboBoxSelections));
-        jComboBox1.setSelectedItem(jComboBox1.getModel().getSelectedItem());
-        repaint();
+        jComboBox1.setSelectedItem(jComboBox1.getSelectedItem());
     }
 
     public void addDisconnectListener(DisconnectListener listener) {

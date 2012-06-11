@@ -13,26 +13,22 @@ import java.awt.event.ActionEvent;
  *
  * @author Tiago
  */
-public class HostAction extends BaseAction{
-    HostFrame hFrame;
-    
-    public HostAction(UIController uiController) {
-        
-        hFrame = new HostFrame(uiController);
-        hFrame.setVisible(false);
-        
+public class InterruptOneAction extends BaseAction {
+
+    private InterruptFrame intFrame;
+
+    public InterruptOneAction(UIController uiController, boolean allHosts) {
+        intFrame = new InterruptFrame(uiController, allHosts);
+        intFrame.setVisible(false);
     }
+
     @Override
     protected String getName() {
-        return "Create connection...";
+            return "Interrupt One...";
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        
-        hFrame.setVisible(true);
-        
-        
+        intFrame.setVisible(true);
     }
-    
 }
