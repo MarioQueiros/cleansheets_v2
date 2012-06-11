@@ -1,0 +1,33 @@
+// $ANTLR 2.7.5 (20050128): ../src/csheets/core/formula/compiler/MacrosCompiler.g -> MacrosParserTokenTypes.txt$
+MacrosParser    // output token vocab name
+COLON=4
+EQ=5
+LOCVAR=6
+CELL_REF=7
+NEQ=8
+GT=9
+LT=10
+LTEQ=11
+GTEQ=12
+AMP=13
+PLUS=14
+MINUS=15
+MULTI=16
+DIV=17
+POWER=18
+PERCENT=19
+LPAR=20
+RPAR=21
+FUNCTION=22
+SEMI=23
+NAME=24
+NUMBER=25
+STRING=26
+LETTER=27
+ALPHABETICAL=28
+QUOT=29
+DIGIT=30
+ABS=31
+EXCL=32
+COMMA=33
+WS=34
