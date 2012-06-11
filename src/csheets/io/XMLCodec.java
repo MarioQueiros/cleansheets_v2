@@ -70,7 +70,7 @@ public class XMLCodec implements Codec {
         Session session = factory.openSession();
         org.hibernate.Transaction tx = session.beginTransaction();
 
-        org.hibernate.Query query = session.createQuery("from csheets.io.XMLVersionControl where filename=:fn order by timestampfile DESC");
+        org.hibernate.Query query = session.createQuery("from csheets.io.VersionControl where filename=:fn order by timestampfile DESC");
         query.setParameter("fn", file.getName());
 
         List list = query.list();
@@ -377,7 +377,7 @@ public class XMLCodec implements Codec {
         java.util.Date now = calendar.getTime();
         java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
 
-        org.hibernate.Query query = session.createQuery("from csheets.io.XMLVersionControl where filename=:idg order by id DESC");
+        org.hibernate.Query query = session.createQuery("from csheets.io.VersionControl where filename=:idg order by id DESC");
         query.setParameter("idg", file.getName());
 
         List list = query.list();
