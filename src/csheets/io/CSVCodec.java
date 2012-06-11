@@ -34,6 +34,7 @@ import java.util.List;
 
 import csheets.core.Spreadsheet;
 import csheets.core.Workbook;
+import java.io.*;
 
 /**
  * A codec for comma-separated files.
@@ -49,7 +50,7 @@ public class CSVCodec implements Codec {
 	 */
 	public CSVCodec() {}
 
-	public Workbook read(InputStream stream) throws IOException {
+	public Workbook read(InputStream stream, File file) throws IOException {
 		// Wraps stream
 		Reader streamReader = new InputStreamReader(stream);
 		BufferedReader reader = new BufferedReader(streamReader);
@@ -79,7 +80,7 @@ public class CSVCodec implements Codec {
 		return new Workbook(content);
 	}
 
-	public void write(Workbook workbook, OutputStream stream) throws IOException {
+	public void write(Workbook workbook, OutputStream stream, File file) throws IOException {
 		System.out.println("Writing!");
 		// Wraps stream
 		PrintWriter writer = new PrintWriter(new BufferedWriter(

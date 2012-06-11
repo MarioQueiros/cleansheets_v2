@@ -28,6 +28,7 @@ import java.io.OutputStream;
 
 import csheets.core.Workbook;
 import csheets.ext.ExtensionManager;
+import java.io.*;
 
 /**
  * A codec for the native CleanSheets format that uses Java Serialization.
@@ -40,13 +41,13 @@ public class CLSCodec implements Codec {
 	 */
 	public CLSCodec() {}
 
-	public Workbook read(InputStream stream) throws IOException, ClassNotFoundException {
+	public Workbook read(InputStream stream, File file) throws IOException, ClassNotFoundException {
 		ObjectInputStream ois = new DynamicObjectInputStream(stream,
 			ExtensionManager.getInstance().getLoader());
 		return (Workbook)ois.readObject();
 	}
 
-	public void write(Workbook workbook, OutputStream stream) throws IOException {
+	public void write(Workbook workbook, OutputStream stream, File file) throws IOException {
 		ObjectOutputStream oos = new ObjectOutputStream(stream);
 		oos.writeObject(workbook);
 		oos.flush();

@@ -37,9 +37,17 @@ options {
 	: ( expression | literal ) EOF
 	; */
 expression
-	: EQ! comparison EOF!
+	: EQ! (key | ref_cell |comparison) EOF!
+	;	
+	
+ref_cell
+	: CELL_REF (EQF comparison)?
 	;
 
+key
+	: LKey CELL_REF (EQF comparison)? ((SEMI CELL_REF (EQF comparison)?))* RKey
+	;
+	
 comparison
 	: concatenation
 		( ( EQ^ | NEQ^ | GT^ | LT^ | LTEQ^ | GTEQ^ ) concatenation )?
@@ -79,13 +87,17 @@ atom
 	|	literal
 	|	LPAR! comparison RPAR!
 	;
-
+	
 function_call
 	:	FUNCTION^ 
 		( comparison ( SEMI! comparison )* )?
 		RPAR!
 	;
-
+	
+another_cell:
+	EQF function_call
+	;
+	
 reference
 	:	CELL_REF
 		( ( COLON^ ) CELL_REF )?
@@ -145,6 +157,7 @@ protected DIGIT : '0'..'9' ;
 
 /* Comparison operators */
 EQ		: "#" ;
+EQF		: ":=" ;
 NEQ		: "<>" ;
 LTEQ	: "<=" ;
 GTEQ	: ">=" ;
@@ -172,7 +185,8 @@ COMMA	: ',' ;
 SEMI	: ';' ;
 LPAR	: '(' ;
 RPAR	: ')' ;
-
+RKey	: '}' ;
+LKey	: '{' ;
 
 /* White-space (ignored) */
 WS: ( ' '
