@@ -31,11 +31,8 @@ import csheets.core.Cell;
 import csheets.core.IllegalValueTypeException;
 import csheets.core.Value;
 import csheets.core.formula.*;
-import csheets.core.formula.lang.CellReference;
-import csheets.core.formula.lang.Language;
-import csheets.core.formula.lang.RangeReference;
-import csheets.core.formula.lang.ReferenceOperation;
-import csheets.core.formula.lang.UnknownElementException;
+import csheets.core.formula.lang.*;
+import csheets.ui.ctrl.UIController;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,6 +47,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
      * The character that signals that a cell's content is a formula ('#')
      */
     public static final char FORMULA_STARTER = '#';
+    private static Cell lastActiveCell = null;
 
     /**
      * Creates the Excel expression compiler.
@@ -63,6 +61,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
 
     public Expression compile(Cell cell, String source) throws FormulaCompilationException {
         // Creates the lexer and parser
+        lastActiveCell = cell;
         FormulaParser parser = new FormulaParser(
                 new FormulaLexer_PT(new StringReader(source)));
 
@@ -85,11 +84,11 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
      */
     protected Expression convert(Cell cell, AST node) throws FormulaCompilationException {
         //System.out.println("Converting node '" + node.getText() + "' of tree '" + node.toStringTree() + "' with " + node.getNumberOfChildren() + " children.");
+        AST nodeP, nodeFunc, nodeRef;
+        CellReference cr;
+        Cell alvo;
+        Expression e;
         try {
-            AST nodeP, nodeFunc, nodeRef;
-            CellReference cr;
-            Cell alvo;
-            Expression e;
             nodeP = node.getNextSibling();
             if (nodeP.getText().equalsIgnoreCase(":=")) {  //Formato alinea a)
                 nodeFunc = nodeP.getNextSibling();
@@ -180,5 +179,13 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
         {
             throw new FormulaCompilationException();
         }
+    }
+
+    /**    
+     * @return a ultima cell que foi chamada para compilar.
+     * nao deve ser chamado directamente, para uso exclusivo da formula "Eval"
+     */
+    public static Cell getLastActiveCell() {
+        return lastActiveCell;
     }
 }
