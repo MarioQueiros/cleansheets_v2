@@ -43,27 +43,25 @@ public class Incrementar implements BinaryOperator {
     public Value applyTo(Expression leftOperand, Expression rightOperand) throws IllegalValueTypeException {
         double esq = 0, dir = 0;
         boolean isLetter = false;
-        String ref = "";
         try {
             esq = leftOperand.evaluate().toDouble();
         } catch (IllegalValueTypeException ex) {
             isLetter = true;
-            ref += esq;
         }
         try {
             dir = rightOperand.evaluate().toDouble();
-        } catch (IllegalValueTypeException ex) {
-            if (isLetter) {
-                Logger.getLogger(Incrementar.class.getName()).log(Level.SEVERE, null, ex);
-            } else {
-                isLetter = true;
-                ref += dir;
+            if(isLetter){
+                return new Value(leftOperand.evaluate().toString() + (int)dir);  //se só houver string à esquerda ex(soma(a+b5))
             }
-
+        } catch (IllegalValueTypeException ex) {
+            if(!isLetter){
+                return new Value((int)esq + rightOperand.evaluate().toString() );  //se só houver string à direita ex(soma(b5+a))
+            }
+            isLetter = true;
         }
-        if (!isLetter) {
+        if (!isLetter) {    //valor normal, 2 numeros
             return new Value(esq + dir);
-        } else {
+        } else {    //2 strings
             return new Value(leftOperand.evaluate().toString() + rightOperand.evaluate().toString());
         }
     }
