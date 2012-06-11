@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class name="csheets.io.VersionControl" table="VERSIONCONTROL">
+    <composite-id name="m_key">
+      <key-property column="FILENAME" length="100" name="m_filename" type="java.lang.String"/>
+      <key-property column="TIMESTAMPFILE" name="m_timestamp" type="java.sql.Timestamp"/>
+    </composite-id>
+    <property name="m_id" type="int">
+      <column name="ID"/>
+    </property>
+    <property name="m_blob" type="java.sql.Blob">
+      <column name="BLOBFILE"/>
+    </property>
+  </class>
+</hibernate-mapping>

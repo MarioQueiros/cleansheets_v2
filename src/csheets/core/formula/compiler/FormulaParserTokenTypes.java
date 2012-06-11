@@ -1,0 +1,39 @@
+// $ANTLR 2.7.5 (20050128): "../src/csheets/core/formula/compiler/FormulaCompiler_PT.g" -> "FormulaParser.java"$
+package csheets.core.formula.compiler;
+public interface FormulaParserTokenTypes {
+	int EOF = 1;
+	int NULL_TREE_LOOKAHEAD = 3;
+	int EQ = 4;
+	int CELL_REF = 5;
+	int EQF = 6;
+	int LKey = 7;
+	int SEMI = 8;
+	int RKey = 9;
+	int NEQ = 10;
+	int GT = 11;
+	int LT = 12;
+	int LTEQ = 13;
+	int GTEQ = 14;
+	int AMP = 15;
+	int PLUS = 16;
+	int MINUS = 17;
+	int MULTI = 18;
+	int DIV = 19;
+	int POWER = 20;
+	int PERCENT = 21;
+	int LPAR = 22;
+	int RPAR = 23;
+	int FUNCTION = 24;
+	int COLON = 25;
+	int NAME = 26;
+	int NUMBER = 27;
+	int STRING = 28;
+	int LETTER = 29;
+	int ALPHABETICAL = 30;
+	int QUOT = 31;
+	int DIGIT = 32;
+	int ABS = 33;
+	int EXCL = 34;
+	int COMMA = 35;
+	int WS = 36;
+}
