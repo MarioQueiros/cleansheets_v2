@@ -55,7 +55,7 @@ public class Incrementar implements BinaryOperator {
             }
         } catch (IllegalValueTypeException ex) {
             if(!isLetter){
-                return new Value((int)esq + rightOperand.evaluate().toString() );  //se só houver string à direita ex(soma(b5+a))
+                return new Value(rightOperand.evaluate().toString() +(int)esq   );  //se só houver string à direita ex(soma(b5+a))
             }
             isLetter = true;
         }
