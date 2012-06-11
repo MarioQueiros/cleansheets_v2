@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>CleanSheets User Properties (11/Jun/2012 8:51:51)</comment>
+<comment>CleanSheets User Properties (11/Jun/2012 20:35:53)</comment>
 <entry key="filetype2.description">Extensible Markup Language (*.xml)</entry>
 <entry key="filetype0.extension">cls</entry>
 <entry key="dependencies.ui.sidebar">true</entry>
 <entry key="filetype0.description">CleanSheets workbook (*.cls)</entry>
 <entry key="filetype2.extension">xml</entry>
+<entry key="recentfile2">C:\Users\MpApQ\Desktop\a.cls</entry>
 <entry key="mainwindow.width">700</entry>
-<entry key="recentfile0">C:\Users\MpApQ\Desktop\a.xml</entry>
+<entry key="recentfile1">C:\Users\MpApQ\Desktop\a.xml</entry>
+<entry key="recentfile0">C:\Users\MpApQ\Desktop\wrjmrtj.cls</entry>
 <entry key="style.ui.toolbar">true</entry>
 <entry key="filetype1.extension">csv</entry>
 <entry key="filetype1.description">Comma-separated file (*.csv)</entry>

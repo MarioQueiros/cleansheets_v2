@@ -394,6 +394,7 @@ public class XMLCodec implements Codec {
         }else{
            xmlvc = (VersionControl) list.get(0);
            int id = xmlvc.getM_id();
+           vc = new VersionControl(xml, ++id, blob);
         }
         
         session.flush();
