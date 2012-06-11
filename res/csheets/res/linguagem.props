@@ -3,7 +3,7 @@ Negator
 Percent
 
 # Binary arithmetic operators
-Adder
+Incrementar
 Subtracter
 Multiplier
 Divider
@@ -33,6 +33,7 @@ Contagem
 Soma
 Media
 Factorial
+Eval
 
 # Pseudo-statements
 Se
