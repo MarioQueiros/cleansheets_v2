@@ -7,9 +7,9 @@ package csheets.ext.share.connect;
 import csheets.core.Address;
 import csheets.core.Cell;
 import csheets.core.formula.compiler.FormulaCompilationException;
+import csheets.ext.share.PageSharingController;
 import csheets.ext.share.PageSharingData;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -17,23 +17,32 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * Subclasse de "Connection", trata-se de um hoste, que cria uma
+ * partilha
  * @author Tiago
  */
 public class Host extends Connection {
 
+    /** A socket ao qual se liga */
     private Socket clntSocket;
+    
+    /** O número de linhas que partilha */
     private int rowNumber;
+    
+    /** O número de colunas que partilha */
     private int colNumber;
+    
+    /** O objecto que se encarrega de manter a sincronização de Threads */
     private Object syncSockets = new Object();
+    
+    /** Booleans que identificam o estado da partilha */
     private boolean connected = false;
     private boolean interrupted = false;
 
-    public Host(PageSharingData connectData, String shareName) {
+    public Host(PageSharingData connectData) {
 
         try {
-            this.shareName = shareName;
-            this.pageSharingController = connectData.getConnectController();
+            this.shareName = connectData.getShareName();
             this.connectedCells = connectData.getCellConnected();
 
             this.connectedSpreadsheet = connectData.getSpreadsheet();
@@ -48,6 +57,8 @@ public class Host extends Connection {
 
     }
 
+    
+/** ESCUTA DO EVENTO DE MUDANÇA NAS CÉLULAS */
     @Override
     public void valueChanged(Cell cell) {
     }
@@ -55,7 +66,7 @@ public class Host extends Connection {
     @Override
     public void contentChanged(Cell cell) {
         PrintWriter out;
-        if(!isInterrupted()){
+        if (!isInterrupted()) {
             for (int i = 0; i < connectedCells.size(); i++) {
                 if (cell.equals(connectedCells.get(i))) {
                     synchronized (syncSockets) {
@@ -79,16 +90,55 @@ public class Host extends Connection {
 
     @Override
     public void cellCleared(Cell cell) {
+        PrintWriter out;
+        if (!isInterrupted()) {
+            for (int i = 0; i < connectedCells.size(); i++) {
+                if (cell.equals(connectedCells.get(i))) {
+                    synchronized (syncSockets) {
+                        try {
+                            out = new PrintWriter(clntSocket.getOutputStream(), true);
+                            out.println(cell.getAddress() + "," + cell.getContent() + "\n");
+                            out.flush();
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(null, e.getMessage());
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     @Override
     public void cellCopied(Cell cell, Cell source) {
+        PrintWriter out;
+        if (!isInterrupted()) {
+            for (int i = 0; i < connectedCells.size(); i++) {
+                if (cell.equals(connectedCells.get(i))) {
+                    synchronized (syncSockets) {
+                        try {
+                            cell.setContent(source.getContent());
+                            out = new PrintWriter(clntSocket.getOutputStream(), true);
+                            out.println(cell.getAddress() + "," + cell.getContent() + "\n");
+                            out.flush();
+                        } catch (Exception e) {
+                            JOptionPane.showMessageDialog(null, e.getMessage());
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     @Override
     public void removeListeners() {
         connectedSpreadsheet.removeCellListener(this);
     }
+    
+     /** Quando do outro lado a conecção é fechada é recolhida na Thread Receive
+     * que por sua vez chama este método para fechar também esta conecção
+     */
 
     @Override
     public void closeSockets() {
@@ -99,11 +149,14 @@ public class Host extends Connection {
             out.println("closeSocket\n");
             out.flush();
             clntSocket.close();
+
         } catch (Exception ex) {
         }
 
     }
 
+/** GETS E SETS */
+    
     /**
      * @return the connected
      */
@@ -144,6 +197,14 @@ public class Host extends Connection {
         this.interrupted = interrupted;
     }
 
+    
+ /** Thread RECEIVE */
+    
+    /**
+     * Esta classe encarrega-se de receber informação pela socket e
+     * a colocar no seu devido lugar. Também se encarrega de verificar
+     * se a socket se mantém activa e fechar o Host se for o caso
+     */
     class Receive implements Runnable {
 
         public void run() {
@@ -151,44 +212,41 @@ public class Host extends Connection {
             String stream;
             String cellInfo[] = new String[2];
             try {
-
                 while (true) {
 
                     in = new BufferedReader(new InputStreamReader(clntSocket.getInputStream()));
                     stream = in.readLine();
 
-                    try {
-                        if (stream.contains("closeSocket")) {
-                            break;
-                        }
 
-                        if (isInterrupted()) {
-                            
-                        } else {
-                            cellInfo = stream.split(",");
+                    if (stream.contains("closeSocket")) {
+                        break;
+                    }
 
-                            synchronized (syncSockets) {
-                                for (int i = 0; i < getConnectedCells().size(); i++) {
-                                    if (connectedFrom.get(i).toString().contains(cellInfo[0])) {
-                                        try {
-                                            getConnectedCells().get(i).setContent(cellInfo[1]);
-                                        } catch (FormulaCompilationException ex) {
-                                            JOptionPane.showMessageDialog(null, "Error on receiving connected content!");
-                                        }
+                    if (isInterrupted()) {
+                    } else {
+                        cellInfo = stream.split(",");
+
+                        synchronized (syncSockets) {
+                            for (int i = 0; i < getConnectedCells().size(); i++) {
+                                if (connectedFrom.get(i).toString().contains(cellInfo[0])) {
+                                    try {
+                                        getConnectedCells().get(i).setContent(cellInfo[1]);
+                                    } catch (FormulaCompilationException ex) {
+                                        JOptionPane.showMessageDialog(null, "Error on receiving connected content!");
                                     }
                                 }
                             }
                         }
-                    } catch (Exception e) {
                     }
                 }
-
             } catch (Exception ex) {
             }
-
         }
     }
 
+    
+    
+/** RUN DO HOST */
     @Override
     public void run() {
 
@@ -223,62 +281,10 @@ public class Host extends Connection {
 
             clntSocket.close();
 
-            pageSharingController.connectionRemoved(this);
+            PageSharingController.getInstance().connectionRemoved(this);
 
-        } catch (NullPointerException e) {
-            e.printStackTrace();
         } catch (Exception ex) {
-            if (ex.getMessage().contains("socket closed")) {
-                JOptionPane.showMessageDialog(null, "Connection Closed!");
-            } else if (ex.getMessage().contains("Connection reset")) {
-                pageSharingController.connectionRemoved(this);
-                JOptionPane.showMessageDialog(null, "Connection Closed!");
-            } else {
-                JOptionPane.showMessageDialog(null, ex.getMessage());
-            }
         }
-    }
-
-    class HandlerOneClient extends Thread {
-
-        private Socket socket;
-
-        public HandlerOneClient(Socket s) throws IOException {
-            this.socket = s;
-            System.out.println("Server Handler: started for client " + this.socket);
-            start(); //calls run() method
-        }
-
-        public @Override
-        void run() {
-            try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
-                //server reads client messages until "END" comes in
-                while (true) {
-                    String str = in.readLine();
-
-                    if (str.equalsIgnoreCase("END")) {
-                        break;
-                    }
-
-                    System.out.println("Server Handler: echoing " + str + " for client on port " + socket.getPort());
-                    out.println(str);
-                }
-
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
-
-            } finally {
-                System.out.println("Server Handler: closing client socket...");
-
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    System.err.println(e.getMessage());
-                }
-            }
-        }
+        PageSharingController.getInstance().connectionRemoved(this);
     }
 }

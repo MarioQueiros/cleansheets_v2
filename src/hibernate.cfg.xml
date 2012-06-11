@@ -7,6 +7,6 @@
     <property name="hibernate.connection.url">jdbc:derby://localhost:1527/VersionControlFiles</property>
     <property name="hibernate.connection.username">fxml</property>
     <property name="hibernate.connection.password">fxml</property>
-    <mapping resource="csheets/io/XMLVersionControl.hbm.xml"/>
+    <mapping resource="csheets/io/VersionControl.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

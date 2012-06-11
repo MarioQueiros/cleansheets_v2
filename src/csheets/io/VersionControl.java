@@ -7,21 +7,21 @@ import java.sql.Blob;
  *
  * @author MpApQ
  */
-public class XMLVersionControl {
-    private XMLVersionControlID m_key;
+public class VersionControl {
+    private VersionControlID m_key;
     private int m_id;
     private java.sql.Blob m_blob;
 
-    XMLVersionControl() {
+    VersionControl() {
     }
 
-    XMLVersionControl(XMLVersionControlID key, int id, java.sql.Blob b) {
+    VersionControl(VersionControlID key, int id, java.sql.Blob b) {
         m_key=key;
         m_id = id;
         m_blob = b;
     }
     
-    XMLVersionControl(XMLVersionControlID key, java.sql.Blob b) {
+    VersionControl(VersionControlID key, java.sql.Blob b) {
         m_key=key;
         m_blob = b;
     }
@@ -58,14 +58,14 @@ public class XMLVersionControl {
     /**
      * @return the m_key
      */
-    public XMLVersionControlID getM_key() {
+    public VersionControlID getM_key() {
         return m_key;
     }
 
     /**
      * @param m_key the m_key to set
      */
-    public void setM_key(XMLVersionControlID m_key) {
+    public void setM_key(VersionControlID m_key) {
         this.m_key = m_key;
     }
 }
