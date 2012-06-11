@@ -52,7 +52,7 @@ public class Language {
         
 	/** The binary operators that are supported by the language */
 	private List<BinaryOperator> binaryOperators = new ArrayList<BinaryOperator>();
-      //  private List<BinaryOperator> binaryOperators_PT = new ArrayList<BinaryOperator>();
+        private List<BinaryOperator> binaryOperators_PT = new ArrayList<BinaryOperator>();
         
 	/** The functions that are supported by the language */
 	private List<Function> functions = new ArrayList<Function>();
@@ -122,7 +122,9 @@ public class Language {
 
 				// Stores element
 				if (Function.class.isAssignableFrom(elementClass))
-					functions_PT.add(Function.class.cast(element));			
+					functions_PT.add(Function.class.cast(element));	
+                                if (BinaryOperator.class.isAssignableFrom(elementClass))
+					binaryOperators_PT.add(BinaryOperator.class.cast(element));
 			}
 		} else if(stream != null)
 			System.err.println("Could not find language properties file ("
@@ -172,6 +174,13 @@ public class Language {
 	 */
 	public BinaryOperator getBinaryOperator(String identifier) throws UnknownElementException {
 		for (BinaryOperator operator : binaryOperators)
+			if (identifier.equalsIgnoreCase(operator.getIdentifier()))
+				return operator; // .clone()
+		throw new UnknownElementException(identifier);
+	}
+        
+        public BinaryOperator getBinaryOperator_PT(String identifier) throws UnknownElementException {
+		for (BinaryOperator operator : binaryOperators_PT)
 			if (identifier.equalsIgnoreCase(operator.getIdentifier()))
 				return operator; // .clone()
 		throw new UnknownElementException(identifier);
