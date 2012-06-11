@@ -23,9 +23,10 @@ public class BaseDadosAction extends BaseAction {
         "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ"};
     private boolean flag_geral = false;
     String infor[] = new String[5];
+    String pk[] = new String[52];
     int[] linhas = new int[nrlinhas];
     int[] vec = new int[4]; //Vector com os extremos seleccionados
-    String tipo_bd;
+    String tipo_bd, chave;
 
     public class ThreadBD implements Runnable {
 
@@ -39,8 +40,12 @@ public class BaseDadosAction extends BaseAction {
             escolherAreaCelulas();
             preencherVectorCoord();
             preencherMatrizFinal();
-            IBaseDados bd = BaseDadosFactory.getBD(tipo_bd);
-            formulario(bd);
+            IBaseDados bd;
+
+            if (!flag_geral) {
+                bd = BaseDadosFactory.getBD(tipo_bd);
+                formulario(bd);
+            }
         }
     }
 
@@ -62,14 +67,14 @@ public class BaseDadosAction extends BaseAction {
             for (int j = 0; j < nrlinhas; ++j) {
                 options[j][i] = coluna[i] + linhas[j];
             }
-       }
+        }
 
     }
 
     public void reset() {
         //flag começa sempre a false
         flag_geral = false;
-        
+
 
     }
 
@@ -97,8 +102,9 @@ public class BaseDadosAction extends BaseAction {
         boolean flag = false;
 
         do {
-            if(flag_geral)
+            if (flag_geral) {
                 break;
+            }
 
             if (flag) {
                 JOptionPane.showMessageDialog(null, "Introduziu valores errados ou no formato errado!");
@@ -133,11 +139,11 @@ public class BaseDadosAction extends BaseAction {
                 int[] valida = new int[4];
                 for (int i = 0; i < nrlinhas; ++i) {
                     for (int j = 0; j < nrcolunas; ++j) {
-                        if (options[i][j].equals(temp[0])) {
+                        if (options[i][j].equalsIgnoreCase(temp[0])) {
                             valida[0] = i;
                             valida[1] = j;
                         }
-                        if (options[i][j].equals(temp[1])) {
+                        if (options[i][j].equalsIgnoreCase(temp[1])) {
                             valida[2] = i;
                             valida[3] = j;
                         }
@@ -225,11 +231,49 @@ public class BaseDadosAction extends BaseAction {
 
     }
 
+    public void escolhaPK(IBaseDados a, String[][] matriz) {
+        //Qual o SGBD que pretende
+
+        boolean pk_f = false, pk_message = false;
+        do {
+
+            if (flag_geral) {
+                break;
+            }
+
+
+            if (pk_message) {
+                JOptionPane.showMessageDialog(null, "Colunas inválidas");
+            }
+
+            chave = JOptionPane.showInputDialog(null, "Quais as colunas que pretende que sejam chave PK da sua tabela?\nSe tem NOME | NIF | MORADA e pretende que nif e morada sejam PK escreva 2;3");
+            if (chave != null) {
+                pk = chave.split(";");
+                pk_f = a.validarPK(pk, matriz_sel);
+            }
+            if (chave == null) {
+                flag_geral = true;
+            }
+            if (tipo_bd == null) {
+                flag_geral = true;
+                break;
+            }
+            if (!pk_f) {
+                pk_message = true;
+            }
+
+        } while (!pk_f);
+
+    }
+
     public void formulario(IBaseDados a) {
+
+
+
         if (a.verificarErro(matriz_sel)) {
 
 
-
+            escolhaPK(a, matriz_sel);
             String dados_bd = "";
             boolean flagbd = false, flagbd_message = false;
             do {
@@ -313,7 +357,7 @@ public class BaseDadosAction extends BaseAction {
             //Correr a thread criada
             Thread a = new Thread(new ThreadBD());
             a.start();
-            
+
 
 
         } catch (Exception ex) {
