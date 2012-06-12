@@ -502,7 +502,7 @@ public class MySQL implements IBaseDados {
             aa.close();
             return matriz_bd;
         } catch (Exception e) {
-            e.printStackTrace();
+           // e.printStackTrace();
             return null;
         }
     }
