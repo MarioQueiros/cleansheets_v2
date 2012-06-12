@@ -4,3 +4,4 @@ csheets.ext.assertion.AssertionExtension
 csheets.ext.test.TestExtension
 csheets.bd.ExtensionBaseDados
 csheets.ext.share.PageSharingExtension
+csheets.ext.html.ExtensionHTML

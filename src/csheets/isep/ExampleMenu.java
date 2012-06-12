@@ -13,7 +13,7 @@ public class ExampleMenu extends JMenu {
 	 * @param uiController the user interface controller
 	 */
 	public ExampleMenu(UIController uiController) {
-		super("Example");
+		super("Export to HTML");
 		setMnemonic(KeyEvent.VK_E);
 
 		// Adds font actions
