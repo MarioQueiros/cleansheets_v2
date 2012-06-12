@@ -28,13 +28,10 @@ import java.util.List;
 import antlr.ANTLRException;
 import antlr.collections.AST;
 import csheets.core.Cell;
-import csheets.core.IllegalValueTypeException;
 import csheets.core.Value;
 import csheets.core.formula.*;
 import csheets.core.formula.lang.*;
-import csheets.ui.ctrl.UIController;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import csheets.core.formula.util.Variavel;
 
 /**
  * A compiler that generates Excel-style formulas from strings.
@@ -47,10 +44,9 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
      * The character that signals that a cell's content is a formula ('#')
      */
     public static final char FORMULA_STARTER = '#';
-    
-    public static final char VARIAVEL_STARTER = '$';
+
         
-    private static RegistoVariaveis vars = RegistoVariaveis.getInstance();
+    private static RegistoVariaveis vars = new RegistoVariaveis();
         
     private static Cell lastActiveCell = null;
 
@@ -111,15 +107,17 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
                     nodeP = nodeFunc.getNextSibling();//nodeP = ";"    
                     ref = nodeRef.getText();
 
-                    if (ref.charAt(0)==VARIAVEL_STARTER) {    //variavel - $temp1
-                        vars.add(ref);
+                    if (ref.charAt(0)==Variavel.VARIAVEL_STARTER) {    //variavel - $temp1
+                        e = convert(cell, nodeFunc);
+                        Value v = e.evaluate();       //cria variavel
+                        vars.add(ref,nodeFunc.getText(),v);
                     } else {
                         cr = new CellReference(cell.getSpreadsheet(), ref);
                         alvo = cr.getCell();
                         func = nodeFunc.getText();
-                        if(func.charAt(0)==VARIAVEL_STARTER){
+                        if(func.charAt(0)==Variavel.VARIAVEL_STARTER){
                             //atribuir valor da variavel
-                            //alvo.setContent(vars.getValue(func));
+                            alvo.setContent(vars.getValue(func).toString());   //func=$temp5
                         }else{
                         e = convert(alvo, nodeFunc);
                         alvo.setContent(e.evaluate().toString());
@@ -136,7 +134,9 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
 
         if (node.getNumberOfChildren() == 0) {
             try {
-                switch (node.getType()) {
+                if(node.getText().charAt(0)==(Variavel.VARIAVEL_STARTER)){
+                    return new Literal (vars.getValue(node.getText()));
+                } else switch (node.getType()) {
                     case FormulaParserTokenTypes.NUMBER:
                         return new Literal(Value.parseNumericValue(node.getText()));
                     case FormulaParserTokenTypes.STRING:
