@@ -45,9 +45,13 @@ ref_cell
 	;
 
 key
-	: LKey CELL_REF (EQF comparison)? ((SEMI CELL_REF (EQF comparison)?))* RKey
+	: LKey exp EQF comparison (SEMI exp EQF comparison)* RKey
 	;
-	
+exp
+	: VARIAVEL
+	| CELL_REF
+	;
+
 comparison
 	: concatenation
 		( ( EQ^ | NEQ^ | GT^ | LT^ | LTEQ^ | GTEQ^ ) concatenation )?
@@ -83,6 +87,7 @@ arithmetic_highest
 
 atom
 	:	function_call
+	|	VARIAVEL
 	|	reference
 	|	literal
 	|	LPAR! comparison RPAR!
@@ -127,6 +132,10 @@ options {
 /* Function calls, named ranges and cell references */
 protected LETTER: ('a'..'z') ;
 
+VARIAVEL
+	: ABS ( LETTER | DIGIT )+
+	;
+
 ALPHABETICAL
 	:	( ( LETTER )+ LPAR ) => ( LETTER )+ LPAR! {
 			try {
@@ -137,8 +146,8 @@ ALPHABETICAL
 			}
 		}
 	|	/* ( LETTER ( LETTER | NUMBER )* EXCL )? */
-		( ABS )? LETTER ( LETTER )?
-		( ABS )? ( DIGIT )+ {
+		 LETTER ( LETTER )?
+		 ( DIGIT )+ {
 			$setType(CELL_REF);
 		}
 	;
@@ -176,7 +185,7 @@ POWER	: '^' ;
 PERCENT : '%' ;
 
 /* Reference operators */
-protected ABS : '$' ;
+protected ABS : "$" ;
 protected EXCL:  '!'  ;
 COLON	: ':' ;
 
