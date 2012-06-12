@@ -43,7 +43,7 @@ public class MacrosExpressionCompiler {
 
     public String convert(AST node, ArrayList<String> nomeVar, ArrayList<Integer> numeroVar, String source) {
 
-        //Caso a gramatica esteja correcta, começar a verificar se tem variaveis ou nao
+        //Caso a gramatica esteja correcta, comear a verificar se tem variaveis ou nao
         AST proximoNo;
 
         String topoArvore = node.getText();
@@ -60,7 +60,7 @@ public class MacrosExpressionCompiler {
                 if (proximoNo.getNextSibling() == null && proximoNo.getNumberOfChildren() != 0) {
                     source = verificarVariavelFilhos(proximoNo, nomeVar, numeroVar, source);
                 }
-                //Se entrar neste if significa que a expressao é assim $var:=123
+                //Se entrar neste if significa que a expressao  assim $var:=123
                 if (proximoNo.getNextSibling() == null && proximoNo.getNumberOfChildren() == 0) {
                     auxiliar = proximoNo.getText();
                     valorVar = Integer.parseInt(auxiliar);

@@ -47,10 +47,12 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
      * The character that signals that a cell's content is a formula ('#')
      */
     public static final char FORMULA_STARTER = '#';
+    
+    public static final char VARIAVEL_STARTER = '$';
+        
+    private static RegistoVariaveis vars = RegistoVariaveis.getInstance();
+        
     private static Cell lastActiveCell = null;
-
-
-
 
     /**
      * Creates the Excel expression compiler.
@@ -90,7 +92,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
         AST nodeP, nodeFunc, nodeRef;
         CellReference cr;
         Cell alvo;
-        Expression e;
+        Expression e = null;
         try {
             nodeP = node.getNextSibling();
             if (nodeP.getText().equalsIgnoreCase(":=")) {  //Formato alinea a)
@@ -101,15 +103,28 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
                 alvo.setContent(e.evaluate().toString());
                 return e;
             } else if (node.getText().equalsIgnoreCase("{")) {   //Formato alinea b)
-                nodeP = node; //P = proximo                
+                nodeP = node; //P = proximo     
+                String ref , func;
                 do {
                     nodeRef = nodeP.getNextSibling();//Exemplo:#{a1:=soma(4;5);a2:=se(a1>10;"grande";"pequeno")}  nodeRef="a1"
                     nodeFunc = nodeRef.getNextSibling().getNextSibling(); //nodeFunc=Sum(a1:a11)
-                    nodeP = nodeFunc.getNextSibling();//nodeP = ";"     
-                    cr = new CellReference(cell.getSpreadsheet(), nodeRef.getText());
-                    alvo = cr.getCell();
-                    e = convert(alvo, nodeFunc);
-                    alvo.setContent(e.evaluate().toString());
+                    nodeP = nodeFunc.getNextSibling();//nodeP = ";"    
+                    ref = nodeRef.getText();
+
+                    if (ref.charAt(0)==VARIAVEL_STARTER) {    //variavel - $temp1
+                        vars.add(ref);
+                    } else {
+                        cr = new CellReference(cell.getSpreadsheet(), ref);
+                        alvo = cr.getCell();
+                        func = nodeFunc.getText();
+                        if(func.charAt(0)==VARIAVEL_STARTER){
+                            //atribuir valor da variavel
+                            //alvo.setContent(vars.getValue(func));
+                        }else{
+                        e = convert(alvo, nodeFunc);
+                        alvo.setContent(e.evaluate().toString());
+                        }
+                    }
                 } while (nodeP.getText().equalsIgnoreCase(";"));
                 return e;
             }
@@ -184,14 +199,15 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
         }
     }
 
-    /**    
-     * @return a ultima cell que foi chamada para compilar.
-     * nao deve ser chamado directamente, para uso exclusivo da formula "Eval"
-     * Tentativas de chamadas por outras funcs retornam "null"
+    /**
+     * @return a ultima cell que foi chamada para compilar. nao deve ser chamado
+     * directamente, para uso exclusivo da formula "Eval" Tentativas de chamadas
+     * por outras funcs retornam "null"
      */
     public static Cell getLastActiveCell(Function function) {
-        if(function.getIdentifier().equalsIgnoreCase("Eval")) 
-        return lastActiveCell;
+        if (function.getIdentifier().equalsIgnoreCase("Eval")) {
+            return lastActiveCell;
+        }
         return null;
     }
 }
