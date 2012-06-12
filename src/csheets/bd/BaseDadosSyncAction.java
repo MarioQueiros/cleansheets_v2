@@ -41,7 +41,7 @@ public class BaseDadosSyncAction extends BaseAction {
         public void run() {
             reset();
             escolhaSGBD();
-            
+
             if (!flag_geral) {
                 bd = BaseDadosFactory.getBD(tipo_bd);
                 formulario(bd);
@@ -71,12 +71,13 @@ public class BaseDadosSyncAction extends BaseAction {
                             //COMPARA A MATRIZ_BD com a matriz inicial
                             comparaMatrizBd_1(matriz_inicial, matriz_bd);
                             comparaMatrizBd_2(matriz_inicial, matriz_bd);
-                            
+
                             //COMPARA A MATRIZ CLEANSHEETS com a matriz inicial
                             comparaMatrizCs_1(matriz_inicial, matriz_sel);
                             comparaMatrizCs_2(matriz_inicial, matriz_sel);
 
-
+                            //COMPARA O CONTEUDO DAS DUAS MATRIZES E FAZ UPDATE
+                            update(matriz_inicial, matriz_sel);
 
                             //Setup da Matriz Inicial
                             saveMatrizActual(bd);
@@ -124,19 +125,17 @@ public class BaseDadosSyncAction extends BaseAction {
 
 
     }
-    
-    public void  saveMatrizActual(IBaseDados bd){
-        matriz_inicial=bd.getMatrizInf(nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
-        
+
+    public void saveMatrizActual(IBaseDados bd) {
+        matriz_inicial = bd.getMatrizInf(nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
+
     }
-    
-    
+
     /* Compara a matriz BD com a matriz anterior - removido bd -> remove células
      * ou seja, a matriz inicial será sempre maior que a BD caso algum registo tenha
      * sido eliminado da BD.
      * 
      */
-
     public void comparaMatrizBd_1(String[][] m1, String[][] m2) {
         String linha = "";
         String linha_i = "";
@@ -193,7 +192,7 @@ public class BaseDadosSyncAction extends BaseAction {
 
             //Trata de inserir nas células
             if (!flag) {
-                
+
                 linha = "";
                 for (int uu = 0; uu < m2[0].length; uu++) {
 
@@ -202,17 +201,15 @@ public class BaseDadosSyncAction extends BaseAction {
                 }
 
                 String vec[] = linha.split(";");
-              //System.out.println(linha);
+                //System.out.println(linha);
                 insereCelula(vec);
             }
         }
     }
-    
-    
+
     // Compara a matriz CS com a matriz anterior - apaga na cs -> apaga BD
-    
-     public void comparaMatrizCs_1(String[][] m1, String[][] m2){
-          String linha = "";
+    public void comparaMatrizCs_1(String[][] m1, String[][] m2) {
+        String linha = "";
         String linha_i = "";
         for (int i = 0; i < m1.length; i++) {
             linha = "";
@@ -227,30 +224,169 @@ public class BaseDadosSyncAction extends BaseAction {
                 for (int z = 0; z < m2[0].length; z++) {
                     linha_i += m2[j][z];
                 }
-                //Encontrou o registo que foi apagado da BD
+
                 if (linha.equals(linha_i)) {
                     flag = true;
                 }
             }
             //Tratar do registo
             if (!flag) {
-             
-                bd.removerLinha(linha, nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
+                String n = "";
+                for (int uu = 0; uu < m2[0].length; uu++) {
+
+                    n = n + m2[i][uu] + ";";
+
+                }
+
+                String vec[] = n.split(";");
+
+                if (bd.inserirLinha(vec, nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]) || vec.length == 0) {
+                    bd.removerLinha(linha, nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
+                } else {
+                    // NÃO VOU APAGAR, PORQUE É UM UPDATE E NÃO UM REMOVE
+                }
             }
         }
-     }
-    
-     // Compara a matriz CS com a matriz anterior - insere na cs -> insere na BD
-     
-     public void comparaMatrizCs_2(String[][] m1, String[][] m2){
-         
-     }
+    }
 
+    // Compara a matriz CS com a matriz anterior - insere na cs -> insere na BD
+    public void comparaMatrizCs_2(String[][] m1, String[][] m2) {
+        String linha = "";
+        String linha_i = "";
+        for (int i = 0; i < m2.length; i++) {
+            linha = "";
+            for (int k = 0; k < m2[0].length; k++) {
+                linha += m2[i][k];
+
+            }
+            boolean flag = false;
+
+            for (int j = 0; j < m1.length; j++) {
+                linha_i = "";
+                for (int z = 0; z < m1[0].length; z++) {
+                    linha_i += m1[j][z];
+                }
+                //Encontrou o registo 
+                if (linha.equals(linha_i)) {
+                    flag = true;
+
+                }
+
+            }
+
+
+
+            if (!flag && !linha.equals("")) {
+
+
+                linha = "";
+                for (int uu = 0; uu < m2[0].length; uu++) {
+
+                    linha = linha + m2[i][uu] + ";";
+
+                }
+
+                String vec[] = linha.split(";");
+                bd.inserirLinha(vec, nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
+            }
+        }
+
+    }
+
+    public void update(String[][] m1, String[][] m2) {
+        String linha = "";
+        String linha_i = "";
+        for (int i = 0; i < m2.length; i++) {
+            linha = "";
+            for (int k = 0; k < m2[0].length; k++) {
+                linha += m2[i][k];
+
+            }
+            boolean flag = false;
+
+            for (int j = 0; j < m1.length; j++) {
+                linha_i = "";
+                for (int z = 0; z < m1[0].length; z++) {
+                    linha_i += m1[j][z];
+                }
+                //Encontrou o registo 
+                if (linha.equals(linha_i)) {
+                    flag = true;
+
+                }
+
+            }
+
+
+
+            if (!flag && !linha.equals("")) {
+
+
+                linha = "";
+                for (int uu = 0; uu < m2[0].length; uu++) {
+
+                    linha = linha + m2[i][uu] + ";";
+
+                }
+
+                String vec[] = linha.split(";");
+                if (!bd.inserirLinha(vec, nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4])) {
+                    
+                    updateCelula(vec, linha);
+                }
+            }
+        }
+    }
     //Insere na Célula
+
+    public void updateCelula(String[] s, String line) {
+        String test = "";
+
+        int row = 0, col = 0;
+        boolean found = false;
+
+        for (int k = vec[0]; k <= vec[2]; k++) {
+
+            for (int l = vec[1]; l <= vec[3]; l++) {
+
+                test += this.uiController.getActiveSpreadsheet().getCell(l, k).getContent() + ";";;
+                col++;
+
+            }
+            // É aqui que devo 
+      
+            int qd = vec[3] - vec[1]+1;
+           
+            if (test.equals(line) && s.length == qd) {
+                String[] infx = bd.registoBD(s, nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
+                found = true;
+                
+                int xx = 0;
+                for (int kk = vec[1]; kk <= vec[3]; kk++) {
+
+                    try {
+                        this.uiController.getActiveSpreadsheet().getCell(kk, k).setContent(infx[xx]);
+                        xx++;
+                    } catch (FormulaCompilationException ex) {
+                        Logger.getLogger(BaseDadosSyncAction.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                break;
+            }
+
+
+            test = "";
+            col = 0;
+            row++;
+        }
+
+    }
+    //Insere na Célula
+
     public void insereCelula(String[] s) {
         String test = "";
         int row = 0, col = 0;
-        boolean found=false;
+        boolean found = false;
 
         for (int k = vec[0]; k <= vec[2]; k++) {
 
@@ -262,7 +398,7 @@ public class BaseDadosSyncAction extends BaseAction {
             }
 
             if (test.equals("")) {
-                found=true;
+                found = true;
                 int xx = 0;
                 for (int kk = vec[1]; kk <= vec[3]; kk++) {
 
@@ -282,8 +418,8 @@ public class BaseDadosSyncAction extends BaseAction {
             row++;
         }
         // Se não dá para preencher mais, então cancela-se a sincronização
-        if(!found){
-            JOptionPane.showMessageDialog(null,"O espaço que escolheu para as células, não aguenta mais conteúdo, sincronização cancelada!");
+        if (!found) {
+            JOptionPane.showMessageDialog(null, "O espaço que escolheu para as células, não aguenta mais conteúdo, sincronização cancelada!");
             SyncSingleton.Instance().setStop(true);
         }
     }
