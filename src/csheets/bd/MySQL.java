@@ -467,10 +467,10 @@ public class MySQL implements IBaseDados {
             url = "jdbc:mysql://" + end + ":" + porta + "/" + nome_bd;
 
 
-            conn = (Connection) DriverManager.getConnection(
+           Connection aa = (Connection) DriverManager.getConnection(
                     url, user, token_pass);
-            conn.setAutoCommit(false);
-            Statement st = (Statement) conn.createStatement();
+            aa.setAutoCommit(false);
+            Statement st = (Statement) aa.createStatement();
             String query = "select * from " + nome_tab + " order by id_t_c";
             String query_conta_col = "SELECT count(*) FROM information_schema.columns WHERE table_name = '" + nome_tab + "'";
             ResultSet rs = st.executeQuery(query_conta_col);
@@ -484,32 +484,226 @@ public class MySQL implements IBaseDados {
             int row = 0;
             while (rs.next()) {
                 for (int i = 1; i <= nrcolunas - 1; i++) {
-                   
                 }
                 row++;
             }
-            
-            String[][] matriz_bd = new String[row][nrcolunas-1];
+
+            String[][] matriz_bd = new String[row][nrcolunas - 1];
             rs = st.executeQuery(query);
-             row = 0;
+            row = 0;
             while (rs.next()) {
                 for (int i = 1; i <= nrcolunas - 1; i++) {
-                   matriz_bd[row][i-1]=rs.getString(i);
+                    matriz_bd[row][i - 1] = rs.getString(i);
                 }
                 row++;
             }
             st.close();
-            conn.commit();
-            conn.close();
+            aa.commit();
+            aa.close();
             return matriz_bd;
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
             return null;
         }
     }
 
     @Override
     public void removerLinha(String linha, String nome_tab, String nome_bd, String tipobd, String end, String porta, String user, String pass) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            nome_tabela = nome_tab;
+
+            verificarPass(pass);
+
+            String url = "";
+
+
+            DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+            url = "jdbc:mysql://" + end + ":" + porta + "/" + nome_bd;
+
+
+            Connection aa = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+            aa.setAutoCommit(false);
+            Statement st = (Statement) aa.createStatement();
+            String query = "select * from " + nome_tab + " order by id_t_c ";
+            String query_conta_col = "SELECT count(*) FROM information_schema.columns WHERE table_name = '" + nome_tab + "'";
+            ResultSet rs = st.executeQuery(query_conta_col);
+            int nrcolunas = 0;
+            //Ir buscar o número de colunas que a tabela tem
+            while (rs.next()) {
+                nrcolunas = rs.getInt(1);
+            }
+            aa.commit();
+            aa.close();
+            st.close();
+
+
+            Connection cc = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+            cc.setAutoCommit(false);
+            Statement st2 = (Statement) cc.createStatement();
+            String line = "";
+            String deletequery = "delete from " + nome_tabela + " where ";
+            rs = st2.executeQuery(query);
+            int row = 0;
+            while (rs.next()) {
+                for (int i = 1; i <= nrcolunas - 1; i++) {
+                    line += rs.getString(i);
+                }
+
+                if (line.equals(linha)) {
+
+                    String[] col = getNomeColunas(nome_tab, nome_bd, tipobd, end, porta, user, pass);
+
+                    for (int l = 1; l <= nrcolunas - 1; l++) {
+                        if (l <= nrcolunas - 2) {
+                            deletequery += col[l - 1] + " = " + "'" + rs.getString(l) + "' AND ";
+                        }
+                        if (l == nrcolunas - 1) {
+                            deletequery += col[l - 1] + " = " + "'" + rs.getString(l) + "'";
+                        }
+
+                    }
+                    break;
+                }
+                line = "";
+                row++;
+            }
+            st2.close();
+            cc.commit();
+            cc.close();
+            
+
+
+            Connection a1 = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+            a1.setAutoCommit(false);
+            Statement st3 = (Statement) a1.createStatement();
+
+            st3.executeUpdate(deletequery);
+            st3.close();
+
+            a1.commit();
+            a1.close();
+
+        } catch (Exception e) {
+            //e.printStackTrace();
+        }
+    }
+
+    public boolean inserirLinha(String[] linha, String nome_tab, String nome_bd, String tipobd, String end, String porta, String user, String pass) {
+        try {
+            nome_tabela = nome_tab;
+
+            verificarPass(pass);
+
+            String url = "";
+
+
+            DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+            url = "jdbc:mysql://" + end + ":" + porta + "/" + nome_bd;
+
+
+
+
+
+           Connection aa = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+           aa.setAutoCommit(false);
+            Statement st2 = (Statement) aa.createStatement();
+
+
+            String infor = "insert into " + nome_tabela + " values ( ";
+            for (int i = 0; i < linha.length; i++) {
+
+
+                if (i != 0 && i < linha.length) {
+                    infor = infor + ", ";
+                }
+                infor = infor + "'" + linha[i] + "' ";
+            }
+            infor = infor + " , NULL );";
+
+
+
+            Statement st3 = (Statement) aa.createStatement();
+
+            st3.executeUpdate(infor);
+            st3.close();
+
+            aa.commit();
+            aa.close();
+
+            return true;
+
+
+        } catch (Exception e) {
+            // e.printStackTrace();
+            return false;
+        }
+    }
+
+    public String[] registoBD(String vec[], String nome_tab, String nome_bd, String tipobd, String end, String porta, String user, String pass) {
+        try {
+            String[] pkz = getPKString(nome_tab, nome_bd, tipobd, end, porta, user, pass);
+
+            String registo[];
+            String query = "SELECT * FROM " + nome_tab + " WHERE ";
+            for (int j = 0; j < pkz.length; j++) {
+                if (j < pkz.length - 1) {
+                    try {
+                        query += pkz[j] + "=" + "'" + vec[getPosCol(pkz[j], nome_tab, nome_bd, tipobd, end, porta, user, pass)] + "' " + "AND ";
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Postgres.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                if (j == pkz.length - 1) {
+                    try {
+                        query += pkz[j] + "=" + "'" + vec[getPosCol(pkz[j], nome_tab, nome_bd, tipobd, end, porta, user, pass)] + "' ";
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Postgres.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+
+
+            }
+
+            String url = "";
+
+
+            DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+            url = "jdbc:mysql://" + end + ":" + porta + "/" + nome_bd;
+
+
+
+            Connection aa = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+            aa.setAutoCommit(false);
+            Statement st = (Statement) aa.createStatement();
+
+            ResultSet rs = st.executeQuery(query);
+            int nrco = 0;
+            nrco = getNrColunas(nome_tab, nome_bd, tipobd, end, porta, user, pass);
+            registo = new String[nrco];
+            int k = 1;
+            while (rs.next()) {
+
+                for (int cic = 0; cic < nrco; ++cic) {
+                    registo[cic] = rs.getString(cic + 1);
+                }
+            }
+          
+
+
+
+            return registo;
+        } catch (SQLException ex) {
+            Logger.getLogger(Postgres.class.getName()).log(Level.SEVERE, null, ex);
+           // ex.printStackTrace();
+            return null;
+        }
+
+
     }
 }

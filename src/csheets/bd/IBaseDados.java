@@ -23,5 +23,7 @@ public interface IBaseDados {
   public boolean addNewInf(String nome_tab, String nome_bd, String[] v, String tipobd, String end, String porta, String user, String pass);
   public String[][] getMatrizInf(String nome_tab,String nome_bd,String tipobd, String end,String porta, String user, String pass);
   public void removerLinha(String linha, String nome_tab,String nome_bd,String tipobd, String end,String porta, String user, String pass);
+  public boolean inserirLinha(String[] linha, String nome_tab,String nome_bd,String tipobd, String end,String porta, String user, String pass);
+  public String [] registoBD(String vec[],String nome_tab,String nome_bd,String tipobd, String end,String porta, String user, String pass);
   
 }

@@ -263,7 +263,7 @@ public class Postgres implements IBaseDados {
         url = "jdbc:postgresql://" + end + ":" + porta + "/" + nome_bd;
 
 
-      Connection c = (Connection) DriverManager.getConnection(
+        Connection c = (Connection) DriverManager.getConnection(
                 url, user, token_pass);
         c.setAutoCommit(false);
         Statement st = (Statement) c.createStatement();
@@ -281,7 +281,7 @@ public class Postgres implements IBaseDados {
                 nome_colunas[cic] = rs_1.getString(cic + 1);
             }
         }
-        
+
         c.commit();
         c.close();
 
@@ -324,7 +324,7 @@ public class Postgres implements IBaseDados {
 
     public int getPosCol(String col, String nome_tab, String nome_bd, String tipobd, String end, String porta, String user, String pass) throws SQLException {
         String[] vec = getNomeColunas(nome_tab, nome_bd, tipobd, end, porta, user, pass);
-        
+
         for (int i = 0; i < vec.length; i++) {
             if (col.equalsIgnoreCase(vec[i])) {
                 return i;
@@ -372,7 +372,7 @@ public class Postgres implements IBaseDados {
                 conn.commit();
                 conn.close();
                 vector_col = getNomeColunas(nome_tab, nome_bd, tipobd, end, porta, user, pass);
-                
+
 
 
             } catch (SQLException ex) {
@@ -545,9 +545,9 @@ public class Postgres implements IBaseDados {
                 }
 
                 if (line.equals(linha)) {
-                    
+
                     String[] col = getNomeColunas(nome_tab, nome_bd, tipobd, end, porta, user, pass);
-                  
+
                     for (int l = 1; l <= nrcolunas - 1; l++) {
                         if (l <= nrcolunas - 2) {
                             deletequery += col[l - 1] + " = " + "'" + rs.getString(l) + "' AND ";
@@ -562,10 +562,10 @@ public class Postgres implements IBaseDados {
                 line = "";
                 row++;
             }
-            st2.close();    
+            st2.close();
             conn.commit();
             conn.close();
-            
+
 
             conn = (Connection) DriverManager.getConnection(
                     url, user, token_pass);
@@ -574,12 +574,124 @@ public class Postgres implements IBaseDados {
 
             st3.executeUpdate(deletequery);
             st3.close();
-            
+
             conn.commit();
             conn.close();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean inserirLinha(String[] linha, String nome_tab, String nome_bd, String tipobd, String end, String porta, String user, String pass) {
+        try {
+            nome_tabela = nome_tab;
+
+            verificarPass(pass);
+
+            String url = "";
+
+            DriverManager.registerDriver(new org.postgresql.Driver());
+            url = "jdbc:postgresql://" + end + ":" + porta + "/" + nome_bd;
+
+
+
+
+            conn = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+            conn.setAutoCommit(false);
+            Statement st2 = (Statement) conn.createStatement();
+
+
+            String infor = "insert into " + nome_tabela + " values ( ";
+            for (int i = 0; i < linha.length; i++) {
+
+
+                if (i != 0 && i < linha.length) {
+                    infor = infor + ", ";
+                }
+                infor = infor + "'" + linha[i] + "' ";
+            }
+            infor = infor + " );";
+
+
+            
+            Statement st3 = (Statement) conn.createStatement();
+
+            st3.executeUpdate(infor);
+            st3.close();
+
+            conn.commit();
+            conn.close();
+
+            return true;
+
+
+        } catch (Exception e) {
+            // e.printStackTrace();
+            return false;
+        }
+    }
+
+    public String[] registoBD(String vec[], String nome_tab, String nome_bd, String tipobd, String end, String porta, String user, String pass) {
+        try {
+            String[] pkz = getPKString(nome_tab, nome_bd, tipobd, end, porta, user, pass);
+
+            String registo[];
+            String query = "SELECT * FROM " + nome_tab + " WHERE ";
+            for (int j = 0; j < pkz.length; j++) {
+                if (j < pkz.length - 1) {
+                    try {
+                        query += pkz[j] + "=" + "'" + vec[getPosCol(pkz[j], nome_tab, nome_bd, tipobd, end, porta, user, pass)] + "' " + "AND ";
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Postgres.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                if (j == pkz.length - 1) {
+                    try {
+                        query += pkz[j] + "=" + "'" + vec[getPosCol(pkz[j], nome_tab, nome_bd, tipobd, end, porta, user, pass)] + "' ";
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Postgres.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+
+
+            }
+
+            String url = "";
+
+            DriverManager.registerDriver(new org.postgresql.Driver());
+            url = "jdbc:postgresql://" + end + ":" + porta + "/" + nome_bd;
+
+
+            conn = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+            conn.setAutoCommit(false);
+            Statement st = (Statement) conn.createStatement();
+
+            ResultSet rs = st.executeQuery(query);
+            int nrco = 0;
+            nrco = getNrColunas(nome_tab, nome_bd, tipobd, end, porta, user, pass);
+            registo = new String[nrco];
+            int k = 1;
+            while (rs.next()) {
+
+                for (int cic = 0; cic < nrco; ++cic) {
+                    registo[cic] = rs.getString(cic + 1);
+                }
+            }
+            
+          
+            conn.commit();
+            conn.close();
+            
+            return registo;
+        } catch (SQLException ex) {
+            Logger.getLogger(Postgres.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+
+
     }
 }
