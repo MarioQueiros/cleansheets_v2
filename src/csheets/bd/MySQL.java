@@ -507,4 +507,9 @@ public class MySQL implements IBaseDados {
             return null;
         }
     }
+
+    @Override
+    public void removerLinha(String linha, String nome_tab, String nome_bd, String tipobd, String end, String porta, String user, String pass) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
