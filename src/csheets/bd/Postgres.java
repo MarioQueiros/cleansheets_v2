@@ -615,7 +615,7 @@ public class Postgres implements IBaseDados {
             infor = infor + " );";
 
 
-            
+
             Statement st3 = (Statement) conn.createStatement();
 
             st3.executeUpdate(infor);
@@ -681,11 +681,11 @@ public class Postgres implements IBaseDados {
                     registo[cic] = rs.getString(cic + 1);
                 }
             }
-            
-          
+
+
             conn.commit();
             conn.close();
-            
+
             return registo;
         } catch (SQLException ex) {
             Logger.getLogger(Postgres.class.getName()).log(Level.SEVERE, null, ex);
