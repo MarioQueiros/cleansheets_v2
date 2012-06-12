@@ -21,6 +21,7 @@ public class Postgres implements IBaseDados {
     private String[] pk = new String[52];
     private String[] vector_col;
     String pk_final[];
+
     public Postgres() {
     }
 
@@ -82,6 +83,7 @@ public class Postgres implements IBaseDados {
             conn = (Connection) DriverManager.getConnection(
                     url, user, token_pass);
             conn.setAutoCommit(false);
+            conn.close();
             return true;
         } catch (Exception e) {
             //  e.printStackTrace();
@@ -190,7 +192,7 @@ public class Postgres implements IBaseDados {
                     url, user, token_pass);
             conn.setAutoCommit(false);
             Statement st = (Statement) conn.createStatement();
-            String query = "select * from " + nome_tab+" order by id_t_c ";
+            String query = "select * from " + nome_tab + " order by id_t_c ";
             String query_conta_col = "SELECT count(*) FROM information_schema.columns WHERE table_name = '" + nome_tab + "'";
             ResultSet rs = st.executeQuery(query_conta_col);
             int nrcolunas = 0;
@@ -202,7 +204,7 @@ public class Postgres implements IBaseDados {
             rs = st.executeQuery(query);
             int row = 0;
             while (rs.next()) {
-                for (int i = 1; i <= nrcolunas-1; i++) {
+                for (int i = 1; i <= nrcolunas - 1; i++) {
                     ui.getActiveSpreadsheet().getCell(i - 1, row).setContent(rs.getString(i));
                 }
                 row++;
@@ -230,10 +232,10 @@ public class Postgres implements IBaseDados {
             url = "jdbc:postgresql://" + end + ":" + porta + "/" + nome_bd;
 
 
-            conn = (Connection) DriverManager.getConnection(
+            Connection c = (Connection) DriverManager.getConnection(
                     url, user, token_pass);
-            conn.setAutoCommit(false);
-            Statement st = (Statement) conn.createStatement();
+            c.setAutoCommit(false);
+            Statement st = (Statement) c.createStatement();
             String query = "select * from " + nome_tab;
             String query_conta_col = "SELECT count(*) FROM information_schema.columns WHERE table_name = '" + nome_tab + "'";
             ResultSet rs = st.executeQuery(query_conta_col);
@@ -242,8 +244,10 @@ public class Postgres implements IBaseDados {
             while (rs.next()) {
                 nrcolunas = rs.getInt(1);
             }
+            c.commit();
+            c.close();
 
-            return nrcolunas-1;
+            return nrcolunas - 1;
         } catch (Exception e) {
             return -1;
         }
@@ -259,10 +263,10 @@ public class Postgres implements IBaseDados {
         url = "jdbc:postgresql://" + end + ":" + porta + "/" + nome_bd;
 
 
-        conn = (Connection) DriverManager.getConnection(
+      Connection c = (Connection) DriverManager.getConnection(
                 url, user, token_pass);
-        conn.setAutoCommit(false);
-        Statement st = (Statement) conn.createStatement();
+        c.setAutoCommit(false);
+        Statement st = (Statement) c.createStatement();
         ResultSet rs = st.executeQuery(sql_col);
         int j = 0;
         j = getNrColunas(nome_tab, nome_bd, tipobd, end, porta, user, pass);
@@ -277,56 +281,59 @@ public class Postgres implements IBaseDados {
                 nome_colunas[cic] = rs_1.getString(cic + 1);
             }
         }
+        
+        c.commit();
+        c.close();
 
         return nome_colunas;
     }
-    
-    
+
     public String[] getPKString(String nome_tab, String nome_bd, String tipobd, String end, String porta, String user, String pass) throws SQLException {
         nome_tabela = nome_tab;
         String pks[];
+
+        String query = "SELECT KU.table_name as tablename,column_name as primarykeycolumn FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KU ON TC.CONSTRAINT_TYPE = 'PRIMARY KEY' AND TC.CONSTRAINT_NAME = KU.CONSTRAINT_NAME and ku.table_name='" + nome_tabela + "' ORDER BY KU.TABLE_NAME, KU.ORDINAL_POSITION;";
+        String url = "";
+
+        DriverManager.registerDriver(new org.postgresql.Driver());
+        url = "jdbc:postgresql://" + end + ":" + porta + "/" + nome_bd;
+
+
+        conn = (Connection) DriverManager.getConnection(
+                url, user, token_pass);
+        conn.setAutoCommit(false);
+        Statement st = (Statement) conn.createStatement();
+        ResultSet rs = st.executeQuery(query);
+        int nr_pk = 0;
+        while (rs.next()) {
+            nr_pk++;
+        }
+        pks = new String[nr_pk];
+        ResultSet rs2 = st.executeQuery(query);
+        int j = 0;
+        while (rs2.next()) {
+            pks[j] = rs2.getString(2);
+            j++;
+        }
+
+
+
+        return pks;
+
+    }
+
+    public int getPosCol(String col, String nome_tab, String nome_bd, String tipobd, String end, String porta, String user, String pass) throws SQLException {
+        String[] vec = getNomeColunas(nome_tab, nome_bd, tipobd, end, porta, user, pass);
         
-        String query="SELECT KU.table_name as tablename,column_name as primarykeycolumn FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KU ON TC.CONSTRAINT_TYPE = 'PRIMARY KEY' AND TC.CONSTRAINT_NAME = KU.CONSTRAINT_NAME and ku.table_name='"+nome_tabela+"' ORDER BY KU.TABLE_NAME, KU.ORDINAL_POSITION;";
-         String url = "";
-
-            DriverManager.registerDriver(new org.postgresql.Driver());
-            url = "jdbc:postgresql://" + end + ":" + porta + "/" + nome_bd;
-
-
-            conn = (Connection) DriverManager.getConnection(
-                    url, user, token_pass);
-            conn.setAutoCommit(false);
-            Statement st = (Statement) conn.createStatement();
-            ResultSet rs = st.executeQuery(query);
-            int nr_pk=0;
-            while(rs.next()){
-                nr_pk++;
+        for (int i = 0; i < vec.length; i++) {
+            if (col.equalsIgnoreCase(vec[i])) {
+                return i;
             }
-            pks= new String[nr_pk];
-            ResultSet rs2 = st.executeQuery(query);
-            int j=0;
-            while(rs2.next()){
-               pks[j]=rs2.getString(2);
-               j++;
-            }
-            st.close();
-            conn.commit();
-            conn.close();
-            
-            return pks;
-    
+        }
+        return -1;
+
     }
-    
-    public int getPosCol(String col,String nome_tab,String nome_bd, String tipobd, String end, String porta, String user, String pass) throws SQLException{
-        String[] vec=  getNomeColunas(nome_tab, nome_bd, tipobd, end, porta, user, pass);
-         for(int i=0;i<vec.length;i++){
-             if(col.equalsIgnoreCase(vec[i]))
-                    return i;
-         }
-             return -1;
-      
-    }
-  
+
     public boolean addNewInf(String nome_tab, String nome_bd, String[] v, String tipobd, String end, String porta, String user, String pass) {
         nome_tabela = nome_tab;
         String nome_colunas[];
@@ -362,12 +369,18 @@ public class Postgres implements IBaseDados {
         } catch (Exception e) {
 
             try {
+                conn.commit();
+                conn.close();
                 vector_col = getNomeColunas(nome_tab, nome_bd, tipobd, end, porta, user, pass);
-               
+                
+
+
             } catch (SQLException ex) {
             }
             try {
-                pk_final=getPKString(nome_tab, nome_bd, tipobd, end, porta, user, pass);
+                pk_final = getPKString(nome_tab, nome_bd, tipobd, end, porta, user, pass);
+                conn.commit();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(Postgres.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -390,14 +403,14 @@ public class Postgres implements IBaseDados {
             for (int i = 0; i < pk_final.length; i++) {
                 if (i < pk_final.length - 1) {
                     try {
-                        update += pk_final[i] + "=" + "'" + v[getPosCol(pk_final[i],nome_tab, nome_bd, tipobd, end, porta, user, pass)] + "' " + "AND ";
+                        update += pk_final[i] + "=" + "'" + v[getPosCol(pk_final[i], nome_tab, nome_bd, tipobd, end, porta, user, pass)] + "' " + "AND ";
                     } catch (SQLException ex) {
                         Logger.getLogger(Postgres.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
                 if (i == pk_final.length - 1) {
                     try {
-                        update += pk_final[i] + "=" + "'" + v[getPosCol(pk_final[i],nome_tab, nome_bd, tipobd, end, porta, user, pass)]+ "' ";
+                        update += pk_final[i] + "=" + "'" + v[getPosCol(pk_final[i], nome_tab, nome_bd, tipobd, end, porta, user, pass)] + "' ";
                     } catch (SQLException ex) {
                         Logger.getLogger(Postgres.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -406,31 +419,31 @@ public class Postgres implements IBaseDados {
 
             }
 
-           Statement ft;
+            Statement ft;
             try {
-         
-              String url = "";
 
-            DriverManager.registerDriver(new org.postgresql.Driver());
-            url = "jdbc:postgresql://" + end + ":" + porta + "/" + nome_bd;
+                String url = "";
+
+                DriverManager.registerDriver(new org.postgresql.Driver());
+                url = "jdbc:postgresql://" + end + ":" + porta + "/" + nome_bd;
 
 
-            conn = (Connection) DriverManager.getConnection(
-                    url, user, token_pass);
-            conn.setAutoCommit(false);
-            Statement st = (Statement) conn.createStatement();
+                conn = (Connection) DriverManager.getConnection(
+                        url, user, token_pass);
+                conn.setAutoCommit(false);
+                Statement st = (Statement) conn.createStatement();
 
-            st.executeUpdate(update);
-            st.close();
-            conn.commit();
-            conn.close();
+                st.executeUpdate(update);
+                st.close();
+                conn.commit();
+                conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(Postgres.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            
 
-            
+
+
             return false;
         }
 
@@ -452,7 +465,7 @@ public class Postgres implements IBaseDados {
                     url, user, token_pass);
             conn.setAutoCommit(false);
             Statement st = (Statement) conn.createStatement();
-            String query = "select * from " + nome_tab+" order by id_t_c ";
+            String query = "select * from " + nome_tab + " order by id_t_c ";
             String query_conta_col = "SELECT count(*) FROM information_schema.columns WHERE table_name = '" + nome_tab + "'";
             ResultSet rs = st.executeQuery(query_conta_col);
             int nrcolunas = 0;
@@ -465,17 +478,16 @@ public class Postgres implements IBaseDados {
             int row = 0;
             while (rs.next()) {
                 for (int i = 1; i <= nrcolunas - 1; i++) {
-                   
                 }
                 row++;
             }
-            
-            String[][] matriz_bd = new String[row][nrcolunas-1];
+
+            String[][] matriz_bd = new String[row][nrcolunas - 1];
             rs = st.executeQuery(query);
-             row = 0;
+            row = 0;
             while (rs.next()) {
                 for (int i = 1; i <= nrcolunas - 1; i++) {
-                   matriz_bd[row][i-1]=rs.getString(i);
+                    matriz_bd[row][i - 1] = rs.getString(i);
                 }
                 row++;
             }
@@ -487,6 +499,87 @@ public class Postgres implements IBaseDados {
             // e.printStackTrace();
             return null;
         }
-        
+
+    }
+
+    @Override
+    public void removerLinha(String linha, String nome_tab, String nome_bd, String tipobd, String end, String porta, String user, String pass) {
+        try {
+            nome_tabela = nome_tab;
+
+            verificarPass(pass);
+
+            String url = "";
+
+            DriverManager.registerDriver(new org.postgresql.Driver());
+            url = "jdbc:postgresql://" + end + ":" + porta + "/" + nome_bd;
+
+            conn = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+            conn.setAutoCommit(false);
+            Statement st = (Statement) conn.createStatement();
+            String query = "select * from " + nome_tab + " order by id_t_c ";
+            String query_conta_col = "SELECT count(*) FROM information_schema.columns WHERE table_name = '" + nome_tab + "'";
+            ResultSet rs = st.executeQuery(query_conta_col);
+            int nrcolunas = 0;
+            //Ir buscar o número de colunas que a tabela tem
+            while (rs.next()) {
+                nrcolunas = rs.getInt(1);
+            }
+            st.close();
+            conn.commit();
+            conn.close();
+
+
+            conn = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+            conn.setAutoCommit(false);
+            Statement st2 = (Statement) conn.createStatement();
+            String line = "";
+            String deletequery = "delete from " + nome_tabela + " where ";
+            rs = st2.executeQuery(query);
+            int row = 0;
+            while (rs.next()) {
+                for (int i = 1; i <= nrcolunas - 1; i++) {
+                    line += rs.getString(i);
+                }
+
+                if (line.equals(linha)) {
+                    
+                    String[] col = getNomeColunas(nome_tab, nome_bd, tipobd, end, porta, user, pass);
+                  
+                    for (int l = 1; l <= nrcolunas - 1; l++) {
+                        if (l <= nrcolunas - 2) {
+                            deletequery += col[l - 1] + " = " + "'" + rs.getString(l) + "' AND ";
+                        }
+                        if (l == nrcolunas - 1) {
+                            deletequery += col[l - 1] + " = " + "'" + rs.getString(l) + "'";
+                        }
+
+                    }
+                    break;
+                }
+                line = "";
+                row++;
+            }
+            st2.close();    
+            conn.commit();
+            conn.close();
+            
+
+            conn = (Connection) DriverManager.getConnection(
+                    url, user, token_pass);
+            conn.setAutoCommit(false);
+            Statement st3 = (Statement) conn.createStatement();
+
+            st3.executeUpdate(deletequery);
+            st3.close();
+            
+            conn.commit();
+            conn.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 }

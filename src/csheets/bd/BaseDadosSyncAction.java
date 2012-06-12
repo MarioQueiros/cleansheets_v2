@@ -30,6 +30,7 @@ public class BaseDadosSyncAction extends BaseAction {
     int valida_colunas;
     int[] vec = new int[4]; //Vector com os extremos seleccionados
     String tipo_bd, nome_tabela;
+    IBaseDados bd;
 
     public class ThreadBD implements Runnable {
 
@@ -40,7 +41,7 @@ public class BaseDadosSyncAction extends BaseAction {
         public void run() {
             reset();
             escolhaSGBD();
-            IBaseDados bd;
+            
             if (!flag_geral) {
                 bd = BaseDadosFactory.getBD(tipo_bd);
                 formulario(bd);
@@ -211,7 +212,32 @@ public class BaseDadosSyncAction extends BaseAction {
     // Compara a matriz CS com a matriz anterior - apaga na cs -> apaga BD
     
      public void comparaMatrizCs_1(String[][] m1, String[][] m2){
-         
+          String linha = "";
+        String linha_i = "";
+        for (int i = 0; i < m1.length; i++) {
+            linha = "";
+            for (int k = 0; k < m1[0].length; k++) {
+                linha += m1[i][k];
+
+            }
+            boolean flag = false;
+
+            for (int j = 0; j < m2.length; j++) {
+                linha_i = "";
+                for (int z = 0; z < m2[0].length; z++) {
+                    linha_i += m2[j][z];
+                }
+                //Encontrou o registo que foi apagado da BD
+                if (linha.equals(linha_i)) {
+                    flag = true;
+                }
+            }
+            //Tratar do registo
+            if (!flag) {
+             
+                bd.removerLinha(linha, nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
+            }
+        }
      }
     
      // Compara a matriz CS com a matriz anterior - insere na cs -> insere na BD
