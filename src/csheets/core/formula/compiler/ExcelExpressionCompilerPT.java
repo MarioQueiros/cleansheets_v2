@@ -28,6 +28,7 @@ import java.util.List;
 import antlr.ANTLRException;
 import antlr.collections.AST;
 import csheets.core.Cell;
+import csheets.core.IllegalValueTypeException;
 import csheets.core.Value;
 import csheets.core.formula.*;
 import csheets.core.formula.lang.*;
@@ -124,10 +125,9 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
                         }
                     }
                 } while (nodeP.getText().equalsIgnoreCase(";"));
+                vars.clear();
                 return e;
             }
-
-
         } catch (Exception ex) {
             // System.out.println("Nao esta no formato pedido na alinea a) da it 2");
         }
