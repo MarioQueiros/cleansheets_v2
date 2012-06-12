@@ -21,5 +21,8 @@ public class BaseDadosMenu extends JMenu {
                 add(new BaseDadosAddRefreshAction(uiController));
                 addSeparator();      
                 add(new BaseDadosLoadAction(uiController));
+                addSeparator();
+                add(new BaseDadosSyncAction(uiController));
+                add(new StopSync(uiController));
 	}	
 }
