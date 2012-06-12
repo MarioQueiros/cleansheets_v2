@@ -12,5 +12,8 @@
     <property name="m_blob" type="java.sql.Blob">
       <column name="BLOBFILE"/>
     </property>
+    <property name="m_annotation" type="java.lang.String">
+      <column name="ANNOTATION"/>
+    </property>
   </class>
 </hibernate-mapping>
