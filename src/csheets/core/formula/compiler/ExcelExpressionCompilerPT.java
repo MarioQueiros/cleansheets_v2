@@ -164,7 +164,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
                     convert(cell, node.getFirstChild()));
         } else if (node.getNumberOfChildren() == 2) {
             // Convert binary operation
-            BinaryOperator operator = Language.getInstance().getBinaryOperator(node.getText());
+            BinaryOperator operator = Language.getInstance().getBinaryOperator_PT(node.getText());
             if (operator instanceof RangeReference) {
                 return new ReferenceOperation(
                         (Reference) convert(cell, node.getFirstChild()),

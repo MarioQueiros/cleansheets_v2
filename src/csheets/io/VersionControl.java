@@ -1,8 +1,5 @@
 package csheets.io;
 
-import java.security.Timestamp;
-import java.sql.Blob;
-
 /**
  *
  * @author MpApQ
@@ -11,6 +8,7 @@ public class VersionControl {
     private VersionControlID m_key;
     private int m_id;
     private java.sql.Blob m_blob;
+    private String m_annotation;
 
     VersionControl() {
     }
@@ -25,6 +23,15 @@ public class VersionControl {
         m_key=key;
         m_blob = b;
     }
+    
+    VersionControl(VersionControlID key, int id, java.sql.Blob b, String anno) {
+        m_key=key;
+        m_id = id;
+        m_blob = b;
+        m_annotation = anno;
+    }
+    
+    
 
    
     /**
@@ -67,5 +74,19 @@ public class VersionControl {
      */
     public void setM_key(VersionControlID m_key) {
         this.m_key = m_key;
+    }
+
+    /**
+     * @return the m_annotation
+     */
+    public String getM_annotation() {
+        return m_annotation;
+    }
+
+    /**
+     * @param m_annotation the m_annotation to set
+     */
+    public void setM_annotation(String m_annotation) {
+        this.m_annotation = m_annotation;
     }
 }
