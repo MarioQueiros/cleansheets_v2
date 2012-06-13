@@ -377,13 +377,13 @@ public class XMLCodec implements Codec {
         for (int row = 0; row < sheet.getRowCount(); row++) {
             int rowcount = sheet.getColumnCount();
 
-            writer.print("\t\t<row idr='" + row + "' rowHeight='" + st.getRowHeight(row) + "'>\n");
+            writer.print("\t\t<row idr='" + (row + 1) + "' rowHeight='" + st.getRowHeight(row) + "'>\n");
 
             for (int column = 0; column <= sheet.getColumnCount(); column++) {
                 String aux = sheet.getCell(column, row).getContent();
                 stylableCell = (StylableCell) sheet.getCell(column, row).getExtension(StyleExtension.NAME);
 
-                if (aux.trim() != "") {
+               // if (aux.trim() != "") {
                     writer.print("\t\t\t<column idc='" + columns[column] + "' columnWidth='" + st.getColumnWidth(0) + "'>\n");
                     writer.print("\t\t\t\t<content>" + sheet.getCell(column, row).getContent() + "</content>\n");
                     writer.print("\t\t\t\t<font>" + stylableCell.getFont() + "</font>\n");
@@ -393,7 +393,7 @@ public class XMLCodec implements Codec {
                     writer.print("\t\t\t\t<backColor>" + stylableCell.getBackgroundColor() + "</backColor>\n");
                     writer.print("\t\t\t\t<border>" + stylableCell.getBorder().getBorderInsets(null) + "</border>\n");
                     writer.print("\t\t\t</column>\n");
-                }
+               // }
             }
 
             writer.print("\t\t</row>\n\n");
@@ -422,32 +422,31 @@ public class XMLCodec implements Codec {
         query.setParameter("idg", file.getName());
 
         List list = query.list();
-        
+
         FileInputStream fs = new FileInputStream(file);
         java.sql.Blob blob = Hibernate.createBlob(fs);
         VersionControlID xml = new VersionControlID(file.getName(), currentTimestamp);
         VersionControl xmlvc = null;
         VersionControl vc = null;
-        
+
         String annotation = annotationWindow();
 
-        
-            if (list.isEmpty()) {
-                vc = new VersionControl(xml, 1, blob, annotation);
-            } else {
-                xmlvc = (VersionControl) list.get(0);
-                int id = xmlvc.getM_id();
-                vc = new VersionControl(xml, ++id, blob, annotation);
-            }
-       
-        
+
+        if (list.isEmpty()) {
+            vc = new VersionControl(xml, 1, blob, annotation);
+        } else {
+            xmlvc = (VersionControl) list.get(0);
+            int id = xmlvc.getM_id();
+            vc = new VersionControl(xml, ++id, blob, annotation);
+        }
+
+
         session.flush();
         session.save(vc);
         tx.commit();
         session.close();
     }
-    
-    
+
     private String annotationWindow() {
         String aux = "";
         JPanel jp;

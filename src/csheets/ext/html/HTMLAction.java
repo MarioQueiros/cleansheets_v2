@@ -4,8 +4,13 @@
  */
 package csheets.ext.html;
 
+import csheets.core.Spreadsheet;
+import csheets.ext.style.StylableCell;
+import csheets.ext.style.StyleExtension;
 import csheets.ui.ctrl.BaseAction;
 import csheets.ui.ctrl.UIController;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import java.util.logging.Level;
@@ -46,21 +51,123 @@ public class HTMLAction extends BaseAction {
      * @param event the event that was fired
      */
     public void actionPerformed(ActionEvent event) {
-        OutputStream stream = null;
         try {
-            stream = new FileOutputStream("html.htm");
-        } catch (FileNotFoundException ex) {
+            OutputStream stream = null;
+            try {
+                stream = new FileOutputStream("html.htm");
+            } catch (FileNotFoundException ex) {
+            }
+            String[] columns = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+                "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG",
+                "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ"};
+
+            PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(stream)));
+
+            Spreadsheet sheet = uiController.getActiveSpreadsheet();
+
+            StylableCell stylableCell;
+
+            writer.print("<html lang='en' xmlns='http://www.w3.org/1999/xhtml' align='center'><head><META http-equiv='Content-Type' content='text/html; charset=ISO-8859-1' align='center'><title>CleanSheets</title><meta name='description' content='Receitas Low Cost' align='center'><meta http-equiv='Content-Language' content='pt-pt' align='center'><meta http-equiv='Content-Type' content='text/html; charset=windows-1252' align='center'></head><body><table border='1' width='2600'><thead><tr><td width='30' align='center'></td>");
+
+            for (int j = 0; j < 52; j++) {
+                writer.print("<td width='50' align='center'>" + columns[j] + "</td>");
+            }
+            writer.print("</tr></tr></thead><tbody>");
+            for (int i = 0; i < 128; i++) {
+                writer.print("\n<tr height=100><td width='30' align='center'>" + (i + 1) + "</td>");
+                for (int j = 0; j < 52; j++) {
+                    stylableCell = (StylableCell) sheet.getCell(j, i).getExtension(StyleExtension.NAME);
+
+                    String fcolor = convertRGBtoHEX(String.valueOf(stylableCell.getForegroundColor().getRed()), String.valueOf(stylableCell.getForegroundColor().getGreen()), String.valueOf(stylableCell.getForegroundColor().getBlue()));
+                    String bcolor = convertRGBtoHEX(String.valueOf(stylableCell.getBackgroundColor().getRed()), String.valueOf(stylableCell.getBackgroundColor().getGreen()), String.valueOf(stylableCell.getBackgroundColor().getBlue()));
+                    String font = stylableCell.getFont().getFontName();
+
+                    int type = stylableCell.getFont().getStyle();
+
+                    if (!fcolor.equals("333333")) {
+                        if (!bcolor.equals("ffffff")) {
+                            switch (type) {
+                                case Font.BOLD:
+                                    writer.print("<td width='50' bgcolor=#'" + bcolor + "'><font face='" + font + "' color='" + fcolor + "'><b>" + sheet.getCell(j, i).getContent() + "</b></color></td>");
+                                    break;
+                                case Font.ITALIC:
+                                    writer.print("<td width='50' bgcolor=#'" + bcolor + "'><font face='" + font + "' color='" + fcolor + "'><i>" + sheet.getCell(j, i).getContent() + "<i></color></td>");
+                                    break;
+                                case Font.PLAIN:
+                                    writer.print("<td width='50' bgcolor=#'" + bcolor + "'><font face='" + font + "' color='" + fcolor + "'>" + sheet.getCell(j, i).getContent() + "</color></td>");
+                                    break;
+                                case Font.BOLD | Font.ITALIC:
+                                    writer.print("<td width='50' bgcolor=#'" + bcolor + "'><font face='" + font + "' color='" + fcolor + "'><b><i>" + sheet.getCell(j, i).getContent() + "</i></b></color></td>");
+                                    break;
+                            }
+                        } else {
+                            switch (type) {
+                                case Font.BOLD:
+                                    writer.print("<td width='50'><font face='" + font + "' color='#" + fcolor + "'><b>" + sheet.getCell(j, i).getContent() + "</b></color></td>");
+                                    break;
+                                case Font.ITALIC:
+                                    writer.print("<td width='50'><font face='" + font + "' color='#" + fcolor + "'><i>" + sheet.getCell(j, i).getContent() + "</i></color></td>");
+                                    break;
+                                case Font.PLAIN:
+                                    writer.print("<td width='50'><font face='" + font + "' color='#" + fcolor + "'>" + sheet.getCell(j, i).getContent() + "</color></td>");
+                                    break;
+                                case Font.BOLD | Font.ITALIC:
+                                    writer.print("<td width='50'><font face='" + font + "' color='#" + fcolor + "'><b><i>" + sheet.getCell(j, i).getContent() + "</i></b></color></td>");
+                                    break;
+                            }
+                        }
+                    } else {
+                        if (!bcolor.equals("ffffff")) {
+                            switch (type) {
+                                case Font.BOLD:
+                                    writer.print("<td width='50' bgcolor='" + bcolor + "'><font face='" + font + "'><b>" + sheet.getCell(j, i).getContent() + "</b></font></td>");
+                                    break;
+                                case Font.ITALIC:
+                                    writer.print("<td width='50' bgcolor='" + bcolor + "'><font face='" + font + "'><i>" + sheet.getCell(j, i).getContent() + "</i></font></td>");
+                                    break;
+                                case Font.PLAIN:
+                                    writer.print("<td width='50' bgcolor='" + bcolor + "'><font face='" + font + "'>" + sheet.getCell(j, i).getContent() + "</font></td>");
+                                    break;
+                                case Font.BOLD | Font.ITALIC:
+                                    writer.print("<td width='50' bgcolor='" + bcolor + "'><font face='" + font + "'><b><i>" + sheet.getCell(j, i).getContent() + "</i></b></font></td>");
+                                    break;
+                            }
+                        } else {
+                            switch (type) {
+                                case Font.BOLD:
+                                    writer.print("<td width='50'><font face='" + font + "'><b>" + sheet.getCell(j, i).getContent() + "</b></font></td>");
+                                    break;
+                                case Font.ITALIC:
+                                    writer.print("<td width='50'><font face='" + font + "'><i>" + sheet.getCell(j, i).getContent() + "</i></font></td>");
+                                    break;
+                                case Font.PLAIN:
+                                    writer.print("<td width='50' valign=0><font face='" + font + "'>" + sheet.getCell(j, i).getContent() + "</font></td>");
+                                    break;
+                                case Font.BOLD | Font.ITALIC:
+                                    writer.print("<td width='50'><font face='" + font + "'><b><i>" + sheet.getCell(j, i).getContent() + "</i></b></font></td>");
+                                    break;
+                            }
+                        }
+                    }
+                }
+                writer.print("</tr>");
+
+            }
+            writer.print("</tbody></table></body></html>");
+            writer.close();
+            stream.close();
+        } catch (IOException ex) {
             Logger.getLogger(HTMLAction.class.getName()).log(Level.SEVERE, null, ex);
         }
-        PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(stream)));
-        
-        writer.print("<html lang='en' xmlns='http://www.w3.org/1999/xhtml'><head><META http-equiv='Content-Type' content='text/html; charset=ISO-8859-1'><title>CleanSheets</title><meta name='description' content='Receitas Low Cost'><meta http-equiv='Content-Language' content='pt-pt'><meta http-equiv='Content-Type' content='text/html; charset=windows-1252'></head><body><table><thead><tr><td width='100'></td><td width='100'>A</td><td width='100'>B</td><td width='100'>C</td><td width='100'>D</td><td width='100'>E</td><td width='100'>F</td><td width='100'>G</td><td width='100'>H</td><td width='100'>I</td><td width='100'>J</td><td width='100'>K</td><td width='100'>L</td><td width='100'>M</td><td width='100'>N</td><td width='100'>O</td><td width='100'>P</td><td width='100'>Q</td><td width='100'>R</td><td width='100'>S</td><td width='100'>T</td><td width='100'>U</td><td width='100'>V</td><td width='100'>W</td><td width='100'>X</td><td width='100'>Y</td><td width='100'>Z</td><td width='100'>AA</td><td width='100'>AB</td><td width='100'>AC</td><td width='100'>AD</td><td width='100'>AE</td><td width='100'>AF</td><td width='100'>AG</td><td width='100'>AH</td><td width='100'>AI</td><td width='100'>AJ</td><td width='100'>AK</td><td width='100'>AL</td><td width='100'>AM</td><td width='100'>AN</td><td width='100'>AO</td><td width='100'>AP</td><td width='100'>AQ</td><td width='100'>AR</td><td width='100'>AS</td><td width='100'>AT</td><td width='100'>AU</td><td width='100'>AV</td><td width='100'>AW</td><td width='100'>AX</td><td width='100'>AY</td><td width='100'>AZ</td></tr></thead><tbody>");
-        for(int i=0; i<128;i++)
-        {
-            writer.print("<tr><td>"+(i+1)+"</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
-        }
-        writer.print("");
-        writer.print("</tbody></table></body></html>");
-        
+    }
+
+    public String convertRGBtoHEX(String r, String g, String b) {
+        int i = Integer.parseInt(r);
+        int j = Integer.parseInt(g);
+        int k = Integer.parseInt(b);
+
+        Color c = new Color(i, j, k);
+
+        return Integer.toHexString(c.getRGB() & 0x00ffffff);
     }
 }
