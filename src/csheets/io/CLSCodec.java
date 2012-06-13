@@ -108,7 +108,7 @@ public class CLSCodec implements Codec {
         jp.setLayout(new BoxLayout(jp, BoxLayout.PAGE_AXIS));
 
         jp.add(scrollPane);
-        JLabel jl = new JLabel("(Mouse over one item to see the annotations)");
+        JLabel jl = new JLabel("(Mouse over one item to show the annotation)");
         jp.add(jl);
 
         JOptionPane.showMessageDialog(null, jp, "Choose a version", JOptionPane.INFORMATION_MESSAGE);
@@ -182,22 +182,12 @@ public class CLSCodec implements Codec {
 
         String annotation = annotationWindow();
 
-        if (!annotation.equals("")) {
-            if (list.isEmpty()) {
-                vc = new VersionControl(xml, 1, blob, annotation);
-            } else {
-                xmlvc = (VersionControl) list.get(0);
-                int id = xmlvc.getM_id();
-                vc = new VersionControl(xml, ++id, blob, annotation);
-            }
+        if (list.isEmpty()) {
+            vc = new VersionControl(xml, 1, blob, annotation);
         } else {
-            if (list.isEmpty()) {
-                vc = new VersionControl(xml, 1, blob);
-            } else {
-                xmlvc = (VersionControl) list.get(0);
-                int id = xmlvc.getM_id();
-                vc = new VersionControl(xml, ++id, blob);
-            }
+            xmlvc = (VersionControl) list.get(0);
+            int id = xmlvc.getM_id();
+            vc = new VersionControl(xml, ++id, blob, annotation);
         }
 
         session.flush();
@@ -210,7 +200,7 @@ public class CLSCodec implements Codec {
     private String annotationWindow() {
         String aux = "";
         JPanel jp;
-        JLabel jl = new JLabel("Insert an annotation about the file:");
+        JLabel jl = new JLabel("Insert an annotation about the file version:");
         JTextField jtf = new JTextField(15);
         jp = new JPanel();
         jp.setLayout(new GridLayout(2, 1));
@@ -219,13 +209,6 @@ public class CLSCodec implements Codec {
 
         JOptionPane.showMessageDialog(null, jp, "Insert an annotation", JOptionPane.INFORMATION_MESSAGE);
 
-        aux = jtf.getText();
-        aux = aux.trim();
-
-        if (!aux.equals("")) {
-            return aux;
-        } else {
-            return aux;
-        }
+        return jtf.getText();
     }
 }
