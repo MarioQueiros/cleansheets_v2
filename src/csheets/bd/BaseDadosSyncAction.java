@@ -59,7 +59,7 @@ public class BaseDadosSyncAction extends BaseAction {
                     //Ciclo para a thread, de X em X segundos actualiza a informação.
                     while (!SyncSingleton.Instance().getStop()) {
                         try {
-                            Thread.currentThread().sleep(5000);
+                            Thread.currentThread().sleep(30000);
                             if (SyncSingleton.Instance().getStop()) {
                                 break;
                             }
@@ -70,18 +70,26 @@ public class BaseDadosSyncAction extends BaseAction {
 
                             //COMPARA A MATRIZ_BD com a matriz inicial
                             comparaMatrizBd_1(matriz_inicial, matriz_bd);
-                            comparaMatrizBd_2(matriz_inicial, matriz_bd);
+                            matriz_bd = bd.getMatrizInf(nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
 
-                            //COMPARA A MATRIZ CLEANSHEETS com a matriz inicial
-                            comparaMatrizCs_1(matriz_inicial, matriz_sel);
-                            comparaMatrizCs_2(matriz_inicial, matriz_sel);
+                            comparaMatrizBd_2(matriz_inicial, matriz_bd);
+                            matriz_bd = bd.getMatrizInf(nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
+
 
                             //COMPARA O CONTEUDO DAS DUAS MATRIZES E FAZ UPDATE
                             update(matriz_inicial, matriz_sel);
 
+                            //COMPARA A MATRIZ CLEANSHEETS com a matriz inicial
+                            comparaMatrizCs_1(matriz_inicial, matriz_sel);
+                            getConteudoActual();
+                            comparaMatrizCs_2(matriz_inicial, matriz_sel);
+                            getConteudoActual();
+
+
                             //Setup da Matriz Inicial
                             saveMatrizActual(bd);
-                            System.out.println(i);
+                            // Print da iteração
+                            System.out.println(i + 1 + "ª Sincronização");
                             i++;
 
 
@@ -231,20 +239,8 @@ public class BaseDadosSyncAction extends BaseAction {
             }
             //Tratar do registo
             if (!flag) {
-                String n = "";
-                for (int uu = 0; uu < m2[0].length; uu++) {
+                bd.removerLinha(linha, nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
 
-                    n = n + m2[i][uu] + ";";
-
-                }
-
-                String vec[] = n.split(";");
-
-                if (bd.inserirLinha(vec, nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]) || vec.length == 0) {
-                    bd.removerLinha(linha, nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
-                } else {
-                    // NÃO VOU APAGAR, PORQUE É UM UPDATE E NÃO UM REMOVE
-                }
             }
         }
     }
@@ -317,8 +313,6 @@ public class BaseDadosSyncAction extends BaseAction {
 
             }
 
-
-
             if (!flag && !linha.equals("")) {
 
 
@@ -330,8 +324,9 @@ public class BaseDadosSyncAction extends BaseAction {
                 }
 
                 String vec[] = linha.split(";");
+
                 if (!bd.inserirLinha(vec, nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4])) {
-                    
+
                     updateCelula(vec, linha);
                 }
             }
@@ -354,13 +349,13 @@ public class BaseDadosSyncAction extends BaseAction {
 
             }
             // É aqui que devo 
-      
-            int qd = vec[3] - vec[1]+1;
-           
+
+            int qd = vec[3] - vec[1] + 1;
+
             if (test.equals(line) && s.length == qd) {
                 String[] infx = bd.registoBD(s, nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
                 found = true;
-                
+
                 int xx = 0;
                 for (int kk = vec[1]; kk <= vec[3]; kk++) {
 

@@ -86,7 +86,7 @@ public class Postgres implements IBaseDados {
             conn.close();
             return true;
         } catch (Exception e) {
-            //  e.printStackTrace();
+            // e.printStackTrace();
             return false;
         }
     }
@@ -496,7 +496,7 @@ public class Postgres implements IBaseDados {
             conn.close();
             return matriz_bd;
         } catch (Exception e) {
-            // e.printStackTrace();
+          //  e.printStackTrace();
             return null;
         }
 
@@ -579,7 +579,7 @@ public class Postgres implements IBaseDados {
             conn.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -628,7 +628,7 @@ public class Postgres implements IBaseDados {
 
 
         } catch (Exception e) {
-            // e.printStackTrace();
+           //  e.printStackTrace();
             return false;
         }
     }

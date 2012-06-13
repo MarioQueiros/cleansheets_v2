@@ -163,7 +163,7 @@ public class BaseDadosLoadAction extends BaseAction {
                 //Aqui deve-se preencher a matriz 
                 
                 
-                JOptionPane.showMessageDialog(null, "Informação exportada com sucesso!");
+                JOptionPane.showMessageDialog(null, "Informação importada com sucesso!");
             }
        
     }
