@@ -20,6 +20,7 @@
  */
 package csheets.core.formula.compiler;
 
+import csheets.core.RegistoVariaveis;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
     public static final char FORMULA_STARTER = '#';
 
         
-    private static RegistoVariaveis vars = new RegistoVariaveis();
+    private static RegistoVariaveis vars = RegistoVariaveis.getInstance();
         
     private static Cell lastActiveCell = null;
 
@@ -125,7 +126,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
                         }
                     }
                 } while (nodeP.getText().equalsIgnoreCase(";"));
-                vars.clear();
+                vars.clear();                      //   __!!!!!!!!!!!!!!1 ver com stor; por causa do eval("$temp1")
                 return e;
             }
         } catch (Exception ex) {
