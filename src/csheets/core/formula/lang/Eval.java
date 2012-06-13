@@ -29,11 +29,11 @@ public class Eval implements Function {
     
     public Value applyTo(Expression[] arguments) throws IllegalValueTypeException {
    
-        Cell a = ExcelExpressionCompilerPT.getLastActiveCell(this);
+        Cell ref = ExcelExpressionCompilerPT.getLastActiveCell(this);
         //a = UIController.getActiveCell();
         try {
             String str = arguments[0].evaluate().toString();
-            Expression e = FormulaCompiler.getInstance().compile(a, ExcelExpressionCompilerPT.FORMULA_STARTER + str);
+            Expression e = FormulaCompiler.getInstance().compile(ref, ExcelExpressionCompilerPT.FORMULA_STARTER + str);
             return e.evaluate();
         } catch (FormulaCompilationException ex) {
             return new Value(ex);

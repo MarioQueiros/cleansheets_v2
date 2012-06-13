@@ -67,7 +67,7 @@ class RegistoVariaveis {
             if (variavel.getId().equalsIgnoreCase(nome)) 
                 return variavel;
         }
-        return new Variavel("err", "VARIAVEL NAO EXISTE", new Value("VARIAVEL NAO EXISTE"));
+        return new Variavel("err", "VARIAVEL NAO DEFINIDA", new Value("VARIAVEL NAO DEFINIDA"));
     }
 
     private void sub(Variavel v) {
@@ -80,6 +80,10 @@ class RegistoVariaveis {
             }
         }
         
+    }
+
+    void clear() {
+        lista.clear();
     }
 }
 // alterada para o formula.util

@@ -8,6 +8,8 @@ import csheets.ext.style.StylableSpreadsheet;
 import csheets.ext.style.StyleExtension;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.MouseEvent;
 import java.io.*;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -40,6 +42,7 @@ public class XMLCodec implements Codec {
     int MATRIX_WIDTH = columns.length;
     int MATRIX_HEIGHT = 128;
     boolean mainFlag;
+    String[] annotations;
 
     public XMLCodec() {
     }
@@ -51,15 +54,53 @@ public class XMLCodec implements Codec {
         String strAux = null;
         VersionControl xml = null;
         dlm.add(0, "Load the version from hard-drive");
+
+        annotations = new String[list.size()];
+
+
+        int j = 0;
+        for (Iterator<VersionControl> i = list.iterator(); i.hasNext();) {
+            xml = i.next();
+            annotations[j] = xml.getM_annotation();
+            j++;
+        }
+
+
+        j = 0;
         for (Iterator<VersionControl> i = list.iterator(); i.hasNext();) {
             xml = i.next();
             dlm.add(index, "Version: " + xml.getM_id() + " - Timestamp: " + xml.getM_key().getM_timestamp());
+
             index++;
+            j++;
         }
 
-        JList jlist = new JList(dlm);
+        JList jlist = new JList(dlm) {
+
+            public String getToolTipText(MouseEvent e) {
+                int index = locationToIndex(e.getPoint());
+                if (-1 < index) {
+                    if (index == 0) {
+                        return null;
+                    } else {
+                        String item = annotations[index - 1];
+                        return item;
+                    }
+                } else {
+                    return null;
+                }
+            }
+        };
         JScrollPane scrollPane = new JScrollPane(jlist);
-        JOptionPane.showMessageDialog(null, scrollPane, "Choose a version", JOptionPane.INFORMATION_MESSAGE);
+
+        JPanel jp = new JPanel();
+        jp.setLayout(new BoxLayout(jp, BoxLayout.PAGE_AXIS));
+
+        jp.add(scrollPane);
+        JLabel jl = new JLabel("(Mouse over one item to show the annotation)");
+        jp.add(jl);
+
+        JOptionPane.showMessageDialog(null, jp, "Choose a version", JOptionPane.INFORMATION_MESSAGE);
 
         return jlist.getSelectedIndex();
     }
@@ -336,13 +377,13 @@ public class XMLCodec implements Codec {
         for (int row = 0; row < sheet.getRowCount(); row++) {
             int rowcount = sheet.getColumnCount();
 
-            writer.print("\t\t<row idr='" + row + "' rowHeight='" + st.getRowHeight(row) + "'>\n");
+            writer.print("\t\t<row idr='" + (row + 1) + "' rowHeight='" + st.getRowHeight(row) + "'>\n");
 
             for (int column = 0; column <= sheet.getColumnCount(); column++) {
                 String aux = sheet.getCell(column, row).getContent();
                 stylableCell = (StylableCell) sheet.getCell(column, row).getExtension(StyleExtension.NAME);
 
-                if (aux.trim() != "") {
+               // if (aux.trim() != "") {
                     writer.print("\t\t\t<column idc='" + columns[column] + "' columnWidth='" + st.getColumnWidth(0) + "'>\n");
                     writer.print("\t\t\t\t<content>" + sheet.getCell(column, row).getContent() + "</content>\n");
                     writer.print("\t\t\t\t<font>" + stylableCell.getFont() + "</font>\n");
@@ -352,7 +393,7 @@ public class XMLCodec implements Codec {
                     writer.print("\t\t\t\t<backColor>" + stylableCell.getBackgroundColor() + "</backColor>\n");
                     writer.print("\t\t\t\t<border>" + stylableCell.getBorder().getBorderInsets(null) + "</border>\n");
                     writer.print("\t\t\t</column>\n");
-                }
+               // }
             }
 
             writer.print("\t\t</row>\n\n");
@@ -381,26 +422,44 @@ public class XMLCodec implements Codec {
         query.setParameter("idg", file.getName());
 
         List list = query.list();
-        
+
         FileInputStream fs = new FileInputStream(file);
         java.sql.Blob blob = Hibernate.createBlob(fs);
         VersionControlID xml = new VersionControlID(file.getName(), currentTimestamp);
         VersionControl xmlvc = null;
         VersionControl vc = null;
-        
-        if(list.isEmpty())
-        {
-            vc = new VersionControl(xml, 1, blob);
-        }else{
-           xmlvc = (VersionControl) list.get(0);
-           int id = xmlvc.getM_id();
-           vc = new VersionControl(xml, ++id, blob);
+
+        String annotation = annotationWindow();
+
+
+        if (list.isEmpty()) {
+            vc = new VersionControl(xml, 1, blob, annotation);
+        } else {
+            xmlvc = (VersionControl) list.get(0);
+            int id = xmlvc.getM_id();
+            vc = new VersionControl(xml, ++id, blob, annotation);
         }
-        
+
+
         session.flush();
         session.save(vc);
         tx.commit();
         session.close();
+    }
+
+    private String annotationWindow() {
+        String aux = "";
+        JPanel jp;
+        JLabel jl = new JLabel("Insert an annotation about the file version:");
+        JTextField jtf = new JTextField(15);
+        jp = new JPanel();
+        jp.setLayout(new GridLayout(2, 1));
+        jp.add(jl);
+        jp.add(jtf);
+
+        JOptionPane.showMessageDialog(null, jp, "Insert an annotation", JOptionPane.INFORMATION_MESSAGE);
+
+        return jtf.getText();
     }
 
     private static String validateXML(Schema schema, Document document) {
