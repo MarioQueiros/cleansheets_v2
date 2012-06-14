@@ -70,20 +70,22 @@ public class BaseDadosSyncAction extends BaseAction {
 
                             //COMPARA A MATRIZ_BD com a matriz inicial
                             comparaMatrizBd_1(matriz_inicial, matriz_bd);
-                            matriz_bd = bd.getMatrizInf(nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
 
+                            getConteudoActual();
                             comparaMatrizBd_2(matriz_inicial, matriz_bd);
-                            matriz_bd = bd.getMatrizInf(nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
 
+                            getConteudoActual();
 
                             //COMPARA O CONTEUDO DAS DUAS MATRIZES E FAZ UPDATE
                             update(matriz_inicial, matriz_sel);
-
+                            getConteudoActual();
+                            
+                                    
                             //COMPARA A MATRIZ CLEANSHEETS com a matriz inicial
                             comparaMatrizCs_1(matriz_inicial, matriz_sel);
-                            getConteudoActual();
+                            matriz_bd = bd.getMatrizInf(nome_tabela, infor[0], tipo_bd, infor[1], infor[2], infor[3], infor[4]);
                             comparaMatrizCs_2(matriz_inicial, matriz_sel);
-                            getConteudoActual();
+                            
 
 
                             //Setup da Matriz Inicial
