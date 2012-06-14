@@ -20,20 +20,18 @@
  */
 package csheets.core.formula.compiler;
 
-import csheets.core.RegistoVariaveis;
-import java.io.StringReader;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-
 import antlr.ANTLRException;
 import antlr.collections.AST;
 import csheets.core.Cell;
-import csheets.core.IllegalValueTypeException;
+import csheets.core.RegistoVariaveis;
 import csheets.core.Value;
 import csheets.core.formula.*;
 import csheets.core.formula.lang.*;
 import csheets.core.formula.util.Variavel;
+import java.io.StringReader;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A compiler that generates Excel-style formulas from strings.
@@ -48,7 +46,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
     public static final char FORMULA_STARTER = '#';
 
         
-    private static RegistoVariaveis vars = RegistoVariaveis.getInstance();
+     private static  RegistoVariaveis vars = RegistoVariaveis.getInstance();
         
     private static Cell lastActiveCell = null;
 
@@ -126,7 +124,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
                         }
                     }
                 } while (nodeP.getText().equalsIgnoreCase(";"));
-                vars.clear();                      //   __!!!!!!!!!!!!!!1 ver com stor; por causa do eval("$temp1")
+                // vars.clear();  //desnecessario com o mecanismo na cell
                 return e;
             }
         } catch (Exception ex) {
@@ -136,7 +134,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
         if (node.getNumberOfChildren() == 0) {
             try {
                 if(node.getText().charAt(0)==(Variavel.VARIAVEL_STARTER)){
-                    return new Literal (vars.getValue(node.getText()));
+                    return new Literal (vars.getValue(node.getText()/*,cell*/));
                 } else switch (node.getType()) {
                     case FormulaParserTokenTypes.NUMBER:
                         return new Literal(Value.parseNumericValue(node.getText()));

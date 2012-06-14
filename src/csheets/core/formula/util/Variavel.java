@@ -1,5 +1,6 @@
 package csheets.core.formula.util;
 
+import csheets.core.Cell;
 import csheets.core.Value;
 
 /**
@@ -14,17 +15,20 @@ public class Variavel {
     private String id;  //temp1
     private String text;    //soma(4;5)
     private Value valor;    //9   
+   // private Cell orig;
 
-    public Variavel(String p_id, String p_text, Value p_valor) {
+    public Variavel(String p_id, String p_text, Value p_valor/*, Cell c*/) {
         id = p_id;
         text = p_text;
         valor = p_valor;
+      //  orig = c;
     }
 
     public Variavel(String p_id) {
         id = p_id;
         text = "";
         valor = null;
+        //orig = c;
     }
 
     public String getId() {
@@ -55,5 +59,10 @@ public class Variavel {
         id = v.id;
         text = v.text;
         valor = v.valor;
+       // orig = v.orig;
     }
+/*
+    public Cell getCellOrig() {
+        return orig;
+    }*/
 }

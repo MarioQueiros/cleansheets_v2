@@ -40,6 +40,7 @@ import javax.swing.text.PlainDocument;
 
 import csheets.core.Address;
 import csheets.core.Cell;
+import csheets.core.RegistoVariaveis;
 import csheets.core.formula.compiler.FormulaCompilationException;
 import csheets.core.formula.lang.UnknownElementException;
 import csheets.ui.ctrl.SelectionEvent;
@@ -145,6 +146,7 @@ public class CellEditor extends JTextField implements TableCellEditor, Selection
 		}
 
 		fireEditingStopped();
+                RegistoVariaveis.getInstance().clear();
 		return true;
 	}
 
