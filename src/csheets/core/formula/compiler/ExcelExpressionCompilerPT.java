@@ -46,10 +46,10 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
     public static final char FORMULA_STARTER = '#';
 
         
-     private static  RegistoVariaveis vars = RegistoVariaveis.getInstance();
+    private static  RegistoVariaveis vars = RegistoVariaveis.getInstance();
         
     private static Cell lastActiveCell = null;
-
+    
     /**
      * Creates the Excel expression compiler.
      */
@@ -98,7 +98,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
                 e = convert(alvo, nodeFunc);
                 alvo.setContent(e.evaluate().toString());
                 return e;
-            } else if (node.getText().equalsIgnoreCase("{")) {   //Formato alinea b)
+            } else if (node.getText().equalsIgnoreCase("{")) {   //Formato alinea b)                
                 nodeP = node; //P = proximo     
                 String ref , func;
                 do {
@@ -122,7 +122,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
                         e = convert(alvo, nodeFunc);
                         alvo.setContent(e.evaluate().toString());
                         }
-                    }
+                    }                    
                 } while (nodeP.getText().equalsIgnoreCase(";"));
                 // vars.clear();  //desnecessario com o mecanismo na cell
                 return e;
@@ -210,3 +210,58 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
         return null;
     }
 }
+
+/*
+public class teste {
+
+	static int[] vector;
+	static int[] maiores;
+
+	public class ProcuraMaior implements Runnable {
+		private int parm;
+
+		ProcuraMaior(int p) {
+			parm = p;
+		}
+
+		public void run() {
+			int maior = 0;
+			for (int i = parm * 100; i < (parm * 100) + 100; i++) {
+				if (Exemplo3.vector[i] > maior)
+					maior = Exemplo3.vector[i];
+			}
+			Exemplo3.maiores[parm] = maior;
+		}
+	}
+
+	public static void main(String[] args) {
+		Exemplo3 ex = new Exemplo3();
+		vector = new int[1000];
+		// Para gerar numeros aleatorios
+		Random generator = new Random();
+		for (int i = 0; i < 1000; i++) {
+			vector[i] = generator.nextInt(10000); 
+													
+		}
+		maiores = new int[10];
+		Thread[] threads = new Thread[10];
+		for (int i = 0; i < 10; i++) {
+			threads[i] = new Thread(ex.new ProcuraMaior(i));
+			threads[i].start();
+		}
+		// esperar que todas as threads terminem
+		for (int i = 0; i < 10; i++) {
+			try {
+				threads[i].join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		int maior = Exemplo3.maiores[0];
+		for (int i = 0; i < 10; i++) {
+			if (Exemplo3.maiores[i] > maior)
+				maior = Exemplo3.maiores[i];
+		}
+		System.out.println("O maior valor= " + maior);
+	}
+}*/
