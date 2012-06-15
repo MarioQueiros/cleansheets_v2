@@ -49,7 +49,6 @@ public class ExcelExpressionCompilersTest {
     @Test
     public void testGetStarterPT() {
         System.out.println("teste excelExpressionCompiler PT");
-
         char expResult = '#';
         char result = instancePT.getStarter();
         assertEquals(expResult, result);
