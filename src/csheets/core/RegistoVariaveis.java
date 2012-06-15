@@ -37,16 +37,7 @@ public class RegistoVariaveis {
             lista.add(v);
     }
 
-    String getText(String func) {       //$temp5
-        String nome = func.replace("$", func);
-        for (Iterator<Variavel> it = lista.iterator(); it.hasNext();) {
-            Variavel variavel = it.next();
-            if (variavel.getId().equalsIgnoreCase(nome)) {
-                return variavel.getText();
-            }
-        }
-        return null;
-    }
+   
 
     
 
@@ -68,6 +59,14 @@ public class RegistoVariaveis {
         return getVarById(nome).getValor();
        
     }
+    
+    String getText(String func) {       //$temp5
+        if(func.charAt(0)!=Variavel.VARIAVEL_STARTER)
+            return ("falta o caracter inicial");   
+       String nome = func.substring(1, func.length());
+        return getVarById(nome).getText();
+    }
+    
 
     private Variavel getVarById(String nome) {        
         for (Iterator<Variavel> it = lista.iterator(); it.hasNext();) {
