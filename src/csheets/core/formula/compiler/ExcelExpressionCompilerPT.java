@@ -202,6 +202,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
      * @return a ultima cell que foi chamada para compilar. nao deve ser chamado
      * directamente, para uso exclusivo da formula "Eval" Tentativas de chamadas
      * por outras funcs retornam "null"
+     * @param funcao que pede a cell. Para garantir utilizacao exclusiva do eval 
      */
     public static Cell getLastActiveCell(Function function) {
         if (function.getIdentifier().equalsIgnoreCase("Eval")) {
