@@ -44,12 +44,10 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
      * The character that signals that a cell's content is a formula ('#')
      */
     public static final char FORMULA_STARTER = '#';
-
-        
-    private static  RegistoVariaveis vars = RegistoVariaveis.getInstance();
-        
+    static RegistoVariaveis vars = RegistoVariaveis.getInstance();
     private static Cell lastActiveCell = null;
-    
+    static Expression sync; //para comunicar com a Thread
+
     /**
      * Creates the Excel expression compiler.
      */
@@ -85,10 +83,10 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
      */
     protected Expression convert(Cell cell, AST node) throws FormulaCompilationException {
         //System.out.println("Converting node '" + node.getText() + "' of tree '" + node.toStringTree() + "' with " + node.getNumberOfChildren() + " children.");
-        AST nodeP, nodeFunc, nodeRef;
+        AST nodeP, nodeFunc;
         CellReference cr;
         Cell alvo;
-        Expression e = null;
+        Expression e;
         try {
             nodeP = node.getNextSibling();
             if (nodeP.getText().equalsIgnoreCase(":=")) {  //Formato alinea a)
@@ -99,32 +97,11 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
                 alvo.setContent(e.evaluate().toString());
                 return e;
             } else if (node.getText().equalsIgnoreCase("{")) {   //Formato alinea b)                
-                nodeP = node; //P = proximo     
-                String ref , func;
-                do {
-                    nodeRef = nodeP.getNextSibling();//Exemplo:#{a1:=soma(4;5);a2:=se(a1>10;"grande";"pequeno")}  nodeRef="a1"
-                    nodeFunc = nodeRef.getNextSibling().getNextSibling(); //nodeFunc=Sum(a1:a11)
-                    nodeP = nodeFunc.getNextSibling();//nodeP = ";"    
-                    ref = nodeRef.getText();
-
-                    if (ref.charAt(0)==Variavel.VARIAVEL_STARTER) {    //variavel - $temp1
-                        e = convert(cell, nodeFunc);
-                        Value v = e.evaluate();       //cria variavel
-                        vars.add(ref,nodeFunc.getText(),v);
-                    } else {
-                        cr = new CellReference(cell.getSpreadsheet(), ref);
-                        alvo = cr.getCell();
-                        func = nodeFunc.getText();
-                        if(func.charAt(0)==Variavel.VARIAVEL_STARTER){
-                            //atribuir valor da variavel
-                            alvo.setContent(vars.getValue(func).toString());   //func=$temp5
-                        }else{
-                        e = convert(alvo, nodeFunc);
-                        alvo.setContent(e.evaluate().toString());
-                        }
-                    }                    
-                } while (nodeP.getText().equalsIgnoreCase(";"));
-                // vars.clear();  //desnecessario com o mecanismo na cell
+                Thread T = new Thread(this.new tSeq(cell, node));
+                T.start();
+                //System.out.println("Nr Threads : "+Thread.activeCount());
+                T.join();
+                e = sync;
                 return e;
             }
         } catch (Exception ex) {
@@ -133,20 +110,22 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
 
         if (node.getNumberOfChildren() == 0) {
             try {
-                if(node.getText().charAt(0)==(Variavel.VARIAVEL_STARTER)){
-                    return new Literal (vars.getValue(node.getText()/*,cell*/));
-                } else switch (node.getType()) {
-                    case FormulaParserTokenTypes.NUMBER:
-                        return new Literal(Value.parseNumericValue(node.getText()));
-                    case FormulaParserTokenTypes.STRING:
-                        return new Literal(Value.parseValue(node.getText(), Value.Type.BOOLEAN, Value.Type.DATE));
-                    case FormulaParserTokenTypes.CELL_REF:
-                        return new CellReference(cell.getSpreadsheet(), node.getText());
-                    case FormulaParserTokenTypes.NAME:
-                    /*
-                     * return cell.getSpreadsheet().getWorkbook().
-                     * getRange(node.getText()) (Reference)
-                     */
+                if (node.getText().charAt(0) == (Variavel.VARIAVEL_STARTER)) {
+                    return new Literal(vars.getValue(node.getText()));
+                } else {
+                    switch (node.getType()) {
+                        case FormulaParserTokenTypes.NUMBER:
+                            return new Literal(Value.parseNumericValue(node.getText()));
+                        case FormulaParserTokenTypes.STRING:
+                            return new Literal(Value.parseValue(node.getText(), Value.Type.BOOLEAN, Value.Type.DATE));
+                        case FormulaParserTokenTypes.CELL_REF:
+                            return new CellReference(cell.getSpreadsheet(), node.getText());
+                        case FormulaParserTokenTypes.NAME:
+                        /*
+                         * return cell.getSpreadsheet().getWorkbook().
+                         * getRange(node.getText()) (Reference)
+                         */
+                    }
                 }
             } catch (ParseException ex) {
                 throw new FormulaCompilationException(ex);
@@ -202,7 +181,7 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
      * @return a ultima cell que foi chamada para compilar. nao deve ser chamado
      * directamente, para uso exclusivo da formula "Eval" Tentativas de chamadas
      * por outras funcs retornam "null"
-     * @param funcao que pede a cell. Para garantir utilizacao exclusiva do eval 
+     * @param funcao que pede a cell. Para garantir utilizacao exclusiva do eval
      */
     public static Cell getLastActiveCell(Function function) {
         if (function.getIdentifier().equalsIgnoreCase("Eval")) {
@@ -210,59 +189,50 @@ public class ExcelExpressionCompilerPT implements ExpressionCompiler {
         }
         return null;
     }
+
+    class tSeq implements Runnable {
+
+        AST nodeP, nodeFunc, nodeRef;
+        CellReference cr;
+        Cell alvo, cell;
+        public Expression e = null;
+
+        tSeq(Cell cel, AST node) {
+            cell = cel;
+            nodeP = node;
+        }
+
+        @Override
+        public void run() {
+            try {
+                String ref, func;
+                do {
+                    nodeRef = nodeP.getNextSibling();//Exemplo:#{a1:=soma(4;5);a2:=se(a1>10;"grande";"pequeno")}  nodeRef="a1"
+                    nodeFunc = nodeRef.getNextSibling().getNextSibling(); //nodeFunc=Sum(a1:a11)
+                    nodeP = nodeFunc.getNextSibling();//nodeP = ";"    
+                    ref = nodeRef.getText();
+
+                    if (ref.charAt(0) == Variavel.VARIAVEL_STARTER) {    //variavel - $temp1
+                        e = convert(cell, nodeFunc);
+                        Value v = e.evaluate();       //cria variavel
+                        vars.add(ref, nodeFunc.getText(), v);
+                    } else {
+                        cr = new CellReference(cell.getSpreadsheet(), ref);
+                        alvo = cr.getCell();
+                        func = nodeFunc.getText();
+                        if (func.charAt(0) == Variavel.VARIAVEL_STARTER) {
+                            //atribuir valor da variavel
+                            alvo.setContent(vars.getValue(func).toString());   //func=$temp5
+                        } else {
+                            e = convert(alvo, nodeFunc);
+                            alvo.setContent(e.evaluate().toString());
+                        }
+                    }
+                } while (nodeP.getText().equalsIgnoreCase(";"));
+            } catch (Exception E) {
+                // System.out.println("Terminou a sequencia/ Mal formada");
+            }
+            sync = e;
+        }
+    }
 }
-
-/*
-public class teste {
-
-	static int[] vector;
-	static int[] maiores;
-
-	public class ProcuraMaior implements Runnable {
-		private int parm;
-
-		ProcuraMaior(int p) {
-			parm = p;
-		}
-
-		public void run() {
-			int maior = 0;
-			for (int i = parm * 100; i < (parm * 100) + 100; i++) {
-				if (Exemplo3.vector[i] > maior)
-					maior = Exemplo3.vector[i];
-			}
-			Exemplo3.maiores[parm] = maior;
-		}
-	}
-
-	public static void main(String[] args) {
-		Exemplo3 ex = new Exemplo3();
-		vector = new int[1000];
-		// Para gerar numeros aleatorios
-		Random generator = new Random();
-		for (int i = 0; i < 1000; i++) {
-			vector[i] = generator.nextInt(10000); 
-													
-		}
-		maiores = new int[10];
-		Thread[] threads = new Thread[10];
-		for (int i = 0; i < 10; i++) {
-			threads[i] = new Thread(ex.new ProcuraMaior(i));
-			threads[i].start();
-		}
-		// esperar que todas as threads terminem
-		for (int i = 0; i < 10; i++) {
-			try {
-				threads[i].join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		int maior = Exemplo3.maiores[0];
-		for (int i = 0; i < 10; i++) {
-			if (Exemplo3.maiores[i] > maior)
-				maior = Exemplo3.maiores[i];
-		}
-		System.out.println("O maior valor= " + maior);
-	}
-}*/
