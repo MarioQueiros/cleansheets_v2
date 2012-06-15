@@ -1,6 +1,5 @@
 package csheets.core;
 
-import csheets.core.Value;
 import csheets.core.formula.util.Variavel;
 import java.util.ArrayList;
 import java.util.Iterator;

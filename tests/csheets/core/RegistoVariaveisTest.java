@@ -4,9 +4,8 @@
  */
 package csheets.core;
 
-import csheets.core.formula.util.Variavel;
-import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  *
@@ -14,25 +13,6 @@ import static org.junit.Assert.*;
  */
 public class RegistoVariaveisTest {
     
-    public RegistoVariaveisTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
-
     /**
      * Test of getInstance method, of class RegistoVariaveis.
      */
@@ -94,9 +74,9 @@ public class RegistoVariaveisTest {
     
     @Test
     public void testVariavelNaoDefinida() {
-        System.out.println("varivavel inexistente");
+        System.out.println("variavel inexistente");
         RegistoVariaveis instance = RegistoVariaveis.getInstance();
         instance.add("$temp1", "media(4;8)", new Value(6));
-        assertEquals(instance.getText("$temp2"), "VARIAVEL NAO DEFINIDA");
+        assertEquals(instance.getText("$temp5"), "VARIAVEL NAO DEFINIDA");
     }
 }
