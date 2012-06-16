@@ -1,1 +1,1 @@
-@java -cp ../res;../lib/antlr.jar csheets.CleanSheets
+@java -cp ../src;../lib/antlr.jar;..lib/derbyclient.jar;..lib/mysql-connector-java-5.1.20-bin.jar/;../dist/lib/ejb3-persistence.jar;../dist/lib/hibernate3.jar;../dist/lib/*.jar;../lib/derbyclient.jar;../lib/ejb3-persistence.jar;../lib/hibernate3.jar;../lib/*.jar;../src/csheets/io/*.java;../src/hibernate.cfg.xml;../dist/lib/hibernate-annotations.jar;../lib/hibernate-annotations.jar csheets.CleanSheets
