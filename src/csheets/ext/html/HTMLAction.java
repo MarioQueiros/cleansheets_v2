@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package csheets.ext.html;
 
 import csheets.core.Spreadsheet;
@@ -20,15 +16,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-/**
- *
- * @author MpApQ
- */
 public class HTMLAction extends BaseAction {
 
-    /**
-     * The user interface controller
-     */
     protected UIController uiController;
 
     /**
