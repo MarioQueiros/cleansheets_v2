@@ -1,18 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package csheets.ext.html;
 
 import csheets.ext.Extension;
-import csheets.isep.UIExtensionExample;
 import csheets.ui.ctrl.UIController;
 import csheets.ui.ext.UIExtension;
 
-/**
- *
- * @author MpApQ
- */
 public class ExtensionHTML extends Extension {
 
     /**

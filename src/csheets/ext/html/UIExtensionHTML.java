@@ -1,7 +1,6 @@
 package csheets.ext.html;
 
 import csheets.ext.Extension;
-import csheets.isep.ExampleMenu;
 import csheets.ui.ctrl.UIController;
 import csheets.ui.ext.UIExtension;
 import javax.swing.Icon;
