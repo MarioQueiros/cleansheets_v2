@@ -17,7 +17,7 @@ public class BaseDadosSyncAction extends BaseAction {
     protected UIController uiController;
     private int nrlinhas = 128, nrcolunas = 52;
     private String[][] options = new String[nrlinhas][nrcolunas];
-    private String[][] matriz_sel; // Área que da tabela da CleanSheets que o utilizador pretende sincronizar
+    private String[][] matriz_sel; // Area que da tabela da CleanSheets que o utilizador pretende sincronizar
     private String[] temp = new String[2];
     String[] coluna = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
         "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG",
