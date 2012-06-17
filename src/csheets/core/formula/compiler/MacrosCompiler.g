@@ -63,6 +63,7 @@ atom
 	:	function_call
 	|	reference
 	|	literal
+        |       execucao
 	|	LPAR! comparison RPAR!
 	;
 
@@ -82,6 +83,10 @@ reference
 literal
 	:	NUMBER
 	|	STRING
+	;
+
+execucao
+	:	EXE TEXTO
 	;
 
 {import csheets.core.formula.lang.Language;
@@ -117,12 +122,17 @@ ALPHABETICAL
 		LETTER ( LETTER )? ( DIGIT )+ {
 			$setType(CELL_REF);
 		}
+
+        |	("exec") {$setType(EXE);}
 	;
 
 LOCVAR
 	:	( ABS ) ( LETTER )+ (NUMBER)?
 	;
 
+TEXTO
+	:	LPAR! (LETTER)+ (NUMBER)? RPAR!
+	;
 
 /* String literals, i.e. anything inside the delimiters */
 STRING

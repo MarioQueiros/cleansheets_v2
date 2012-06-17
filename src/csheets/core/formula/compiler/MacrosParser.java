@@ -450,6 +450,7 @@ public MacrosParser(ParserSharedInputState state) {
 		case NAME:
 		case NUMBER:
 		case STRING:
+		case EXE:
 		{
 			break;
 		}
@@ -496,6 +497,13 @@ public MacrosParser(ParserSharedInputState state) {
 			atom_AST = (AST)currentAST.root;
 			break;
 		}
+		case EXE:
+		{
+			execucao();
+			astFactory.addASTChild(currentAST, returnAST);
+			atom_AST = (AST)currentAST.root;
+			break;
+		}
 		case LPAR:
 		{
 			match(LPAR);
@@ -533,6 +541,7 @@ public MacrosParser(ParserSharedInputState state) {
 		case NAME:
 		case NUMBER:
 		case STRING:
+		case EXE:
 		{
 			comparison();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -683,6 +692,24 @@ public MacrosParser(ParserSharedInputState state) {
 		returnAST = literal_AST;
 	}
 	
+	public final void execucao() throws RecognitionException, TokenStreamException {
+		
+		returnAST = null;
+		ASTPair currentAST = new ASTPair();
+		AST execucao_AST = null;
+		
+		AST tmp32_AST = null;
+		tmp32_AST = astFactory.create(LT(1));
+		astFactory.addASTChild(currentAST, tmp32_AST);
+		match(EXE);
+		AST tmp33_AST = null;
+		tmp33_AST = astFactory.create(LT(1));
+		astFactory.addASTChild(currentAST, tmp33_AST);
+		match(TEXTO);
+		execucao_AST = (AST)currentAST.root;
+		returnAST = execucao_AST;
+	}
+	
 	
 	public static final String[] _tokenNames = {
 		"<0>",
@@ -712,6 +739,8 @@ public MacrosParser(ParserSharedInputState state) {
 		"NAME",
 		"NUMBER",
 		"STRING",
+		"EXE",
+		"TEXTO",
 		"LETTER",
 		"ALPHABETICAL",
 		"QUOT",
