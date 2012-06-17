@@ -9,6 +9,8 @@ import csheets.core.Cell;
 import csheets.core.formula.compiler.FormulaCompilationException;
 import csheets.ext.share.PageSharingController;
 import csheets.ext.share.PageSharingData;
+import csheets.ext.share.PageSharingEvent;
+import csheets.ext.share.PageSharingListener;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -17,31 +19,38 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 /**
- * Subclasse de "Connection", trata-se de um hoste, que cria uma
- * partilha
+ * Subclasse de "Connection", trata-se de um hoste, que cria uma partilha
+ *
  * @author Tiago
  */
-public class Host extends Connection {
+public class Host extends Connection implements PageSharingListener {
 
-    /** A socket ao qual se liga */
+    /**
+     * A socket ao qual se liga
+     */
     private Socket clntSocket;
-    
-    /** O número de linhas que partilha */
+    /**
+     * O número de linhas que partilha
+     */
     private int rowNumber;
-    
-    /** O número de colunas que partilha */
+    /**
+     * O número de colunas que partilha
+     */
     private int colNumber;
-    
-    /** O objecto que se encarrega de manter a sincronização de Threads */
+    /**
+     * O objecto que se encarrega de manter a sincronização de Threads
+     */
     private Object syncSockets = new Object();
-    
-    /** Booleans que identificam o estado da partilha */
+    /**
+     * Booleans que identificam o estado da partilha
+     */
     private boolean connected = false;
     private boolean interrupted = false;
 
     public Host(PageSharingData connectData) {
 
         try {
+
             this.shareName = connectData.getShareName();
             this.connectedCells = connectData.getCellConnected();
 
@@ -49,6 +58,8 @@ public class Host extends Connection {
             connectedWorkbook = connectData.getSpreadsheet().getWorkbook();
             this.rowNumber = connectData.getRowNumber();
             this.colNumber = connectData.getColNumber();
+
+            this.type = connectData.getType();
             this.connectedFrom = new ArrayList<Address>();
 
         } catch (Exception e) {
@@ -57,8 +68,9 @@ public class Host extends Connection {
 
     }
 
-    
-/** ESCUTA DO EVENTO DE MUDANÇA NAS CÉLULAS */
+    /**
+     * ESCUTA DO EVENTO DE MUDANÇA NAS CÉLULAS
+     */
     @Override
     public void valueChanged(Cell cell) {
     }
@@ -135,11 +147,11 @@ public class Host extends Connection {
     public void removeListeners() {
         connectedSpreadsheet.removeCellListener(this);
     }
-    
-     /** Quando do outro lado a conecção é fechada é recolhida na Thread Receive
+
+    /**
+     * Quando do outro lado a conecção é fechada é recolhida na Thread Receive
      * que por sua vez chama este método para fechar também esta conecção
      */
-
     @Override
     public void closeSockets() {
 
@@ -155,8 +167,9 @@ public class Host extends Connection {
 
     }
 
-/** GETS E SETS */
-    
+    /**
+     * GETS E SETS
+     */
     /**
      * @return the connected
      */
@@ -195,15 +208,51 @@ public class Host extends Connection {
      */
     public void setInterrupted(boolean interrupted) {
         this.interrupted = interrupted;
+        if (isInterrupted()) {
+            PrintWriter out;
+            try {
+                out = new PrintWriter(clntSocket.getOutputStream(), true);
+                out.println("interrupted\n");
+                out.flush();
+
+            } catch (Exception ex) {
+            }
+        } else {
+            PrintWriter out;
+            try {
+                out = new PrintWriter(clntSocket.getOutputStream(), true);
+                out.println("resumed\n");
+                out.flush();
+
+            } catch (Exception ex) {
+            }
+        }
     }
 
-    
- /** Thread RECEIVE */
-    
+    @Override
+    public void connectionsChanged(PageSharingEvent event) {
+        //
+    }
+
+    @Override
+    public void connectionsInterrupted(String shareName, boolean test) {
+        if (this.shareName.equals(shareName)) {
+            this.setInterrupted(test);
+        }
+    }
+
+    @Override
+    public void serverInstanceOn(boolean state) {
+        //
+    }
+
     /**
-     * Esta classe encarrega-se de receber informação pela socket e
-     * a colocar no seu devido lugar. Também se encarrega de verificar
-     * se a socket se mantém activa e fechar o Host se for o caso
+     * Thread RECEIVE
+     */
+    /**
+     * Esta classe encarrega-se de receber informação pela socket e a colocar no
+     * seu devido lugar. Também se encarrega de verificar se a socket se mantém
+     * activa e fechar o Host se for o caso
      */
     class Receive implements Runnable {
 
@@ -219,6 +268,7 @@ public class Host extends Connection {
 
 
                     if (stream.contains("closeSocket")) {
+                        closeSockets();
                         break;
                     }
 
@@ -244,9 +294,9 @@ public class Host extends Connection {
         }
     }
 
-    
-    
-/** RUN DO HOST */
+    /**
+     * RUN DO HOST
+     */
     @Override
     public void run() {
 
@@ -255,7 +305,7 @@ public class Host extends Connection {
         int firstRowFromConnected = 0, firstColFromConnected = 0;
 
         try {
-
+            PageSharingController.getInstance().addConnectionListener(this);
             connectedSpreadsheet.addCellListener(this);
             BufferedReader in = new BufferedReader(new InputStreamReader(clntSocket.getInputStream()));
             PrintWriter out = new PrintWriter(clntSocket.getOutputStream(), true);
@@ -281,10 +331,12 @@ public class Host extends Connection {
 
             clntSocket.close();
 
-            PageSharingController.getInstance().connectionRemoved(this);
+            
 
         } catch (Exception ex) {
+            //PageSharingController.getInstance().connectionRemoved(this);
         }
-        PageSharingController.getInstance().connectionRemoved(this);
+        JOptionPane.showMessageDialog(null, type +" from "+clntSocket.getInetAddress().getHostAddress()+ " \"" + shareName + "\" connection closed!");
+        PageSharingController.getInstance().connectionRemoved(this,false);
     }
 }
