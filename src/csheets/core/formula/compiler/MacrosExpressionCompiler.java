@@ -7,6 +7,7 @@ import csheets.core.CellImpl;
 import csheets.core.Value;
 import csheets.core.formula.*;
 import csheets.core.formula.lang.*;
+import csheets.ui.MacrosFrame;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -33,7 +34,6 @@ public class MacrosExpressionCompiler {
         }
 
         if (flag != 1) {
-            //Converts the expression and returns it
             conteudoInstrucao = convert(parser.getAST(), nomeVar, numeroVar, source);
         } else {
             conteudoInstrucao = "erro";
@@ -43,7 +43,7 @@ public class MacrosExpressionCompiler {
 
     public String convert(AST node, ArrayList<String> nomeVar, ArrayList<Integer> numeroVar, String source) {
 
-        //Caso a gramatica esteja correcta, comear a verificar se tem variaveis ou nao
+        //Caso a gramatica esteja correcta, comecar a verificar se tem variaveis ou nao
         AST proximoNo;
 
         String topoArvore = node.getText();
@@ -56,152 +56,157 @@ public class MacrosExpressionCompiler {
             //Enquanto houver ramos na arvore, ou seja enquanto houver valores na nossa intrucao
             proximoNo = node.getNextSibling();
             while ((proximoNo = proximoNo.getNextSibling()) != null) {
-                //Significa que podera ser do genero de: $var:=sum(1;2) ou $var:=sum($res;2)
+                //Significa que podera ser do genero de: $var:=sum(1;2) ou $var:=sum($res;2) ou $var:=sum(exec(macro);2)
                 if (proximoNo.getNextSibling() == null && proximoNo.getNumberOfChildren() != 0) {
-                    source = verificarVariavelFilhos(proximoNo, nomeVar, numeroVar, source);
+                    source = percorrerArvore(proximoNo, nomeVar, numeroVar, source);
                 }
-                //Se entrar neste if significa que a expressao  assim $var:=123
+                //Se entrar neste if significa que a expressao e assim $var:=123 
                 if (proximoNo.getNextSibling() == null && proximoNo.getNumberOfChildren() == 0) {
                     auxiliar = proximoNo.getText();
                     valorVar = Integer.parseInt(auxiliar);
                     nomeVar.add(topoArvore);
                     numeroVar.add(valorVar);
+                } else //$var:=exec(macro)
+                if (proximoNo.getText().equals("exec")) {
+                    String conteudoMacro = MacrosFrame.verificarNomeMacro(proximoNo.getNextSibling().getText());
+                    String aux[] = new String[3];
+                    int valor = 0, flag = 0;
+
+                    if (conteudoMacro.equals("") == false) {
+                        aux = MacrosFrame.executarMacro(nomeVar, numeroVar, conteudoMacro);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "O nome que introduziu nao corrresponde a uma Macro criada anteriormente!");
+                        flag = 1;
+                    }
+
+                    if (flag == 0) {
+                        conteudoMacro = aux[2];
+                        valor = Integer.parseInt(conteudoMacro);
+
+                        nomeVar.add(topoArvore);
+                        numeroVar.add(valor);
+                    }
                 }
             }
         } else {
             proximoNo = node.getNextSibling();
             while ((proximoNo = proximoNo.getNextSibling()) != null) {
-                auxiliar=proximoNo.getText();
-                //Significa que podera ser do genero de: A1:=sum(1;2) ou A1:=sum($res;2)
+                auxiliar = proximoNo.getText();
+                //Significa que podera ser do genero de: A1:=sum(1;2) ou A1:=sum($res;2) ou A1:=sum(exec(macro);2)
                 if (proximoNo.getNextSibling() == null && proximoNo.getNumberOfChildren() != 0) {
-                    source = verificarVariavelFilhos(proximoNo, nomeVar, numeroVar, source);
+                    source = percorrerArvore(proximoNo, nomeVar, numeroVar, source);
                     //Caso seja A1:=$res
-                }else if(proximoNo.getNextSibling() == null && proximoNo.getNumberOfChildren() == 0 && auxiliar.substring(0, 1).equals("$")==true){
-                    source = verificarVariavel(proximoNo, nomeVar, numeroVar, source);                
+                } else if (proximoNo.getNextSibling() == null && proximoNo.getNumberOfChildren() == 0 && auxiliar.substring(0, 1).equals("$") == true) {
+                    source = substituirValorVariavel(proximoNo, nomeVar, numeroVar, source);
+                    //A1:=exec(macro)
+                } else if (proximoNo.getText().equals("exec")) {
+                    String conteudoMacro = MacrosFrame.verificarNomeMacro(proximoNo.getNextSibling().getText());
+                    String aux[] = new String[3];
+                    int flag = 0;
+
+                    if (conteudoMacro.equals("") == false) {
+                        aux = MacrosFrame.executarMacro(nomeVar, numeroVar, conteudoMacro);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "O nome que introduziu nao corrresponde a uma Macro criada anteriormente!");
+                        flag = 1;
+                    }
+
+                    if (flag == 0) {
+                        conteudoMacro = aux[2];                        
+                        source=source.replace("exec(" + proximoNo.getNextSibling().getText() + ")", conteudoMacro);
+                    }
                 }
             }
         }
 
         return source;
     }
-    public String verificarVariavel(AST proximoNo, ArrayList<String> nomeVar, ArrayList<Integer> numeroVar, String source) {
-        
-            //Ira verificar na nossa arrayList se existe esta variavel
-            int flag = 0;
-            for (int i = 0; i < nomeVar.size(); i++) {
-                String a = proximoNo.getText();
-                //Caso encontre a variavel na arrayList
-                if (nomeVar.get(i).equals(a)) {
-                    //Valor da variavel
-                    int auxiliarVar = numeroVar.get(i);
-                    String auxiliar = Integer.toString(auxiliarVar);
 
-                    String[] instrucao = source.split(":=");
+    public String substituirValorVariavel(AST proximoNo, ArrayList<String> nomeVar, ArrayList<Integer> numeroVar, String source) {
 
-                    source = instrucao[0] + ":=";
+        //Ira verificar na nossa arrayList se existe esta variavel
+        int flag = 0;
+        for (int i = 0; i < nomeVar.size(); i++) {
+            String no = proximoNo.getText();
+            //Caso encontre a variavel na arrayList
+            if (nomeVar.get(i).equals(no)) {
+                //Valor da variavel
+                int auxiliarVar = numeroVar.get(i);
+                String auxiliar = Integer.toString(auxiliarVar);
 
-                    //Substituir a variavel pelo seu valor
-                    instrucao[1] = instrucao[1].replace(nomeVar.get(i), auxiliar);
-                    source = source + instrucao[1];
-                    flag = 1;
-                }
+                source = source.replace(nomeVar.get(i), auxiliar);
+                flag = 1;
             }
-
-            if (nomeVar.size() == 0 || flag == 0) {
-                String[] instrucao = source.split(":=");
-
-                source = instrucao[0] + ":=";
-
-                //Substituir a variavel pelo seu valor
-                instrucao[1] = instrucao[1].replace(proximoNo.getText(), "0");
-                source = source + instrucao[1];
-            }
-
-
-        
+        }
+        if (nomeVar.isEmpty() || flag == 0) {
+            source = source.replace(proximoNo.getText(), "0");
+        }
         return source;
     }
 
-    public String verificarVariavelFilhos(AST proximoNo, ArrayList<String> nomeVar, ArrayList<Integer> numeroVar, String source) {
-        int auxiliarVar;
+    public String percorrerArvore(AST proximoNo, ArrayList<String> nomeVar, ArrayList<Integer> numeroVar, String source) {
         String nomeFilho;
-        AST filho;
-        String auxiliar;
+        AST filho, novoFilho;
 
         filho = proximoNo.getFirstChild();
         nomeFilho = filho.getText();
-        //Verificar se encontra uma variavel dentro da formula
+
+        novoFilho = filho;
+
+
         if (nomeFilho.substring(0, 1).equals("$")) {
+            source = substituirValorVariavel(filho, nomeVar, numeroVar, source);
 
-            //Ira verificar na nossa arrayList se existe esta variavel
-            int flag = 0;
-            for (int i = 0; i < nomeVar.size(); i++) {
-                //Caso encontre a variavel na arrayList
-                if (nomeVar.get(i).equals(nomeFilho)) {
-                    //Valor da variavel
-                    auxiliarVar = numeroVar.get(i);
-                    auxiliar = Integer.toString(auxiliarVar);
-
-                    String[] instrucao = source.split(":=");
-
-                    source = instrucao[0] + ":=";
-
-                    //Substituir a variavel pelo seu valor
-                    instrucao[1] = instrucao[1].replace(nomeVar.get(i), auxiliar);
-                    source = source + instrucao[1];
-                    flag = 1;
-                }
-            }
-
-            if (nomeVar.size() == 0 || flag == 0) {
-                String[] instrucao = source.split(":=");
-
-                source = instrucao[0] + ":=";
-
-                //Substituir a variavel pelo seu valor
-                instrucao[1] = instrucao[1].replace(filho.getText(), "0");
-                source = source + instrucao[1];
-            }
-
-
+            //$var:=sum(exec(macro);1)
+        } else if (nomeFilho.equals("exec")) {
+            source = substituirExecucaoMacro(novoFilho, nomeVar, numeroVar, source);
         }
 
-        //Percorrer os outros filhos
-        while ((filho = filho.getNextSibling()) != null) {
-            nomeFilho = filho.getText();
+        //Percorrer a arvore
+        while ((novoFilho = novoFilho.getNextSibling()) != null) {
+            nomeFilho = novoFilho.getText();
+            //Verificar se e variavel e substituir o seu valor
             if (nomeFilho.substring(0, 1).equals("$")) {
-                //Ira verificar na nossa arrayList se existe esta variavel
-                int flag = 0;
-                for (int i = 0; i < nomeVar.size(); i++) {
-                    //Caso encontre a variavel na arrayList
-                    if (nomeVar.get(i).equals(nomeFilho)) {
+                source = substituirValorVariavel(novoFilho, nomeVar, numeroVar, source);
+                //$var:=sum(1;exec(macro))
+            } else if (nomeFilho.equals("exec")) {
+                source = substituirExecucaoMacro(novoFilho, nomeVar, numeroVar, source);
+            }
 
-                        //Valor da variavel
-                        auxiliarVar = numeroVar.get(i);
-                        auxiliar = Integer.toString(auxiliarVar);
-
-                        String[] instrucao = source.split(":=");
-
-                        source = instrucao[0] + ":=";
-
-                        //Substituir a variavel pelo seu valor
-                        instrucao[1] = instrucao[1].replace(nomeVar.get(i), auxiliar);
-                        source = source + instrucao[1];
-                        flag = 1;
-                    }
-                }
-
-                if (nomeVar.size() == 0 || flag == 0) {
-                    String[] instrucao = source.split(":=");
-
-                    source = instrucao[0] + ":=";
-
-                    //Substituir a variavel pelo seu valor
-                    instrucao[1] = instrucao[1].replace(filho.getText(), "0");
-                    source = source + instrucao[1];
+            //Verificar se a arvore tem mais ramos, ou seja se existe mais filhos
+            if (novoFilho.getNextSibling() == null && filho.getFirstChild() != null) {
+                filho = filho.getFirstChild();
+                novoFilho = filho;
+                nomeFilho = novoFilho.getText();
+                if (nomeFilho.substring(0, 1).equals("$")) {
+                    source = substituirValorVariavel(novoFilho, nomeVar, numeroVar, source);
+                } else if (nomeFilho.equals("exec")) {
+                    source = substituirExecucaoMacro(novoFilho, nomeVar, numeroVar, source);
                 }
             }
         }
+
+        return source;
+    }
+
+    public String substituirExecucaoMacro(AST novoFilho, ArrayList<String> nomeVar, ArrayList<Integer> numeroVar, String source) {
+        String conteudoMacro = MacrosFrame.verificarNomeMacro(novoFilho.getNextSibling().getText());
+        String aux[] = new String[3];
+        int flag = 0;
+
+        if (conteudoMacro.equals("") == false) {
+            aux = MacrosFrame.executarMacro(nomeVar, numeroVar, conteudoMacro);
+        } else {
+            JOptionPane.showMessageDialog(null, "O nome que introduziu nao corrresponde a uma Macro criada anteriormente!");
+            flag = 1;
+        }
+
+        if (flag == 0) {
+            conteudoMacro = aux[2];
+
+            source = source.replace("exec(" + novoFilho.getNextSibling().getText() + ")", conteudoMacro);
+        }
+
         return source;
     }
 }

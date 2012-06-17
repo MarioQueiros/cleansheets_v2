@@ -26,12 +26,14 @@ public interface MacrosParserTokenTypes {
 	int NAME = 24;
 	int NUMBER = 25;
 	int STRING = 26;
-	int LETTER = 27;
-	int ALPHABETICAL = 28;
-	int QUOT = 29;
-	int DIGIT = 30;
-	int ABS = 31;
-	int EXCL = 32;
-	int COMMA = 33;
-	int WS = 34;
+	int EXE = 27;
+	int TEXTO = 28;
+	int LETTER = 29;
+	int ALPHABETICAL = 30;
+	int QUOT = 31;
+	int DIGIT = 32;
+	int ABS = 33;
+	int EXCL = 34;
+	int COMMA = 35;
+	int WS = 36;
 }
