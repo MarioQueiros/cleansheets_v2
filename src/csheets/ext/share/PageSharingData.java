@@ -26,26 +26,32 @@ public class PageSharingData {
     private UIController uiController;
     private InetAddress ip;
     private Cell cell;
-    private int numberOfShares;
+    private String password;
     private String shareName;
+    private String type;
+    private boolean interrupted = false;
+    private int numberConnections;
 
-    public PageSharingData(Socket connectedSocket, InetAddress ip, Cell cell, Spreadsheet spreadsheet, UIController uiController,String shareName) {
+    public PageSharingData(Socket connectedSocket, InetAddress ip, Cell cell, Spreadsheet spreadsheet, UIController uiController,String shareName,String type) {
         this.connectedSocket = connectedSocket;
         this.spreadsheet = spreadsheet;
         this.ip = ip;
         this.cell = cell;
         this.uiController = uiController;
         this.shareName = shareName;
+        this.type = type;
     }
 
-    public PageSharingData(String shareName, int numShares, List<Cell> cellConnected, int rowNumber, int colNumber, Spreadsheet spreadsheet, UIController uiController) {
+    public PageSharingData(String shareName, String password, List<Cell> cellConnected, int rowNumber, int colNumber, Spreadsheet spreadsheet, UIController uiController,String type) {
         this.cellConnected = cellConnected;
         this.rowNumber = rowNumber;
         this.colNumber = colNumber;
         this.spreadsheet = spreadsheet;
         this.uiController = uiController;
-        this.numberOfShares = numShares;
+        this.password = password;
         this.shareName = shareName;
+        this.type = type;
+        this.numberConnections = 0;
     }
 
     public UIController getUiController() {
@@ -101,8 +107,8 @@ public class PageSharingData {
     /**
      * @return the numberOfShares
      */
-    public int getNumberOfShares() {
-        return numberOfShares;
+    public String  getPassword() {
+        return password;
     }
 
     /**
@@ -110,5 +116,38 @@ public class PageSharingData {
      */
     public String getShareName() {
         return shareName;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @return the interrupted
+     */
+    public boolean isInterrupted() {
+        return interrupted;
+    }
+
+    void setInterrupted(boolean b) {
+        this.interrupted = b;
+    }
+
+    /**
+     * @return the numberConnections
+     */
+    public int getNumberConnections() {
+        return numberConnections;
+    }
+
+    public void addConnection() {
+        numberConnections++;
+    }
+    
+    public void removeConnection() {
+        numberConnections = numberConnections - 1;
     }
 }

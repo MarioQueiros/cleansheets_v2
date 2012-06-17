@@ -20,6 +20,7 @@ public class DisconnectAction extends BaseAction{
     public DisconnectAction(UIController uiController){
            dscFrame = new DisconnectFrame(uiController);
            dscFrame.setVisible(false);
+           dscFrame.setLocationRelativeTo(null);
     }
     
     
