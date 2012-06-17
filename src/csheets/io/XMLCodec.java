@@ -167,7 +167,7 @@ public class XMLCodec implements Codec {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(stream);
-            Schema schema = loadSchema("src\\csheets\\io\\xsd.xsd");
+            Schema schema = loadSchema("xsd.xsd");
 
             doc.getDocumentElement().normalize();
             content = new String[MATRIX_WIDTH][MATRIX_HEIGHT];
@@ -343,6 +343,8 @@ public class XMLCodec implements Codec {
                         }
                     }
                 }
+            } else {
+                System.out.println("XSD ERROR!!");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -383,17 +385,17 @@ public class XMLCodec implements Codec {
                 String aux = sheet.getCell(column, row).getContent();
                 stylableCell = (StylableCell) sheet.getCell(column, row).getExtension(StyleExtension.NAME);
 
-               // if (aux.trim() != "") {
-                    writer.print("\t\t\t<column idc='" + columns[column] + "' columnWidth='" + st.getColumnWidth(0) + "'>\n");
-                    writer.print("\t\t\t\t<content>" + sheet.getCell(column, row).getContent() + "</content>\n");
-                    writer.print("\t\t\t\t<font>" + stylableCell.getFont() + "</font>\n");
-                    writer.print("\t\t\t\t<valign>" + stylableCell.getVerticalAlignment() + "</valign>\n");
-                    writer.print("\t\t\t\t<halign>" + stylableCell.getHorizontalAlignment() + "</halign>\n");
-                    writer.print("\t\t\t\t<foreColor>" + stylableCell.getForegroundColor() + "</foreColor>\n");
-                    writer.print("\t\t\t\t<backColor>" + stylableCell.getBackgroundColor() + "</backColor>\n");
-                    writer.print("\t\t\t\t<border>" + stylableCell.getBorder().getBorderInsets(null) + "</border>\n");
-                    writer.print("\t\t\t</column>\n");
-               // }
+                // if (aux.trim() != "") {
+                writer.print("\t\t\t<column idc='" + columns[column] + "' columnWidth='" + st.getColumnWidth(0) + "'>\n");
+                writer.print("\t\t\t\t<content>" + sheet.getCell(column, row).getContent() + "</content>\n");
+                writer.print("\t\t\t\t<font>" + stylableCell.getFont() + "</font>\n");
+                writer.print("\t\t\t\t<valign>" + stylableCell.getVerticalAlignment() + "</valign>\n");
+                writer.print("\t\t\t\t<halign>" + stylableCell.getHorizontalAlignment() + "</halign>\n");
+                writer.print("\t\t\t\t<foreColor>" + stylableCell.getForegroundColor() + "</foreColor>\n");
+                writer.print("\t\t\t\t<backColor>" + stylableCell.getBackgroundColor() + "</backColor>\n");
+                writer.print("\t\t\t\t<border>" + stylableCell.getBorder().getBorderInsets(null) + "</border>\n");
+                writer.print("\t\t\t</column>\n");
+                // }
             }
 
             writer.print("\t\t</row>\n\n");
