@@ -1,0 +1,39 @@
+// $ANTLR 2.7.5 (20050128): "../src/csheets/core/formula/compiler/MacrosCompiler.g" -> "MacrosLexer.java"$
+package csheets.core.formula.compiler;
+public interface MacrosParserTokenTypes {
+	int EOF = 1;
+	int NULL_TREE_LOOKAHEAD = 3;
+	int COLON = 4;
+	int EQ = 5;
+	int LOCVAR = 6;
+	int CELL_REF = 7;
+	int NEQ = 8;
+	int GT = 9;
+	int LT = 10;
+	int LTEQ = 11;
+	int GTEQ = 12;
+	int AMP = 13;
+	int PLUS = 14;
+	int MINUS = 15;
+	int MULTI = 16;
+	int DIV = 17;
+	int POWER = 18;
+	int PERCENT = 19;
+	int LPAR = 20;
+	int RPAR = 21;
+	int FUNCTION = 22;
+	int SEMI = 23;
+	int NAME = 24;
+	int NUMBER = 25;
+	int STRING = 26;
+	int EXE = 27;
+	int TEXTO = 28;
+	int LETTER = 29;
+	int ALPHABETICAL = 30;
+	int QUOT = 31;
+	int DIGIT = 32;
+	int ABS = 33;
+	int EXCL = 34;
+	int COMMA = 35;
+	int WS = 36;
+}
