@@ -6,10 +6,9 @@ package csheets.ext.share.ui;
 
 import csheets.CleanSheets;
 import csheets.ext.share.PageSharingController;
+import csheets.ext.share.PageSharingData;
 import csheets.ext.share.PageSharingEvent;
 import csheets.ext.share.PageSharingListener;
-import csheets.ext.share.connect.Connection;
-import csheets.ext.share.connect.Host;
 import csheets.ui.ctrl.UIController;
 import java.awt.Toolkit;
 import java.util.ArrayList;
@@ -30,21 +29,15 @@ public class InterruptFrame extends JFrame implements PageSharingListener {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private UIController uiController;
     private boolean allHosts;
-    private List<Host> hosts;
-    private List<String> shareName;
-    private List<String> numberOfShares;
-    private List<String> numberOfConnected;
-    private List<String> isInterrupted;
+    private List<PageSharingData> shares;
     private List<InterruptListener> interruptListeners = new ArrayList<InterruptListener>();
 
     public InterruptFrame(UIController uiController, boolean allHosts) {
@@ -59,12 +52,10 @@ public class InterruptFrame extends JFrame implements PageSharingListener {
             jButton1 = new javax.swing.JButton();
             jButton2 = new javax.swing.JButton();
             jComboBox1 = new javax.swing.JComboBox();
-            jLabel2 = new javax.swing.JLabel();
             jLabel3 = new javax.swing.JLabel();
             jLabel4 = new javax.swing.JLabel();
             jLabel5 = new javax.swing.JLabel();
             jLabel6 = new javax.swing.JLabel();
-            jLabel7 = new javax.swing.JLabel();
             jLabel8 = new javax.swing.JLabel();
             jLabel9 = new javax.swing.JLabel();
             jLabel10 = new javax.swing.JLabel();
@@ -94,13 +85,11 @@ public class InterruptFrame extends JFrame implements PageSharingListener {
                 }
             });
 
-            jLabel2.setText("Nr. of Shares :");
 
             jLabel3.setText("Nr. of Connected :");
 
             jLabel4.setText("Interrupted :");
 
-            jLabel7.setText("");
 
             jLabel8.setText("");
 
@@ -117,9 +106,9 @@ public class InterruptFrame extends JFrame implements PageSharingListener {
             javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
             getContentPane().setLayout(layout);
             layout.setHorizontalGroup(
-                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup().addGap(43, 43, 43).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jLabel1).addGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jLabel2).addComponent(jLabel3).addComponent(jLabel4).addComponent(jLabel5).addComponent(jLabel6)).addGap(46, 46, 46).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jLabel9).addComponent(jLabel10).addComponent(jLabel11).addComponent(jLabel8).addComponent(jLabel7))).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING).addGroup(layout.createSequentialGroup().addComponent(jButton1).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addComponent(jButton2)).addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 383, javax.swing.GroupLayout.PREFERRED_SIZE))).addContainerGap(95, Short.MAX_VALUE)));
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup().addGap(43, 43, 43).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jLabel1).addGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jLabel3).addComponent(jLabel4).addComponent(jLabel5).addComponent(jLabel6)).addGap(46, 46, 46).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jLabel9).addComponent(jLabel10).addComponent(jLabel11).addComponent(jLabel8))).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING).addGroup(layout.createSequentialGroup().addComponent(jButton1).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addComponent(jButton2)).addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 383, javax.swing.GroupLayout.PREFERRED_SIZE))).addContainerGap(95, Short.MAX_VALUE)));
             layout.setVerticalGroup(
-                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup().addGap(34, 34, 34).addComponent(jLabel1).addGap(26, 26, 26).addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel2).addComponent(jLabel7)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel3).addComponent(jLabel8)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel4).addComponent(jLabel9)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel5).addComponent(jLabel10)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel6).addComponent(jLabel11)).addGap(39, 39, 39).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jButton2).addComponent(jButton1)).addContainerGap(25, Short.MAX_VALUE)));
+                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup().addGap(34, 34, 34).addComponent(jLabel1).addGap(26, 26, 26).addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel3).addComponent(jLabel8)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel4).addComponent(jLabel9)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel5).addComponent(jLabel10)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel6).addComponent(jLabel11)).addGap(39, 39, 39).addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jButton2).addComponent(jButton1)).addContainerGap(25, Short.MAX_VALUE)));
         } else {
 
             jScrollPane1 = new javax.swing.JScrollPane();
@@ -166,7 +155,7 @@ public class InterruptFrame extends JFrame implements PageSharingListener {
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
-        fireInterruptOne(shareName.get(jComboBox1.getSelectedIndex()), true);
+        fireInterruptOne(shares.get(jComboBox1.getSelectedIndex()).getShareName(), true);
     }
 
     private void jButton1ActionPerformedAll(java.awt.event.ActionEvent evt) {
@@ -174,18 +163,16 @@ public class InterruptFrame extends JFrame implements PageSharingListener {
     }
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {
-        if (!jComboBox1.getSelectedItem().equals(null)) {
+        if (jComboBox1.getSelectedItem() != null) {
 
-            jLabel7.setText(numberOfShares.get(jComboBox1.getSelectedIndex()));
+            jLabel8.setText(String.valueOf(shares.get(jComboBox1.getSelectedIndex()).getNumberConnections()));
 
-            jLabel8.setText(numberOfConnected.get(jComboBox1.getSelectedIndex()));
-
-            jLabel9.setText(isInterrupted.get(jComboBox1.getSelectedIndex()));
-
-            if (jLabel9.getText().equals("Yes")) {
+            if(shares.get(jComboBox1.getSelectedIndex()).isInterrupted()){
+                jLabel9.setText("Yes");
                 jButton1.setEnabled(false);
                 jButton2.setEnabled(true);
-            } else if (jLabel9.getText().equals("No")) {
+            }else{
+                jLabel9.setText("No");
                 jButton1.setEnabled(true);
                 jButton2.setEnabled(false);
             }
@@ -193,7 +180,7 @@ public class InterruptFrame extends JFrame implements PageSharingListener {
     }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
-        fireInterruptOne(shareName.get(jComboBox1.getSelectedIndex()), false);
+        fireInterruptOne(shares.get(jComboBox1.getSelectedIndex()).getShareName(), false);
     }
 
     private void jButton2ActionPerformedAll(java.awt.event.ActionEvent evt) {
@@ -241,70 +228,56 @@ public class InterruptFrame extends JFrame implements PageSharingListener {
 
     @Override
     public void connectionsChanged(PageSharingEvent event) {
-        List<Connection> connections = event.getConnectionList();
-        hosts = new ArrayList<Host>();
-        shareName = new ArrayList<String>();
-        numberOfShares = new ArrayList<String>();
-        numberOfConnected = new ArrayList<String>();
-        isInterrupted = new ArrayList<String>();
-        int auxIndex = 0;
+        shares = event.getShareData();
 
         String[] hostList;
 
-        for (int i = 0; i < connections.size(); i++) {
-            if (connections.get(i).getType().equals("Host")) {
-                hosts.add((Host) connections.get(i));
-            }
-        }
-        if (hosts.size() > 0) {
-
-            for (int i = 0; i < hosts.size(); i++) {
-                if (!shareName.contains(hosts.get(i).getShareName())) {
-                    shareName.add(hosts.get(i).getShareName());
-                    numberOfShares.add("1");
-                    numberOfConnected.add("0");
-                    isInterrupted.add("No");
-                } else {
-                    auxIndex = shareName.lastIndexOf(hosts.get(i).getShareName());
-                    numberOfShares.set(auxIndex, "" + (Integer.parseInt(numberOfShares.get(auxIndex)) + 1));
-                }
-
-                if (hosts.get(i).isConnected()) {
-                    auxIndex = shareName.lastIndexOf(hosts.get(i).getShareName());
-                    numberOfConnected.set(auxIndex, "" + (Integer.parseInt(numberOfConnected.get(auxIndex)) + 1));
-                }
-
-                if (hosts.get(i).isInterrupted()) {
-                    auxIndex = shareName.lastIndexOf(hosts.get(i).getShareName());
-                    isInterrupted.set(auxIndex, "Yes");
-                }
-            }
-
-
-
+        
+        if (shares.size() > 0) {
             if (allHosts) {
-
-                hostList = new String[shareName.size()];
-                for (int i = 0; i < shareName.size(); i++) {
-                    hostList[i] = " Share Name : " + shareName.get(i);
+                hostList = new String[shares.size()];
+                for (int i = 0; i < shares.size(); i++) {
+                    hostList[i] = " Share Name : " + shares.get(i).getShareName();
                     hostList[i] += " |";
-                    hostList[i] += " Nr. of Shares : " + numberOfShares.get(i);
+                    hostList[i] += " Nr. of Connected : " + shares.get(i).getNumberConnections();
                     hostList[i] += " |";
-                    hostList[i] += " Nr. of Connected : " + numberOfConnected.get(i);
-                    hostList[i] += " |";
-                    hostList[i] += " Interrupted : " + isInterrupted.get(i);
+                    hostList[i] += " Interrupted : " ;
+                    if(shares.get(i).isInterrupted()){
+                        hostList[i] +=" Yes ";
+                    }else{
+                        hostList[i] +=" No ";
+                    }
                 }
                 jList1.setListData(hostList);
             } else {
-                hostList = new String[shareName.size()];
-                for (int i = 0; i < shareName.size(); i++) {
+                hostList = new String[shares.size()];
+                for (int i = 0; i < shares.size(); i++) {
                     hostList[i] = (i + 1) + ".";
-                    hostList[i] += " Share Name : " + shareName.get(i);
+                    hostList[i] += " Share Name : " + shares.get(i).getShareName();
                 }
                 jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(hostList));
                 jComboBox1.setSelectedItem(jComboBox1.getSelectedItem());
             }
 
+        }else{
+            if (allHosts) {
+                jList1.removeAll();
+                jList1.repaint();
+            }else{
+                jComboBox1.removeAllItems();
+                jLabel8.setText("");
+                jLabel9.setText("");
+            }
         }
+    }
+
+    @Override
+    public void connectionsInterrupted(String shareName, boolean interrupted) {
+        //
+    }
+
+    @Override
+    public void serverInstanceOn(boolean state) {
+        //
     }
 }

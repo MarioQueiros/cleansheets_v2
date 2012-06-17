@@ -20,7 +20,7 @@ public class ClientAction extends BaseAction{
     public ClientAction(UIController uiController) {
         cFrame = new ClientFrame(uiController);
         cFrame.setVisible(false);
-        
+        cFrame.setLocationRelativeTo(null);
     }
     
     @Override

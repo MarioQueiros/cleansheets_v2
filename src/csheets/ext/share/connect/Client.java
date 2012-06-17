@@ -24,7 +24,7 @@ import javax.swing.JOptionPane;
 public class Client extends Connection {
 
     /** A socket que o liga ao servidor */
-    private Socket socket;
+    protected Socket socket;
     
     /** A primeira célula da partilha */
     private Cell firstCell;
@@ -45,7 +45,6 @@ public class Client extends Connection {
             connectedSpreadsheet.addCellListener(this);
             this.connectedCells = new ArrayList<Cell>();
             this.connectedFrom = new ArrayList<Address>();
-            start();
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
@@ -176,7 +175,7 @@ public class Client extends Connection {
                 }
             }
 
-            setType("Client");
+            
             if (!PageSharingController.getInstance().isConnectedTo(getType(), getConnectedCells().get(0),
                     getConnectedCells().get(getConnectedCells().size() - 1),
                     getSpreadsheet(), getWorkbook())) {
@@ -186,16 +185,18 @@ public class Client extends Connection {
                 receiver.start();
                 receiver.join();
                 socket.close();
-                PageSharingController.getInstance().connectionRemoved(this);
+                //PageSharingController.getInstance().connectionRemoved(this,false);
 
             } else {
                 JOptionPane.showMessageDialog(null, "Unable to create connection, already connected to that server!");
-                PageSharingController.getInstance().connectionRemoved(this);
+                //PageSharingController.getInstance().connectionRemoved(this,false);
             }
 
         } catch (Exception ex) {
+            //PageSharingController.getInstance().connectionRemoved(this);
         }
-        PageSharingController.getInstance().connectionRemoved(this);
+        JOptionPane.showMessageDialog(null, type +" to "+socket.getInetAddress().getHostAddress()+ " \"" + shareName + "\" connection closed!");
+         PageSharingController.getInstance().connectionRemoved(this,false);
     }
     
  /** GETS E SETS */
@@ -230,24 +231,42 @@ public class Client extends Connection {
                     stream = in.readLine();
 
                     if (stream.contains("closeSocket")) {
+                        closeSockets();
                         break;
                     }
-                    cellInfo = stream.split(",");
+                    
+                    if (stream.contains("interrupted")) {
+                        JOptionPane.showMessageDialog(null,"Connection to "
+                                +(socket.getInetAddress().toString().split("/"))[1] +" of the area from "
+                                +connectedCells.get(0) +" to "
+                                +connectedCells.get(connectedCells.size()-1)+
+                                " interrupted.");
+                    }else if(stream.contains("resumed")){
+                        JOptionPane.showMessageDialog(null,"Connection to "
+                                +(socket.getInetAddress().toString().split("/"))[1]+" of the area from "
+                                +connectedCells.get(0) +" to "
+                                +connectedCells.get(connectedCells.size()-1)+
+                                " resumed.");
+                    }
+                    else{
 
-                    for (int i = 0; i < connectedCells.size(); i++) {
-                        for (int j = 0; j < connectedCells.size(); j++) {
-                            if (connectedFrom.get(i).toString().contains(cellInfo[0])) {
-                                try {
-                                    connectedCells.get(i).setContent(cellInfo[1]);
-                                } catch (FormulaCompilationException ex) {
-                                    JOptionPane.showMessageDialog(null, "Error on receiving connected content!");
+                        cellInfo = stream.split(",");
 
+                        for (int i = 0; i < connectedCells.size(); i++) {
+                            for (int j = 0; j < connectedCells.size(); j++) {
+                                if (connectedFrom.get(i).toString().contains(cellInfo[0])) {
+                                    try {
+                                        connectedCells.get(i).setContent(cellInfo[1]);
+                                    } catch (FormulaCompilationException ex) {
+                                        JOptionPane.showMessageDialog(null, "Error on receiving connected content!");
+
+                                    }
                                 }
                             }
                         }
+
+
                     }
-
-
                 }
             } catch (Exception ex) {
             }
