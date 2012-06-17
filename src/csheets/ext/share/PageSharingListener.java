@@ -14,5 +14,9 @@ import java.util.EventListener;
 public interface PageSharingListener extends EventListener{
     
     public void connectionsChanged(PageSharingEvent event);
+
+    public void connectionsInterrupted(String shareName,boolean interrupted);
+    
+    public void serverInstanceOn(boolean state);
     
 }

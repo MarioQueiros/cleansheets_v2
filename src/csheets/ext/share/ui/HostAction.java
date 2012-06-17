@@ -20,7 +20,7 @@ public class HostAction extends BaseAction{
         
         hFrame = new HostFrame(uiController);
         hFrame.setVisible(false);
-        
+        hFrame.setLocationRelativeTo(null);
     }
     @Override
     protected String getName() {
