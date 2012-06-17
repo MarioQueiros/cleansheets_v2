@@ -36,7 +36,7 @@ public class MacroAction extends BaseAction {
     public void actionPerformed(ActionEvent event) {
         MacrosFrame aux = new MacrosFrame(uiController, listaMacros, nomeMacros);         
         
-        aux.setLocation(500, 250);
+        aux.setLocation(500, 150);
         aux.setVisible(true);
         listaMacros = aux.getArrayMacros();
         nomeMacros = aux.getArrayNomeMacros();
