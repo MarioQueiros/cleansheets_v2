@@ -84,7 +84,7 @@ public class Host extends Connection implements PageSharingListener {
                     synchronized (syncSockets) {
                         try {
                             out = new PrintWriter(clntSocket.getOutputStream(), true);
-                            out.println(cell.getAddress() + "," + cell.getContent() + "\n");
+                            out.write(cell.getAddress() + "," + cell.getContent() + "\n");
                             out.flush();
                         } catch (Exception e) {
                             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -109,7 +109,7 @@ public class Host extends Connection implements PageSharingListener {
                     synchronized (syncSockets) {
                         try {
                             out = new PrintWriter(clntSocket.getOutputStream(), true);
-                            out.println(cell.getAddress() + "," + cell.getContent() + "\n");
+                            out.write(cell.getAddress() + "," + cell.getContent() + "\n");
                             out.flush();
                         } catch (Exception e) {
                             JOptionPane.showMessageDialog(null, e.getMessage());
@@ -123,24 +123,7 @@ public class Host extends Connection implements PageSharingListener {
 
     @Override
     public void cellCopied(Cell cell, Cell source) {
-        PrintWriter out;
-        if (!isInterrupted()) {
-            for (int i = 0; i < connectedCells.size(); i++) {
-                if (cell.equals(connectedCells.get(i))) {
-                    synchronized (syncSockets) {
-                        try {
-                            cell.setContent(source.getContent());
-                            out = new PrintWriter(clntSocket.getOutputStream(), true);
-                            out.println(cell.getAddress() + "," + cell.getContent() + "\n");
-                            out.flush();
-                        } catch (Exception e) {
-                            JOptionPane.showMessageDialog(null, e.getMessage());
-                        }
-                    }
-                }
-            }
-        }
-
+        //
     }
 
     @Override
@@ -336,7 +319,7 @@ public class Host extends Connection implements PageSharingListener {
         } catch (Exception ex) {
             //PageSharingController.getInstance().connectionRemoved(this);
         }
-        JOptionPane.showMessageDialog(null, type +" from "+clntSocket.getInetAddress().getHostAddress()+ " \"" + shareName + "\" connection closed!");
+        JOptionPane.showMessageDialog(null, type +" of "+clntSocket.getInetAddress().getHostAddress()+ " \"" + shareName + "\" connection closed!");
         PageSharingController.getInstance().connectionRemoved(this,false);
     }
 }

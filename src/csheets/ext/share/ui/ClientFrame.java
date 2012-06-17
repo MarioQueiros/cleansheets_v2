@@ -283,7 +283,7 @@ public class ClientFrame extends javax.swing.JFrame {
         String[] split;
         try {
             out.write((jComboBox1.getSelectedIndex() + 1) + "\n");
-            out.write(new String(Encryptor.encrypt(String.valueOf(jPasswordField1.getPassword())))+ "\n");
+            out.write(Encryptor.encrypt(String.valueOf(jPasswordField1.getPassword()))+ "\n");
             out.flush();
             stream = in.readLine();
             if (stream.contains("Connection started!")) {

@@ -4,44 +4,39 @@
  */
 package csheets.ext.share;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author Tiago
  */
 public class Encryptor {
 
-    public static byte[] encrypt(String target) {
-        byte[] result;
-        try {
-            String enc = null;
-            char[] encAux = target.toCharArray();
-            for (int i = 0; i < encAux.length; i++) {
-                encAux[i] = Character.reverseBytes(encAux[i]);
-            }
-            enc = String.valueOf(encAux);
-            result = enc.getBytes("UTF-8");
-            return result;
-        } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace();
+    public static String encrypt(String target) {
+            
+            int key = 2;
+            StringBuilder msgCifrada = new StringBuilder();
 
-        }
-        return target.getBytes();
+            try {
+                for (char character : target.toCharArray()) {
+                    msgCifrada.append(Character.toString((char) (character + key)));
+                }
+            } catch (Exception e) {
+                System.out.println("ERROR: " + e.getMessage());
+            }
+            return msgCifrada.toString();
     }
 
-    public static String dencrypt(byte[] target) {
+    public static String decrypt(String target) {
         
-        String dec = new String(target);
-        char[] encAux = dec.toCharArray();
-        for (int i = 0; i < encAux.length; i++) {
-            encAux[i] = Character.reverseBytes(encAux[i]);
-        }
-        dec = String.valueOf(encAux);
+            int key = 2;
+            StringBuilder msgCifrada = new StringBuilder();
 
-        return dec;
+            try {
+                for (char character : target.toCharArray()) {
+                    msgCifrada.append(Character.toString((char) (character - key)));
+                }
+            } catch (Exception e) {
+                System.out.println("ERROR: " + e.getMessage());
+            }
+            return msgCifrada.toString();
     }
 }
