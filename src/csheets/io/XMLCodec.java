@@ -377,7 +377,7 @@ public class XMLCodec implements Codec {
         for (int row = 0; row < sheet.getRowCount(); row++) {
             int rowcount = sheet.getColumnCount();
 
-            writer.print("\t\t<row idr='" + (row + 1) + "' rowHeight='" + st.getRowHeight(row) + "'>\n");
+            writer.print("\t\t<row idr='" + row + "' rowHeight='" + st.getRowHeight(row) + "'>\n");
 
             for (int column = 0; column <= sheet.getColumnCount(); column++) {
                 String aux = sheet.getCell(column, row).getContent();
