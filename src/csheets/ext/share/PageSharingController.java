@@ -278,7 +278,6 @@ public class PageSharingController implements SpreadsheetAppListener, HostListen
             }
 
         } catch (Exception ex) {
-            ex.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error disconnecting!");
         }
 
@@ -516,5 +515,9 @@ public class PageSharingController implements SpreadsheetAppListener, HostListen
         }
         serverOn = state;
         fireServerInstanceOn(state);
+    }
+
+    public void refresh() {
+        fireConnectionsChanged(connections,connectionDataOfShares);
     }
 }
