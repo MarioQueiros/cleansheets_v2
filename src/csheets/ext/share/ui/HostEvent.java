@@ -19,15 +19,15 @@ public class HostEvent extends EventObject{
     private List<Cell> cellConnected;
     private int rowNumber;
     private int colNumber;
-    private int numberOfShares;
+    private String password;
     private String shareName;
     private Spreadsheet spreadsheet;
     private UIController uiController;
             
-    HostEvent(Object source, List<Cell> cellConnected, int rowNumber, int colNumber, Spreadsheet spreadsheet, UIController uiController,String shareName, int numShares) {
+    HostEvent(Object source, List<Cell> cellConnected, int rowNumber, int colNumber, Spreadsheet spreadsheet, UIController uiController,String shareName, char [] password) {
         super(source);
         this.cellConnected = cellConnected;
-        this.numberOfShares = numShares;
+        this.password = String.valueOf(password);
         this.shareName = shareName;
         this.colNumber = colNumber;
         this.rowNumber = rowNumber;
@@ -73,8 +73,8 @@ public class HostEvent extends EventObject{
     /**
      * @return the numberOfShares
      */
-    public int getNumberOfShares() {
-        return numberOfShares;
+    public String getPassword() {
+        return password;
     }
 
     /**

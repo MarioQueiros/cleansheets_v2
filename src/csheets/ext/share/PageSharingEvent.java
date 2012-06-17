@@ -16,10 +16,13 @@ public class PageSharingEvent extends EventObject {
 
     /** The active connection */
     private List<Connection> connectionList;
+    
+    private List<PageSharingData> shareData;
 
-    public PageSharingEvent(Object source, List<Connection> connectionList) {
+    public PageSharingEvent(Object source, List<Connection> connectionList, List<PageSharingData> shareData) {
         super(source);
         this.connectionList = connectionList;
+        this.shareData = shareData;
     }
 
     /**
@@ -27,5 +30,12 @@ public class PageSharingEvent extends EventObject {
      */
     public List<Connection> getConnectionList() {
         return connectionList;
+    }
+
+    /**
+     * @return the shareData
+     */
+    public List<PageSharingData> getShareData() {
+        return shareData;
     }
 }
