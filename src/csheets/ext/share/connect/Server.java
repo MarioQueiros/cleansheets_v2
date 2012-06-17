@@ -134,9 +134,8 @@ public class Server extends Thread {
         while (true) {
             infoRead = in.readLine();
             password = in.readLine();
-            password = Encryptor.dencrypt(password.getBytes());
+            password = Encryptor.decrypt(password);
             boolean active = false;
-
             try {
 
                 if (!infoRead.equals("-1")) {
@@ -229,7 +228,7 @@ public class Server extends Thread {
 
             shareName = in.readLine();
             password = in.readLine();
-            password = Encryptor.dencrypt(password.getBytes());
+            password = Encryptor.decrypt(password);
 
             for (int i = 0; i < PageSharingController.getInstance().getConnectionDataOfShares().size(); i++) {
                 if (shareName.equals(PageSharingController.getInstance().getConnectionDataOfShares().get(i).getShareName())) {
