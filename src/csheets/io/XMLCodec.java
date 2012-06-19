@@ -167,7 +167,7 @@ public class XMLCodec implements Codec {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(stream);
-            Schema schema = loadSchema("xsd.xsd");
+            Schema schema = loadSchema("../xsd.xsd");
 
             doc.getDocumentElement().normalize();
             content = new String[MATRIX_WIDTH][MATRIX_HEIGHT];
